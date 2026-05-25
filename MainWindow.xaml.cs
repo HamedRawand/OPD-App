@@ -1,3 +1,4 @@
+using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -34,6 +35,9 @@ public partial class MainWindow : Window
         var user = App.Auth.CurrentUser!;
         UserNameText.Text = user.FullName;
         UserRoleText.Text = user.Role.ToString();
+
+        var v = Assembly.GetExecutingAssembly().GetName().Version;
+        AppVersionText.Text = v is null ? "" : $"v{v.Major}.{v.Minor}.{v.Build}";
 
         if (user.Role == UserRole.Admin)
             AdminNav.Visibility = Visibility.Visible;
