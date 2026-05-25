@@ -1,0 +1,256 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:sys="clr-namespace:System;assembly=mscorlib">
+
+    <FlowDirection x:Key="App.FlowDirection">LeftToRight</FlowDirection>
+    <sys:String x:Key="App.Title">OPD Clinic</sys:String>
+    <sys:String x:Key="Lang.Toggle">دری</sys:String>
+
+    <!-- Navigation -->
+    <sys:String x:Key="Nav.Dashboard">Dashboard</sys:String>
+    <sys:String x:Key="Nav.Patients">Patients</sys:String>
+    <sys:String x:Key="Nav.Physicians">Physicians</sys:String>
+    <sys:String x:Key="Nav.Medicines">Medicines</sys:String>
+    <sys:String x:Key="Nav.Users">Users</sys:String>
+    <sys:String x:Key="Nav.Import">Import Data</sys:String>
+    <sys:String x:Key="Nav.Backup">Backup &amp; Restore</sys:String>
+    <sys:String x:Key="Nav.Logout">Logout</sys:String>
+
+    <!-- Login -->
+    <sys:String x:Key="Login.Subtitle">Please sign in to continue</sys:String>
+    <sys:String x:Key="Login.Username">Username</sys:String>
+    <sys:String x:Key="Login.Password">Password</sys:String>
+    <sys:String x:Key="Login.SignIn">Sign In</sys:String>
+
+    <!-- Patient List -->
+    <sys:String x:Key="PatList.Title">Patients</sys:String>
+    <sys:String x:Key="PatList.NewVisit">+ New Visit</sys:String>
+    <sys:String x:Key="PatList.Search">Search by name, diagnosis, number…</sys:String>
+    <sys:String x:Key="PatList.AllPhysicians">All Physicians</sys:String>
+    <sys:String x:Key="PatList.Clear">Clear</sys:String>
+    <sys:String x:Key="PatList.Col.Date">Date</sys:String>
+    <sys:String x:Key="PatList.Col.Shamsi">Shamsi</sys:String>
+    <sys:String x:Key="PatList.Col.Name">Patient Name</sys:String>
+    <sys:String x:Key="PatList.Col.Age">Age</sys:String>
+    <sys:String x:Key="PatList.Col.Sex">Sex</sys:String>
+    <sys:String x:Key="PatList.Col.No">No.</sys:String>
+    <sys:String x:Key="PatList.Col.BP">BP</sys:String>
+    <sys:String x:Key="PatList.Col.Physician">Physician</sys:String>
+    <sys:String x:Key="PatList.Col.Diagnosis">Diagnosis</sys:String>
+
+    <!-- Patient Edit -->
+    <sys:String x:Key="PatEdit.Tab.Visit">Visit Info</sys:String>
+    <sys:String x:Key="PatEdit.Tab.Rx">Prescription</sys:String>
+    <sys:String x:Key="PatEdit.Section.Visit">Visit Information</sys:String>
+    <sys:String x:Key="PatEdit.Section.Patient">Patient Information</sys:String>
+    <sys:String x:Key="PatEdit.Section.Vitals">Vital Signs</sys:String>
+    <sys:String x:Key="PatEdit.Section.Clinical">Clinical Findings</sys:String>
+    <sys:String x:Key="PatEdit.Section.Diagnosis">Diagnosis</sys:String>
+    <sys:String x:Key="PatEdit.Physician">Physician</sys:String>
+    <sys:String x:Key="PatEdit.OpdDate">OPD Date</sys:String>
+    <sys:String x:Key="PatEdit.ShamsiDate">Shamsi Date</sys:String>
+    <sys:String x:Key="PatEdit.ShamsiHint">(auto-syncs with OPD date)</sys:String>
+    <sys:String x:Key="PatEdit.PatientNo">Patient Number</sys:String>
+    <sys:String x:Key="PatEdit.PatientName">Patient Name *</sys:String>
+    <sys:String x:Key="PatEdit.Age">Age</sys:String>
+    <sys:String x:Key="PatEdit.Sex">Sex</sys:String>
+    <sys:String x:Key="PatEdit.Female">Female</sys:String>
+    <sys:String x:Key="PatEdit.Male">Male</sys:String>
+    <sys:String x:Key="PatEdit.Vital.BP">BP</sys:String>
+    <sys:String x:Key="PatEdit.Vital.HR">HR</sys:String>
+    <sys:String x:Key="PatEdit.Vital.PR">PR</sys:String>
+    <sys:String x:Key="PatEdit.Vital.RR">RR</sys:String>
+    <sys:String x:Key="PatEdit.Vital.BT">BT (°C)</sys:String>
+    <sys:String x:Key="PatEdit.Vital.BW">BW (kg)</sys:String>
+    <sys:String x:Key="PatEdit.Btn.Save">💾  Save Visit</sys:String>
+    <sys:String x:Key="PatEdit.Btn.SavePrint">🖨  Save &amp; Print</sys:String>
+    <sys:String x:Key="PatEdit.Btn.Cancel">Cancel</sys:String>
+
+    <!-- Prescription -->
+    <sys:String x:Key="Rx.Section.Add">Add Medicine</sys:String>
+    <sys:String x:Key="Rx.Medicine">Medicine Name</sys:String>
+    <sys:String x:Key="Rx.Form">Form</sys:String>
+    <sys:String x:Key="Rx.Strength">Strength</sys:String>
+    <sys:String x:Key="Rx.Qty">Qty</sys:String>
+    <sys:String x:Key="Rx.Dosage">Dosage</sys:String>
+    <sys:String x:Key="Rx.Route">Route</sys:String>
+    <sys:String x:Key="Rx.Note">Note</sys:String>
+    <sys:String x:Key="Rx.Btn.Add">+ Add to Prescription</sys:String>
+    <sys:String x:Key="Rx.Section.Lines">Prescription Lines</sys:String>
+    <sys:String x:Key="Rx.Col.Medicine">Medicine</sys:String>
+    <sys:String x:Key="Rx.Col.Form">Form</sys:String>
+    <sys:String x:Key="Rx.Col.Strength">Strength</sys:String>
+    <sys:String x:Key="Rx.Col.Qty">Qty</sys:String>
+    <sys:String x:Key="Rx.Col.Dosage">Dosage</sys:String>
+    <sys:String x:Key="Rx.Col.Route">Route</sys:String>
+    <sys:String x:Key="Rx.Col.Note">Note</sys:String>
+    <sys:String x:Key="RxLine.Edit.Title">Edit Prescription Line</sys:String>
+    <sys:String x:Key="RxLine.Edit.Header">Edit Medicine</sys:String>
+    <sys:String x:Key="Options.NoteEdit.Category">Category</sys:String>
+    <sys:String x:Key="Rx.Empty">No medicines added yet. Use the form above to add prescription lines.</sys:String>
+    <sys:String x:Key="Rx.Section.LabTests">Lab Tests</sys:String>
+    <sys:String x:Key="Rx.SelectedTests">Selected Tests</sys:String>
+    <sys:String x:Key="Rx.NoTestsSelected">No tests selected yet.</sys:String>
+    <sys:String x:Key="Rx.Section.FooterNote">Prescription Note</sys:String>
+    <sys:String x:Key="Rx.FooterHint">Footer note printed at the bottom of the prescription:</sys:String>
+
+    <!-- Physicians -->
+    <sys:String x:Key="Physician.Title">Physicians</sys:String>
+    <sys:String x:Key="Physician.Btn.Add">+ Add Physician</sys:String>
+
+    <!-- Catalog -->
+    <sys:String x:Key="Catalog.Title">Medicines</sys:String>
+    <sys:String x:Key="Catalog.Btn.Add">+ Add Medicine</sys:String>
+    <sys:String x:Key="Catalog.Search">Search medicines…</sys:String>
+    <sys:String x:Key="Catalog.AllCategories">All</sys:String>
+    <sys:String x:Key="Catalog.Col.Name">Medicine Name</sys:String>
+    <sys:String x:Key="Catalog.Col.GenericName">Generic Name</sys:String>
+    <sys:String x:Key="Catalog.Col.Category">Category</sys:String>
+    <sys:String x:Key="Catalog.Col.Type">Type</sys:String>
+    <sys:String x:Key="Catalog.Col.Strength">Strength</sys:String>
+    <sys:String x:Key="Catalog.Col.Note">Note</sys:String>
+
+    <!-- Users -->
+    <sys:String x:Key="Users.Title">User Management</sys:String>
+    <sys:String x:Key="Users.Btn.Add">+ Add User</sys:String>
+    <sys:String x:Key="Users.Col.Username">Username</sys:String>
+    <sys:String x:Key="Users.Col.FullName">Full Name</sys:String>
+    <sys:String x:Key="Users.Col.Role">Role</sys:String>
+    <sys:String x:Key="Users.Col.Status">Status</sys:String>
+    <sys:String x:Key="Users.Col.LastLogin">Last Login</sys:String>
+    <sys:String x:Key="Users.Col.Actions">Actions</sys:String>
+
+    <!-- Backup -->
+    <sys:String x:Key="Backup.Title">Backup &amp; Restore</sys:String>
+    <sys:String x:Key="Backup.Create.Title">Create Backup</sys:String>
+    <sys:String x:Key="Backup.Restore.Title">Restore from Backup</sys:String>
+    <sys:String x:Key="Backup.Btn.Create">💾  Create Backup Now</sys:String>
+    <sys:String x:Key="Backup.Btn.Restore">↩  Restore &amp; Restart</sys:String>
+    <sys:String x:Key="Backup.SavedBackups">Saved Backups</sys:String>
+
+    <!-- Import -->
+    <sys:String x:Key="Import.Title">Import from Access</sys:String>
+    <sys:String x:Key="Import.Btn.Browse">Browse…</sys:String>
+    <sys:String x:Key="Import.Btn.Start">Start Import</sys:String>
+
+    <!-- Medicine Edit Dialog -->
+    <sys:String x:Key="MedEdit.Title">Medicine</sys:String>
+    <sys:String x:Key="MedEdit.Header.Add">Add Medicine</sys:String>
+    <sys:String x:Key="MedEdit.Header.Edit">Edit Medicine</sys:String>
+    <sys:String x:Key="MedEdit.MedicineName">Medicine Name *</sys:String>
+    <sys:String x:Key="MedEdit.GenericName">Generic Name</sys:String>
+    <sys:String x:Key="MedEdit.Category">Category</sys:String>
+    <sys:String x:Key="MedEdit.Form">Form / Type</sys:String>
+    <sys:String x:Key="MedEdit.Strength">Strength</sys:String>
+    <sys:String x:Key="MedEdit.Note">Note</sys:String>
+
+    <!-- Physician Edit Dialog -->
+    <sys:String x:Key="PhysEdit.Title">Physician</sys:String>
+    <sys:String x:Key="PhysEdit.Header.Add">Add Physician</sys:String>
+    <sys:String x:Key="PhysEdit.Header.Edit">Edit Physician</sys:String>
+    <sys:String x:Key="PhysEdit.Section.English">English Information</sys:String>
+    <sys:String x:Key="PhysEdit.Section.Dari">Dari Information</sys:String>
+    <sys:String x:Key="PhysEdit.Section.Contact">Contact Information</sys:String>
+    <sys:String x:Key="PhysEdit.NameEng">Name (English) *</sys:String>
+    <sys:String x:Key="PhysEdit.SpecialityEng">Speciality (English)</sys:String>
+    <sys:String x:Key="PhysEdit.OtherSpecialityEng">Other Speciality / Notes (English)</sys:String>
+    <sys:String x:Key="PhysEdit.NameDari">Name (Dari)</sys:String>
+    <sys:String x:Key="PhysEdit.SpecialityDari">Speciality (Dari)</sys:String>
+    <sys:String x:Key="PhysEdit.OtherSpecialityDari">Other Speciality / Notes (Dari)</sys:String>
+    <sys:String x:Key="PhysEdit.Section.Symbol">Physician Symbol / Logo</sys:String>
+    <sys:String x:Key="PhysEdit.Symbol.Hint">Upload an image (logo, stamp, or signature) that will appear on the prescription.</sys:String>
+    <sys:String x:Key="PhysEdit.Symbol.Browse">📂  Browse Image…</sys:String>
+    <sys:String x:Key="PhysEdit.Symbol.Clear">✕  Clear</sys:String>
+    <sys:String x:Key="PhysEdit.Contact">Contact Number</sys:String>
+    <sys:String x:Key="PhysEdit.WhatsApp">WhatsApp Number</sys:String>
+    <sys:String x:Key="PhysEdit.Reception">Reception Number</sys:String>
+    <sys:String x:Key="PhysEdit.Address">Address</sys:String>
+
+    <!-- User Edit Dialog -->
+    <sys:String x:Key="UserEdit.Title">User</sys:String>
+    <sys:String x:Key="UserEdit.Header.Add">Add User</sys:String>
+    <sys:String x:Key="UserEdit.Header.Edit">Edit User</sys:String>
+    <sys:String x:Key="UserEdit.Username">Username *</sys:String>
+    <sys:String x:Key="UserEdit.FullName">Full Name *</sys:String>
+    <sys:String x:Key="UserEdit.Role">Role *</sys:String>
+    <sys:String x:Key="UserEdit.Password">Password *</sys:String>
+    <sys:String x:Key="UserEdit.NewPassword">New Password (optional)</sys:String>
+    <sys:String x:Key="UserEdit.ConfirmPassword">Confirm Password *</sys:String>
+    <sys:String x:Key="UserEdit.ConfirmNewPassword">Confirm New Password</sys:String>
+    <sys:String x:Key="UserEdit.PasswordNote">Leave password fields blank to keep existing password.</sys:String>
+    <sys:String x:Key="UserEdit.IsActive">Account is active</sys:String>
+    <sys:String x:Key="UserEdit.MustChangePwd">User must change password on first login</sys:String>
+
+    <!-- Options -->
+    <sys:String x:Key="Nav.Options">Options</sys:String>
+    <sys:String x:Key="Options.Title">Options</sys:String>
+    <sys:String x:Key="Options.Tab.Routes">Route of Administration</sys:String>
+    <sys:String x:Key="Options.Route.Category">Category</sys:String>
+    <sys:String x:Key="Options.Route.RouteName">Route Name</sys:String>
+    <sys:String x:Key="Options.Route.Abbreviation">Abbreviation</sys:String>
+    <sys:String x:Key="Options.Route.Description">Description</sys:String>
+    <sys:String x:Key="Options.Route.BtnAdd">+ Add Route</sys:String>
+    <sys:String x:Key="Options.RouteEdit.Title">Route of Administration</sys:String>
+    <sys:String x:Key="Options.RouteEdit.Header.Add">Add Route</sys:String>
+    <sys:String x:Key="Options.RouteEdit.Header.Edit">Edit Route</sys:String>
+    <sys:String x:Key="Options.MedCatEdit.Title">Medicine Category</sys:String>
+    <sys:String x:Key="Options.MedCatEdit.Header.Add">Add Medicine Category</sys:String>
+    <sys:String x:Key="Options.MedCatEdit.Header.Edit">Edit Medicine Category</sys:String>
+    <sys:String x:Key="Options.MedCat.BtnAdd">+ Add Category</sys:String>
+    <sys:String x:Key="Options.DosageEdit.Title">Dosage</sys:String>
+    <sys:String x:Key="Options.DosageEdit.Header.Add">Add Dosage</sys:String>
+    <sys:String x:Key="Options.DosageEdit.Header.Edit">Edit Dosage</sys:String>
+    <sys:String x:Key="Options.Dosage.BtnAdd">+ Add Dosage</sys:String>
+    <sys:String x:Key="Options.NoteEdit.Title">Medicine Note</sys:String>
+    <sys:String x:Key="Options.NoteEdit.Header.Add">Add Note</sys:String>
+    <sys:String x:Key="Options.NoteEdit.Header.Edit">Edit Note</sys:String>
+    <sys:String x:Key="Options.Note.BtnAdd">+ Add Note</sys:String>
+    <sys:String x:Key="Options.RxNoteEdit.Title">Prescription Note</sys:String>
+    <sys:String x:Key="Options.RxNoteEdit.Header.Add">Add Prescription Note</sys:String>
+    <sys:String x:Key="Options.RxNoteEdit.Header.Edit">Edit Prescription Note</sys:String>
+    <sys:String x:Key="Options.RxNote.BtnAdd">+ Add Note</sys:String>
+    <sys:String x:Key="Options.Tab.Dosage">Dosage</sys:String>
+    <sys:String x:Key="Options.Tab.Categories">Medicine Categories</sys:String>
+    <sys:String x:Key="Options.Tab.Notes">Medicine Notes</sys:String>
+    <sys:String x:Key="Options.Tab.PrescriptionNotes">Prescription Notes</sys:String>
+    <sys:String x:Key="Options.Dosage.Text">Dosage</sys:String>
+    <sys:String x:Key="Options.Dosage.Type">Type</sys:String>
+    <sys:String x:Key="Options.Dosage.Category">Category</sys:String>
+    <sys:String x:Key="Options.MedCat.Category">Category</sys:String>
+    <sys:String x:Key="Options.MedCat.FormName">Form Name</sys:String>
+    <sys:String x:Key="Options.MedCat.Abbreviation">Abbreviation</sys:String>
+    <sys:String x:Key="Options.MedCat.Note">Note</sys:String>
+    <sys:String x:Key="Options.Note.Value">Note Text</sys:String>
+    <sys:String x:Key="Options.Btn.AddRow">+ Add Row</sys:String>
+    <sys:String x:Key="Options.Btn.SaveAll">Save Changes</sys:String>
+
+    <!-- Dashboard -->
+    <sys:String x:Key="Dashboard.Title">Dashboard</sys:String>
+    <sys:String x:Key="Dashboard.Subtitle">Welcome — here's a quick overview of your clinic today.</sys:String>
+    <sys:String x:Key="Dashboard.TotalPatients">Total Patients</sys:String>
+    <sys:String x:Key="Dashboard.AllTime">all time</sys:String>
+    <sys:String x:Key="Dashboard.TodayPatients">Today's Patients</sys:String>
+    <sys:String x:Key="Dashboard.TodayVisits">visits today</sys:String>
+    <sys:String x:Key="Dashboard.TotalMedicines">Medicines</sys:String>
+    <sys:String x:Key="Dashboard.InCatalog">in catalog</sys:String>
+    <sys:String x:Key="Dashboard.TotalPhysicians">Physicians</sys:String>
+    <sys:String x:Key="Dashboard.Registered">registered</sys:String>
+    <sys:String x:Key="Dashboard.LastBackup">Last Backup</sys:String>
+    <sys:String x:Key="Dashboard.DbSize">Database Size</sys:String>
+    <sys:String x:Key="Dashboard.QuickActions">Quick Actions</sys:String>
+    <sys:String x:Key="Dashboard.Btn.NewVisit">+ New Patient Visit</sys:String>
+    <sys:String x:Key="Dashboard.Btn.Backup">💾 Create Backup</sys:String>
+    <sys:String x:Key="Dashboard.RecentVisits">Recent Visits</sys:String>
+    <sys:String x:Key="Dashboard.NoRecentVisits">No visits recorded yet.</sys:String>
+
+    <!-- Common -->
+    <sys:String x:Key="Common.Edit">✏ Edit</sys:String>
+    <sys:String x:Key="Common.Delete">✕ Delete</sys:String>
+    <sys:String x:Key="Common.Clear">✕ Clear</sys:String>
+    <sys:String x:Key="Common.Print">🖨 Print</sys:String>
+    <sys:String x:Key="Common.Save">Save</sys:String>
+    <sys:String x:Key="Common.Cancel">Cancel</sys:String>
+    <sys:String x:Key="Common.Add">Add</sys:String>
+    <sys:String x:Key="Common.Refresh">↻ Refresh</sys:String>
+
+</ResourceDictionary>

@@ -1,0 +1,24 @@
+# Build output
+bin/
+obj/
+
+# Self-contained publish output (rebuild with: dotnet publish -c Release -r win-x64 --self-contained true)
+publish/
+
+# Installer output (rebuild with: ISCC.exe installer.iss)
+installer_output/
+
+# SQLite database — contains patient data; never commit to source control
+*.db
+*.db-shm
+*.db-wal
+
+# User-specific Visual Studio / Rider files
+*.user
+*.suo
+.vs/
+.idea/
+
+# OS metadata
+Thumbs.db
+.DS_Store

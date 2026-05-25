@@ -1,0 +1,356 @@
+<UserControl x:Class="OPDClinic.Views.OptionsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             FlowDirection="{DynamicResource App.FlowDirection}">
+
+    <Grid Background="{StaticResource ContentBgBrush}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <Border Grid.Row="0" Background="White" Padding="24,16"
+                BorderBrush="{StaticResource BorderBrush}" BorderThickness="0,0,0,1">
+            <TextBlock Text="{DynamicResource Options.Title}"
+                       FontSize="20" FontWeight="Bold"
+                       Foreground="{StaticResource TextPrimaryBrush}"
+                       VerticalAlignment="Center"/>
+        </Border>
+
+        <!-- Tabs -->
+        <TabControl Grid.Row="1" Margin="16" Background="Transparent" BorderThickness="0">
+
+            <!-- ══════════════════════════════════
+                 TAB 1 — ROUTE OF ADMINISTRATION
+                 ══════════════════════════════════ -->
+            <TabItem Header="{DynamicResource Options.Tab.Routes}">
+                <Grid Margin="0,12,0,0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- Toolbar -->
+                    <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,8">
+                        <Button Content="{DynamicResource Options.Route.BtnAdd}"
+                                Style="{StaticResource SecondaryButton}"
+                                Click="AddRoute_Click"
+                                Padding="12,6"/>
+                    </StackPanel>
+
+                    <DataGrid Grid.Row="1"
+                              ItemsSource="{Binding Routes}"
+                              Style="{StaticResource AppDataGrid}"
+                              AutoGenerateColumns="False"
+                              CanUserAddRows="False" CanUserDeleteRows="False">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="{DynamicResource Options.Route.Category}"
+                                               Binding="{Binding Category}" Width="120"/>
+                            <DataGridTextColumn Header="{DynamicResource Options.Route.RouteName}"
+                                               Binding="{Binding RouteName}" Width="160"/>
+                            <DataGridTextColumn Header="{DynamicResource Options.Route.Abbreviation}"
+                                               Binding="{Binding Abbreviation}" Width="100"/>
+                            <DataGridTextColumn Header="{DynamicResource Options.Route.Description}"
+                                               Binding="{Binding Description}" Width="*"/>
+                            <!-- Edit + Delete -->
+                            <DataGridTemplateColumn Width="180" CanUserResize="False" IsReadOnly="True">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <StackPanel Orientation="Horizontal">
+                                            <Button Content="{DynamicResource Common.Edit}"
+                                                    Style="{StaticResource ActionButton}"
+                                                    Tag="{Binding}"
+                                                    Click="EditRoute_Click"
+                                                    Margin="0,0,6,0"/>
+                                            <Button Content="{DynamicResource Common.Delete}"
+                                                    Style="{StaticResource ActionButton}"
+                                                    Foreground="{StaticResource DangerBrush}"
+                                                    Command="{Binding DataContext.DeleteRouteCommand,
+                                                              RelativeSource={RelativeSource AncestorType=DataGrid}}"
+                                                    CommandParameter="{Binding}"/>
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </Grid>
+            </TabItem>
+
+            <!-- ══════════════════════════════════
+                 TAB 2 — MEDICINE CATEGORIES
+                 ══════════════════════════════════ -->
+            <TabItem Header="{DynamicResource Options.Tab.Categories}">
+                <Grid Margin="0,12,0,0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- Toolbar -->
+                    <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,8">
+                        <Button Content="{DynamicResource Options.MedCat.BtnAdd}"
+                                Style="{StaticResource SecondaryButton}"
+                                Click="AddMedicineCategory_Click"
+                                Padding="12,6"/>
+                    </StackPanel>
+
+                    <DataGrid Grid.Row="1"
+                              ItemsSource="{Binding MedicineCategories}"
+                              Style="{StaticResource AppDataGrid}"
+                              AutoGenerateColumns="False"
+                              CanUserAddRows="False" CanUserDeleteRows="False">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="{DynamicResource Options.MedCat.Category}"
+                                               Binding="{Binding Category}" Width="140"/>
+                            <DataGridTextColumn Header="{DynamicResource Options.MedCat.FormName}"
+                                               Binding="{Binding FormName}" Width="160"/>
+                            <DataGridTextColumn Header="{DynamicResource Options.MedCat.Abbreviation}"
+                                               Binding="{Binding Abbreviation}" Width="110"/>
+                            <DataGridTextColumn Header="{DynamicResource Options.MedCat.Note}"
+                                               Binding="{Binding Note}" Width="*"/>
+                            <!-- Edit + Delete -->
+                            <DataGridTemplateColumn Width="180" CanUserResize="False" IsReadOnly="True">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <StackPanel Orientation="Horizontal">
+                                            <Button Content="{DynamicResource Common.Edit}"
+                                                    Style="{StaticResource ActionButton}"
+                                                    Tag="{Binding}"
+                                                    Click="EditMedicineCategory_Click"
+                                                    Margin="0,0,6,0"/>
+                                            <Button Content="{DynamicResource Common.Delete}"
+                                                    Style="{StaticResource ActionButton}"
+                                                    Foreground="{StaticResource DangerBrush}"
+                                                    Command="{Binding DataContext.DeleteMedicineCategoryCommand,
+                                                              RelativeSource={RelativeSource AncestorType=DataGrid}}"
+                                                    CommandParameter="{Binding}"/>
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </Grid>
+            </TabItem>
+
+            <!-- ══════════════════════════════════
+                 TAB 3 — DOSAGE
+                 ══════════════════════════════════ -->
+            <TabItem Header="{DynamicResource Options.Tab.Dosage}">
+                <Grid Margin="0,12,0,0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- Toolbar -->
+                    <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,8">
+                        <Button Content="{DynamicResource Options.Dosage.BtnAdd}"
+                                Style="{StaticResource SecondaryButton}"
+                                Click="AddDosage_Click"
+                                Padding="12,6"/>
+                    </StackPanel>
+
+                    <DataGrid Grid.Row="1"
+                              ItemsSource="{Binding Dosages}"
+                              Style="{StaticResource AppDataGrid}"
+                              AutoGenerateColumns="False"
+                              CanUserAddRows="False" CanUserDeleteRows="False">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="{DynamicResource Options.Dosage.Category}"
+                                               Binding="{Binding Category}" Width="140"/>
+                            <DataGridTextColumn Header="{DynamicResource Options.Dosage.Type}"
+                                               Binding="{Binding Type}" Width="130"/>
+                            <DataGridTextColumn Header="{DynamicResource Options.Dosage.Text}"
+                                               Binding="{Binding DosageText}" Width="*"/>
+                            <!-- Edit + Delete -->
+                            <DataGridTemplateColumn Width="180" CanUserResize="False" IsReadOnly="True">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <StackPanel Orientation="Horizontal">
+                                            <Button Content="{DynamicResource Common.Edit}"
+                                                    Style="{StaticResource ActionButton}"
+                                                    Tag="{Binding}"
+                                                    Click="EditDosage_Click"
+                                                    Margin="0,0,6,0"/>
+                                            <Button Content="{DynamicResource Common.Delete}"
+                                                    Style="{StaticResource ActionButton}"
+                                                    Foreground="{StaticResource DangerBrush}"
+                                                    Command="{Binding DataContext.DeleteDosageCommand,
+                                                              RelativeSource={RelativeSource AncestorType=DataGrid}}"
+                                                    CommandParameter="{Binding}"/>
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </Grid>
+            </TabItem>
+
+            <!-- ══════════════════════════════════
+                 TAB 4 — MEDICINE NOTES
+                 ══════════════════════════════════ -->
+            <TabItem Header="{DynamicResource Options.Tab.Notes}">
+                <Grid Margin="0,12,0,0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- Toolbar -->
+                    <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,8">
+                        <Button Content="{DynamicResource Options.Note.BtnAdd}"
+                                Style="{StaticResource SecondaryButton}"
+                                Click="AddMedicineNote_Click"
+                                Padding="12,6"/>
+                    </StackPanel>
+
+                    <DataGrid Grid.Row="1"
+                              ItemsSource="{Binding MedicineNotes}"
+                              Style="{StaticResource AppDataGrid}"
+                              AutoGenerateColumns="False"
+                              CanUserAddRows="False" CanUserDeleteRows="False">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="{DynamicResource Options.Note.Value}"
+                                               Binding="{Binding Notes}" Width="*"/>
+                            <!-- Edit + Delete -->
+                            <DataGridTemplateColumn Width="180" CanUserResize="False" IsReadOnly="True">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <StackPanel Orientation="Horizontal">
+                                            <Button Content="{DynamicResource Common.Edit}"
+                                                    Style="{StaticResource ActionButton}"
+                                                    Tag="{Binding}"
+                                                    Click="EditMedicineNote_Click"
+                                                    Margin="0,0,6,0"/>
+                                            <Button Content="{DynamicResource Common.Delete}"
+                                                    Style="{StaticResource ActionButton}"
+                                                    Foreground="{StaticResource DangerBrush}"
+                                                    Command="{Binding DataContext.DeleteMedicineNoteCommand,
+                                                              RelativeSource={RelativeSource AncestorType=DataGrid}}"
+                                                    CommandParameter="{Binding}"/>
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </Grid>
+            </TabItem>
+
+            <!-- ══════════════════════════════════
+                 TAB 5 — PRESCRIPTION NOTES
+                 ══════════════════════════════════ -->
+            <TabItem Header="{DynamicResource Options.Tab.PrescriptionNotes}">
+                <Grid Margin="0,12,0,0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- Toolbar -->
+                    <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,8">
+                        <Button Content="{DynamicResource Options.RxNote.BtnAdd}"
+                                Style="{StaticResource SecondaryButton}"
+                                Click="AddPrescriptionNote_Click"
+                                Padding="12,6"/>
+                    </StackPanel>
+
+                    <DataGrid Grid.Row="1"
+                              ItemsSource="{Binding PrescriptionNotes}"
+                              Style="{StaticResource AppDataGrid}"
+                              AutoGenerateColumns="False"
+                              CanUserAddRows="False" CanUserDeleteRows="False">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="{DynamicResource Options.Note.Value}"
+                                               Binding="{Binding Notes}" Width="*"/>
+                            <!-- Edit + Delete -->
+                            <DataGridTemplateColumn Width="180" CanUserResize="False" IsReadOnly="True">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <StackPanel Orientation="Horizontal">
+                                            <Button Content="{DynamicResource Common.Edit}"
+                                                    Style="{StaticResource ActionButton}"
+                                                    Tag="{Binding}"
+                                                    Click="EditPrescriptionNote_Click"
+                                                    Margin="0,0,6,0"/>
+                                            <Button Content="{DynamicResource Common.Delete}"
+                                                    Style="{StaticResource ActionButton}"
+                                                    Foreground="{StaticResource DangerBrush}"
+                                                    Command="{Binding DataContext.DeletePrescriptionNoteCommand,
+                                                              RelativeSource={RelativeSource AncestorType=DataGrid}}"
+                                                    CommandParameter="{Binding}"/>
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </Grid>
+            </TabItem>
+
+            <!-- ══════════════════════════════════
+                 TAB 6 — LAB TESTS
+                 ══════════════════════════════════ -->
+            <TabItem Header="Lab Tests">
+                <Grid Margin="0,12,0,0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- Toolbar -->
+                    <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,8">
+                        <Button Content="+ Add Lab Test"
+                                Style="{StaticResource SecondaryButton}"
+                                Click="AddLabTest_Click"
+                                Padding="12,6"/>
+                    </StackPanel>
+
+                    <DataGrid Grid.Row="1"
+                              ItemsSource="{Binding LabTests}"
+                              Style="{StaticResource AppDataGrid}"
+                              AutoGenerateColumns="False"
+                              CanUserAddRows="False" CanUserDeleteRows="False">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Category"
+                                               Binding="{Binding Category}" Width="110"/>
+                            <DataGridTextColumn Header="Test Name"
+                                               Binding="{Binding TestName}" Width="180"/>
+                            <DataGridTextColumn Header="Abbreviation"
+                                               Binding="{Binding Abbreviation}" Width="100"/>
+                            <DataGridTextColumn Header="Specimen"
+                                               Binding="{Binding Specimen}" Width="120"/>
+                            <DataGridTextColumn Header="Description"
+                                               Binding="{Binding Description}" Width="*"/>
+                            <!-- Edit + Delete -->
+                            <DataGridTemplateColumn Width="180" CanUserResize="False" IsReadOnly="True">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <StackPanel Orientation="Horizontal">
+                                            <Button Content="{DynamicResource Common.Edit}"
+                                                    Style="{StaticResource ActionButton}"
+                                                    Tag="{Binding}"
+                                                    Click="EditLabTest_Click"
+                                                    Margin="0,0,6,0"/>
+                                            <Button Content="{DynamicResource Common.Delete}"
+                                                    Style="{StaticResource ActionButton}"
+                                                    Foreground="{StaticResource DangerBrush}"
+                                                    Command="{Binding DataContext.DeleteLabTestCommand,
+                                                              RelativeSource={RelativeSource AncestorType=DataGrid}}"
+                                                    CommandParameter="{Binding}"/>
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </Grid>
+            </TabItem>
+
+        </TabControl>
+    </Grid>
+</UserControl>

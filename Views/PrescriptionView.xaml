@@ -1,0 +1,318 @@
+<UserControl x:Class="OPDClinic.Views.PrescriptionView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:OPDClinic">
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel Margin="4,8,4,16">
+
+            <!-- ══ Add Medicine ══════════════════════════════════════════════ -->
+            <TextBlock Text="{DynamicResource Rx.Section.Add}"
+                       Style="{StaticResource SectionHeader}" Margin="0,0,0,8"/>
+
+            <Border Style="{StaticResource Card}" Margin="0,0,0,4">
+                <StackPanel>
+
+                    <!-- Row 1: Form (parent selector — full width) -->
+                    <StackPanel Margin="0,0,0,10">
+                        <TextBlock Text="{DynamicResource Rx.Form}" Style="{StaticResource FormLabel}"/>
+                        <ComboBox ItemsSource="{Binding MedicineForms}"
+                                  DisplayMemberPath="FormName"
+                                  SelectedItem="{Binding SelectedMedicineForm}"
+                                  Style="{StaticResource FormComboBox}"/>
+                    </StackPanel>
+
+                    <!-- Row 2: Medicine Name (filtered) + Strength + Qty -->
+                    <Grid Margin="0,0,0,10">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="2*"/>
+                            <ColumnDefinition Width="12"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="12"/>
+                            <ColumnDefinition Width="100"/>
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Grid.Column="0">
+                            <TextBlock Text="{DynamicResource Rx.Medicine}" Style="{StaticResource FormLabel}"/>
+                            <ComboBox IsEditable="True" StaysOpenOnEdit="True"
+                                      IsTextSearchEnabled="False"
+                                      ItemsSource="{Binding FilteredMedicines}"
+                                      SelectedItem="{Binding SelectedMedicine}"
+                                      DisplayMemberPath="MedicineName"
+                                      Text="{Binding CurrentMedicineName, UpdateSourceTrigger=PropertyChanged}"
+                                      Style="{StaticResource FormComboBox}"/>
+                        </StackPanel>
+                        <StackPanel Grid.Column="2">
+                            <TextBlock Text="{DynamicResource Rx.Strength}" Style="{StaticResource FormLabel}"/>
+                            <TextBox Text="{Binding CurrentStrength, UpdateSourceTrigger=PropertyChanged}"
+                                     Style="{StaticResource FormTextBox}" FlowDirection="LeftToRight"/>
+                        </StackPanel>
+                        <StackPanel Grid.Column="4">
+                            <TextBlock Text="{DynamicResource Rx.Qty}" Style="{StaticResource FormLabel}"/>
+                            <TextBox Text="{Binding CurrentQty, UpdateSourceTrigger=PropertyChanged, TargetNullValue=''}"
+                                     Style="{StaticResource FormTextBox}" FlowDirection="LeftToRight"/>
+                        </StackPanel>
+                    </Grid>
+
+                    <!-- Row 3: Dosage (filtered by Form Category — full width) -->
+                    <StackPanel Margin="0,0,0,10">
+                        <TextBlock Text="{DynamicResource Rx.Dosage}" Style="{StaticResource FormLabel}"/>
+                        <ComboBox ItemsSource="{Binding FilteredDosages}"
+                                  SelectedItem="{Binding SelectedDosage}"
+                                  DisplayMemberPath="DosageText"
+                                  Style="{StaticResource FormComboBox}"/>
+                    </StackPanel>
+
+                    <!-- Row 4: Note (filtered by Form Category — full width) -->
+                    <StackPanel Margin="0,0,0,10">
+                        <TextBlock Text="{DynamicResource Rx.Note}" Style="{StaticResource FormLabel}"/>
+                        <ComboBox ItemsSource="{Binding FilteredMedicineNotes}"
+                                  SelectedItem="{Binding SelectedMedicineNote}"
+                                  DisplayMemberPath="Notes"
+                                  Style="{StaticResource FormComboBox}"/>
+                    </StackPanel>
+
+                    <TextBlock Text="{Binding AddError}" Foreground="{StaticResource DangerBrush}"
+                               FontSize="12" Margin="0,0,0,6"
+                               Visibility="{Binding AddError, Converter={x:Static local:Converters.NullToCollapsed}}"/>
+
+                    <Button Content="{DynamicResource Rx.Btn.Add}"
+                            Style="{StaticResource PrimaryButton}"
+                            Command="{Binding AddLineCommand}"
+                            HorizontalAlignment="Right"/>
+                </StackPanel>
+            </Border>
+
+            <!-- ══ Prescription Lines ════════════════════════════════════════ -->
+            <TextBlock Text="{DynamicResource Rx.Section.Lines}"
+                       Style="{StaticResource SectionHeader}" Margin="0,16,0,8"/>
+
+            <Border BorderBrush="{StaticResource BorderBrush}" BorderThickness="1"
+                    CornerRadius="6" Margin="0,0,0,4">
+                <DataGrid ItemsSource="{Binding Lines}"
+                          Style="{StaticResource AppDataGrid}" MinHeight="120">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="#" Width="36"
+                            Binding="{Binding LineNumber}"/>
+                        <DataGridTextColumn Header="{DynamicResource Rx.Col.Medicine}" Width="150"
+                            Binding="{Binding Prescription}"/>
+                        <DataGridTextColumn Header="{DynamicResource Rx.Col.Form}" Width="70"
+                            Binding="{Binding Type}"/>
+                        <DataGridTextColumn Header="{DynamicResource Rx.Col.Strength}" Width="70"
+                            Binding="{Binding Strength}"/>
+                        <DataGridTextColumn Header="{DynamicResource Rx.Col.Qty}" Width="45"
+                            Binding="{Binding Qty}"/>
+                        <!-- Dosage — wider relative column, RTL Dari text -->
+                        <DataGridTextColumn Header="{DynamicResource Rx.Col.Dosage}" Width="2*"
+                            Binding="{Binding Usage}">
+                            <DataGridTextColumn.ElementStyle>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="TextTrimming"  Value="CharacterEllipsis"/>
+                                    <Setter Property="ToolTip"       Value="{Binding Usage}"/>
+                                    <Setter Property="FlowDirection" Value="RightToLeft"/>
+                                </Style>
+                            </DataGridTextColumn.ElementStyle>
+                        </DataGridTextColumn>
+                        <!-- Note — relative column, RTL Dari text -->
+                        <DataGridTextColumn Header="{DynamicResource Rx.Col.Note}" Width="*"
+                            Binding="{Binding Note}">
+                            <DataGridTextColumn.ElementStyle>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="TextTrimming"  Value="CharacterEllipsis"/>
+                                    <Setter Property="ToolTip"       Value="{Binding Note}"/>
+                                    <Setter Property="FlowDirection" Value="RightToLeft"/>
+                                </Style>
+                            </DataGridTextColumn.ElementStyle>
+                        </DataGridTextColumn>
+                        <!-- Edit button -->
+                        <DataGridTemplateColumn Header="" Width="40" CanUserResize="False">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <Button Content="✏"
+                                            Style="{StaticResource ActionButton}"
+                                            Tag="{Binding}" Click="EditLine_Click"/>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                        <!-- Delete button -->
+                        <DataGridTemplateColumn Header="" Width="40" CanUserResize="False">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <Button Content="✕"
+                                            Style="{StaticResource ActionButton}"
+                                            Foreground="{StaticResource DangerBrush}"
+                                            Tag="{Binding}" Click="DeleteLine_Click"/>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </Border>
+
+            <Border Background="#F8FAFF" CornerRadius="6" Padding="16" Margin="0,0,0,4"
+                    Visibility="{Binding Lines.Count, Converter={x:Static local:Converters.ZeroToVisible}}">
+                <TextBlock Text="{DynamicResource Rx.Empty}"
+                           Foreground="{StaticResource TextSecondaryBrush}"
+                           FontSize="12" HorizontalAlignment="Center"/>
+            </Border>
+
+            <!-- ══ Lab Tests ══════════════════════════════════════════════════ -->
+            <TextBlock Text="{DynamicResource Rx.Section.LabTests}"
+                       Style="{StaticResource SectionHeader}" Margin="0,16,0,8"/>
+
+            <Border Style="{StaticResource Card}" Margin="0,0,0,4">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="2*"/>
+                        <ColumnDefinition Width="16"/>
+                        <ColumnDefinition Width="*" MinWidth="180"/>
+                    </Grid.ColumnDefinitions>
+
+                    <!-- Left: expandable test groups with checkboxes -->
+                    <ItemsControl Grid.Column="0" ItemsSource="{Binding LabTestGroups}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Expander Margin="0,0,0,4" IsExpanded="False">
+                                    <Expander.Header>
+                                        <TextBlock Text="{Binding Category}" FontWeight="SemiBold"
+                                                   FontSize="13" Foreground="{StaticResource TextPrimaryBrush}"/>
+                                    </Expander.Header>
+                                    <ItemsControl ItemsSource="{Binding Tests}" Margin="8,6,0,8">
+                                        <ItemsControl.ItemsPanel>
+                                            <ItemsPanelTemplate><WrapPanel/></ItemsPanelTemplate>
+                                        </ItemsControl.ItemsPanel>
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <StackPanel Orientation="Horizontal" Margin="0,0,20,6">
+                                                    <CheckBox IsChecked="{Binding IsSelected}" VerticalAlignment="Center"/>
+                                                    <StackPanel Margin="6,0,0,0">
+                                                        <TextBlock Text="{Binding Test.TestName}"
+                                                                   FontSize="12" FontWeight="SemiBold"/>
+                                                        <TextBlock Text="{Binding Test.Abbreviation}"
+                                                                   FontSize="10"
+                                                                   Foreground="{StaticResource TextSecondaryBrush}"/>
+                                                    </StackPanel>
+                                                </StackPanel>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </Expander>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+
+                    <!-- Separator -->
+                    <Border Grid.Column="1" Width="1"
+                            Background="{StaticResource BorderBrush}"
+                            HorizontalAlignment="Center"/>
+
+                    <!-- Right: selected tests snapshot -->
+                    <StackPanel Grid.Column="2">
+                        <TextBlock Text="{DynamicResource Rx.SelectedTests}"
+                                   FontWeight="SemiBold" FontSize="12"
+                                   Foreground="{StaticResource PrimaryBrush}"
+                                   Margin="0,0,0,10"/>
+
+                        <!-- "No tests selected" hint -->
+                        <TextBlock Text="{DynamicResource Rx.NoTestsSelected}"
+                                   FontSize="11" Foreground="{StaticResource TextSecondaryBrush}"
+                                   Margin="0,0,0,4"
+                                   Visibility="{Binding SelectedLabTestGroups.Count,
+                                                Converter={x:Static local:Converters.ZeroToVisible}}"/>
+
+                        <!-- Selected tests — grouped by category -->
+                        <ItemsControl ItemsSource="{Binding SelectedLabTestGroups}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <StackPanel Margin="0,0,0,8">
+                                        <!-- Category header -->
+                                        <TextBlock Text="{Binding Category}"
+                                                   FontSize="11" FontWeight="Bold"
+                                                   Foreground="{StaticResource PrimaryBrush}"
+                                                   Margin="0,0,0,4"/>
+                                        <!-- Tests in this category -->
+                                        <ItemsControl ItemsSource="{Binding Tests}">
+                                            <ItemsControl.ItemTemplate>
+                                                <DataTemplate>
+                                                    <Border Background="White" CornerRadius="5"
+                                                            BorderBrush="{StaticResource BorderBrush}"
+                                                            BorderThickness="1" Margin="0,0,0,4" Padding="8,5">
+                                                        <Grid>
+                                                            <Grid.ColumnDefinitions>
+                                                                <ColumnDefinition Width="*"/>
+                                                                <ColumnDefinition Width="Auto"/>
+                                                            </Grid.ColumnDefinitions>
+                                                            <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                                                                <TextBlock Text="{Binding Test.TestName}"
+                                                                           FontSize="11" FontWeight="SemiBold"
+                                                                           TextWrapping="Wrap"/>
+                                                                <TextBlock Text="{Binding Test.Abbreviation}"
+                                                                           FontSize="10"
+                                                                           Foreground="{StaticResource TextSecondaryBrush}"
+                                                                           Visibility="{Binding Test.Abbreviation,
+                                                                                        Converter={x:Static local:Converters.NullToCollapsed}}"/>
+                                                            </StackPanel>
+                                                            <Button Grid.Column="1"
+                                                                    Content="✕"
+                                                                    Style="{StaticResource ActionButton}"
+                                                                    Foreground="{StaticResource DangerBrush}"
+                                                                    Padding="4,2" FontSize="10"
+                                                                    VerticalAlignment="Center"
+                                                                    Tag="{Binding}"
+                                                                    Click="DeselectTest_Click"/>
+                                                        </Grid>
+                                                    </Border>
+                                                </DataTemplate>
+                                            </ItemsControl.ItemTemplate>
+                                        </ItemsControl>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </StackPanel>
+
+                </Grid>
+            </Border>
+
+            <!-- ══ Prescription Note ══════════════════════════════════════════ -->
+            <TextBlock Text="{DynamicResource Rx.Section.FooterNote}"
+                       Style="{StaticResource SectionHeader}" Margin="0,16,0,8"/>
+
+            <Border Style="{StaticResource Card}" Margin="0,0,0,4">
+                <StackPanel>
+                    <TextBlock Text="{DynamicResource Rx.FooterHint}"
+                               FontSize="12" Foreground="{StaticResource TextSecondaryBrush}"
+                               Margin="0,0,0,8"/>
+
+                    <!-- ComboBox + Clear button -->
+                    <Grid Margin="0,0,0,8">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <ComboBox Grid.Column="0"
+                                  ItemsSource="{Binding PrescriptionNotes}"
+                                  SelectedItem="{Binding SelectedPrescriptionNote}"
+                                  DisplayMemberPath="Notes"
+                                  Style="{StaticResource FormComboBox}"/>
+                        <Button Grid.Column="1"
+                                Content="{DynamicResource Common.Clear}"
+                                Style="{StaticResource SecondaryButton}"
+                                Command="{Binding ClearPrescriptionNoteCommand}"
+                                Visibility="{Binding SelectedPrescriptionNote,
+                                             Converter={x:Static local:Converters.NullToCollapsed}}"
+                                Padding="14,8" FontSize="12"
+                                Margin="8,0,0,0"/>
+                    </Grid>
+
+                    <!-- Preview of selected note text -->
+                    <TextBlock Text="{Binding SelectedPrescriptionNote.Notes}"
+                               FlowDirection="RightToLeft" FontSize="12" Foreground="#444"
+                               TextWrapping="Wrap"
+                               Visibility="{Binding SelectedPrescriptionNote,
+                                            Converter={x:Static local:Converters.NullToCollapsed}}"/>
+                </StackPanel>
+            </Border>
+
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

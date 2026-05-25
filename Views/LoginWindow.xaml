@@ -1,0 +1,46 @@
+<Window x:Class="OPDClinic.Views.LoginWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="OPD Clinic — Login"
+        Height="380" Width="420"
+        WindowStartupLocation="CenterScreen"
+        ResizeMode="NoResize"
+        Background="{StaticResource ContentBgBrush}"
+        FlowDirection="{DynamicResource App.FlowDirection}">
+
+    <Grid>
+        <StackPanel VerticalAlignment="Center" Margin="44,0">
+
+            <TextBlock Text="{DynamicResource App.Title}"
+                       FontSize="24" FontWeight="Bold"
+                       HorizontalAlignment="Center" Margin="0,0,0,4"
+                       Foreground="{StaticResource TextPrimaryBrush}"/>
+            <TextBlock Text="{DynamicResource Login.Subtitle}"
+                       FontSize="13" Foreground="{StaticResource TextSecondaryBrush}"
+                       HorizontalAlignment="Center" Margin="0,0,0,28"/>
+
+            <TextBlock Text="{DynamicResource Login.Username}"
+                       Style="{StaticResource FormLabel}"/>
+            <TextBox x:Name="UsernameBox" Style="{StaticResource FormTextBox}"
+                     Margin="0,4,0,14" FlowDirection="LeftToRight"/>
+
+            <TextBlock Text="{DynamicResource Login.Password}"
+                       Style="{StaticResource FormLabel}"/>
+            <PasswordBox x:Name="PasswordBox"
+                         Padding="10,8" FontSize="13"
+                         BorderBrush="{StaticResource BorderBrush}" BorderThickness="1"
+                         Margin="0,4,0,0" FlowDirection="LeftToRight"/>
+
+            <TextBlock x:Name="ErrorText" Foreground="{StaticResource DangerBrush}"
+                       FontSize="12" Margin="0,10,0,0"
+                       TextWrapping="Wrap" Visibility="Collapsed"/>
+
+            <Button Content="{DynamicResource Login.SignIn}"
+                    Style="{StaticResource PrimaryButton}"
+                    Height="40" FontSize="14" FontWeight="SemiBold"
+                    Margin="0,20,0,0"
+                    IsDefault="True"
+                    Click="SignIn_Click"/>
+        </StackPanel>
+    </Grid>
+</Window>

@@ -1,0 +1,71 @@
+<Window x:Class="OPDClinic.Views.MedicineNoteEditDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="{DynamicResource Options.NoteEdit.Title}"
+        Height="360" Width="480"
+        WindowStartupLocation="CenterOwner"
+        ResizeMode="CanResizeWithGrip"
+        FlowDirection="{DynamicResource App.FlowDirection}"
+        Background="{StaticResource ContentBgBrush}">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <Border Grid.Row="0" Background="{StaticResource PrimaryBrush}" Padding="24,14">
+            <TextBlock x:Name="HeaderTitle"
+                       Foreground="White" FontSize="16" FontWeight="Bold"/>
+        </Border>
+
+        <!-- Form -->
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Padding="24,16">
+            <StackPanel>
+
+                <!-- Category (optional — links to RouteOfAdministration.Category) -->
+                <StackPanel Margin="0,0,0,14">
+                    <TextBlock Text="{DynamicResource Options.NoteEdit.Category}" Style="{StaticResource FormLabel}"/>
+                    <ComboBox x:Name="CategoryBox"
+                              IsEditable="True"
+                              Style="{StaticResource FormComboBox}"/>
+                </StackPanel>
+
+                <!-- Notes (always Dari / RTL) -->
+                <StackPanel Margin="0,0,0,14">
+                    <TextBlock Text="{DynamicResource Options.Note.Value}" Style="{StaticResource FormLabel}"/>
+                    <TextBox x:Name="NotesBox"
+                             Style="{StaticResource MultiLineTextBox}"
+                             FlowDirection="RightToLeft"
+                             MinHeight="80" AcceptsReturn="True"/>
+                </StackPanel>
+
+                <!-- Error -->
+                <Border x:Name="ErrorBorder" Background="#FEE2E2" CornerRadius="5"
+                        Padding="12,8" Visibility="Collapsed">
+                    <TextBlock x:Name="ErrorText" Foreground="#B91C1C" FontSize="12"/>
+                </Border>
+
+            </StackPanel>
+        </ScrollViewer>
+
+        <!-- Footer -->
+        <Border Grid.Row="2" Background="White" Padding="24,14"
+                BorderBrush="{StaticResource BorderBrush}" BorderThickness="0,1,0,0">
+            <DockPanel>
+                <Button DockPanel.Dock="Right"
+                        Content="{DynamicResource Common.Save}"
+                        Style="{StaticResource PrimaryButton}"
+                        Click="Save_Click" MinWidth="120"/>
+                <Button DockPanel.Dock="Right"
+                        Content="{DynamicResource Common.Cancel}"
+                        Style="{StaticResource SecondaryButton}"
+                        IsCancel="True"
+                        Click="Cancel_Click"
+                        Margin="0,0,10,0" MinWidth="100"/>
+            </DockPanel>
+        </Border>
+    </Grid>
+</Window>

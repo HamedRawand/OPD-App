@@ -1,0 +1,143 @@
+<UserControl x:Class="OPDClinic.Views.CatalogView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:OPDClinic"
+             FlowDirection="{DynamicResource App.FlowDirection}">
+
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVisible"/>
+    </UserControl.Resources>
+
+    <Grid Background="{StaticResource ContentBgBrush}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <Border Grid.Row="0" Background="White" Padding="24,16"
+                BorderBrush="{StaticResource BorderBrush}" BorderThickness="0,0,0,1">
+            <DockPanel>
+                <TextBlock DockPanel.Dock="Left"
+                           Text="{DynamicResource Catalog.Title}"
+                           FontSize="20" FontWeight="Bold"
+                           Foreground="{StaticResource TextPrimaryBrush}"
+                           VerticalAlignment="Center"/>
+                <StackPanel DockPanel.Dock="Right" Orientation="Horizontal"
+                            VerticalAlignment="Center">
+                    <TextBlock VerticalAlignment="Center"
+                               Foreground="{StaticResource TextSecondaryBrush}"
+                               FontSize="12" Margin="0,0,16,0"
+                               Text="{Binding TotalCount, StringFormat='{}{0} medicine(s)'}"/>
+                    <Button Content="{DynamicResource Catalog.Btn.Add}"
+                            Style="{StaticResource PrimaryButton}"
+                            Click="AddMedicine_Click"/>
+                </StackPanel>
+            </DockPanel>
+        </Border>
+
+        <!-- Filter bar -->
+        <Border Grid.Row="1" Background="#EEF2F7" Padding="24,10"
+                BorderBrush="{StaticResource BorderBrush}" BorderThickness="0,0,0,1">
+            <WrapPanel VerticalAlignment="Center">
+
+                <!-- Search -->
+                <Border CornerRadius="5" BorderBrush="{StaticResource BorderBrush}"
+                        BorderThickness="1" Background="White" Margin="0,0,10,0">
+                    <DockPanel Width="220" Height="34">
+                        <TextBlock DockPanel.Dock="Left" Text="🔍" VerticalAlignment="Center"
+                                   Margin="10,0,6,0" Foreground="{StaticResource TextSecondaryBrush}"/>
+                        <TextBox BorderThickness="0" FontSize="13" VerticalContentAlignment="Center"
+                                 Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"
+                                 Background="Transparent"/>
+                    </DockPanel>
+                </Border>
+
+                <!-- Category filter -->
+                <ComboBox ItemsSource="{Binding Categories}"
+                          SelectedItem="{Binding CategoryFilter}"
+                          Style="{StaticResource FormComboBox}"
+                          Width="140" Height="34"/>
+            </WrapPanel>
+        </Border>
+
+        <!-- DataGrid + empty state -->
+        <Grid Grid.Row="2">
+            <DataGrid x:Name="MedicinesGrid"
+                      ItemsSource="{Binding Medicines}"
+                      Style="{StaticResource AppDataGrid}"
+                      Margin="16">
+
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="{DynamicResource Catalog.Col.Name}" Width="180"
+                        Binding="{Binding MedicineName}"/>
+                    <DataGridTextColumn Header="{DynamicResource Catalog.Col.GenericName}" Width="160"
+                        Binding="{Binding GenericName}"/>
+                    <DataGridTextColumn Header="{DynamicResource Catalog.Col.Category}" Width="90"
+                        Binding="{Binding Category}"/>
+                    <DataGridTextColumn Header="{DynamicResource Catalog.Col.Type}" Width="90"
+                        Binding="{Binding Type}"/>
+                    <DataGridTextColumn Header="{DynamicResource Catalog.Col.Strength}" Width="90"
+                        Binding="{Binding Strength}"/>
+                    <DataGridTextColumn Header="{DynamicResource Catalog.Col.Note}" Width="*"
+                        Binding="{Binding Note}">
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
+
+                    <!-- Actions -->
+                    <DataGridTemplateColumn Header="" Width="180" CanUserResize="False">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                    <Button Content="{DynamicResource Common.Edit}"
+                                            Style="{StaticResource ActionButton}"
+                                            Tag="{Binding}"
+                                            Click="EditMedicine_Click"
+                                            Margin="0,0,6,0"/>
+                                    <Button Content="{DynamicResource Common.Delete}"
+                                            Style="{StaticResource ActionButton}"
+                                            Foreground="{StaticResource DangerBrush}"
+                                            Command="{Binding DataContext.DeleteMedicineCommand,
+                                                      RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                            CommandParameter="{Binding}"/>
+                                </StackPanel>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                </DataGrid.Columns>
+            </DataGrid>
+
+            <!-- Loading overlay -->
+            <Border Background="#80FFFFFF" Visibility="{Binding IsLoading, Converter={StaticResource BoolToVisible}}"
+                    Panel.ZIndex="10">
+                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                    <TextBlock Text="Loading…" FontSize="16" FontWeight="SemiBold"
+                               Foreground="{StaticResource TextSecondaryBrush}"
+                               HorizontalAlignment="Center"/>
+                </StackPanel>
+            </Border>
+
+            <!-- Empty state — shown when no medicines match the current filters -->
+            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center"
+                        Visibility="{Binding TotalCount, Converter={x:Static local:Converters.ZeroToVisible}}">
+                <TextBlock Text="&#xE8EC;" FontFamily="Segoe MDL2 Assets" FontSize="52"
+                           HorizontalAlignment="Center"
+                           Foreground="{StaticResource BorderBrush}"/>
+                <TextBlock Text="No medicines found"
+                           FontSize="15" FontWeight="SemiBold"
+                           HorizontalAlignment="Center"
+                           Foreground="{StaticResource TextSecondaryBrush}"
+                           Margin="0,12,0,4"/>
+                <TextBlock Text="Try adjusting the search or click '+ Add Medicine' to add a medicine."
+                           FontSize="12" HorizontalAlignment="Center"
+                           Foreground="{StaticResource TextSecondaryBrush}"/>
+            </StackPanel>
+        </Grid>
+
+    </Grid>
+</UserControl>

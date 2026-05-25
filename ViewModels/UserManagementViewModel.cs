@@ -1,0 +1,176 @@
+using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Windows;
+using System.Windows.Data;
+using System.Windows.Threading;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using OPDClinic.Models;
+using OPDClinic.Services;
+
+namespace OPDClinic.ViewModels;
+
+public partial class UserManagementViewModel : ObservableObject
+{
+    private readonly List<User> _allUsers = [];
+    private ICollectionView? _view;
+
+    // Debounce timer — prevents a collection refresh on every keystroke
+    private readonly DispatcherTimer _searchDebounce = new()
+    {
+        Interval = TimeSpan.FromMilliseconds(300)
+    };
+
+    public ObservableCollection<User> Users { get; } = [];
+
+    [ObservableProperty] private string _searchText = "";
+    [ObservableProperty] private string _statusText = "";
+    [ObservableProperty] private int    _userCount;
+
+    public UserManagementViewModel()
+    {
+        _searchDebounce.Tick += (_, _) =>
+        {
+            _searchDebounce.Stop();
+            _view?.Refresh();
+        };
+    }
+
+    // Debounced — waits 300 ms after the last keystroke before refreshing
+    partial void OnSearchTextChanged(string value)
+    {
+        _searchDebounce.Stop();
+        _searchDebounce.Start();
+    }
+
+    [RelayCommand]
+    public void LoadUsers()
+    {
+        _allUsers.Clear();
+        _allUsers.AddRange(App.Db.Users.OrderBy(u => u.Username).ToList());
+
+        Users.Clear();
+        foreach (var u in _allUsers) Users.Add(u);
+
+        _view = CollectionViewSource.GetDefaultView(Users);
+        _view.Filter = FilterUser;
+
+        UserCount  = _allUsers.Count;
+        StatusText = $"{_allUsers.Count} users";
+    }
+
+    private bool FilterUser(object obj)
+    {
+        if (obj is not User u) return false;
+        if (string.IsNullOrWhiteSpace(SearchText)) return true;
+        var q = SearchText.Trim().ToLower();
+        return u.Username.ToLower().Contains(q) ||
+               u.FullName.ToLower().Contains(q) ||
+               u.Role.ToString().ToLower().Contains(q);
+    }
+
+    [RelayCommand]
+    public void ToggleActive(User user)
+    {
+        if (user.Id == App.Auth.CurrentUser!.Id)
+        {
+            MessageBox.Show("You cannot deactivate your own account.",
+                "Not Allowed", MessageBoxButton.OK, MessageBoxImage.Warning);
+            return;
+        }
+
+        var action = user.IsActive ? "deactivate" : "activate";
+        var result = MessageBox.Show(
+            $"Are you sure you want to {action} user '{user.Username}'?",
+            "Confirm", MessageBoxButton.YesNo, MessageBoxImage.Question);
+
+        if (result != MessageBoxResult.Yes) return;
+
+        user.IsActive = !user.IsActive;
+        try { App.Db.SaveChanges(); }
+        catch (Exception ex)
+        {
+            user.IsActive = !user.IsActive; // revert optimistic change
+            MessageBox.Show($"Could not update user:\n{ex.Message}",
+                "Update Failed", MessageBoxButton.OK, MessageBoxImage.Error);
+            return;
+        }
+        AuditService.Log(user.IsActive ? "UserActivated" : "UserDeactivated", "User", user.Id, user.Username);
+        _view?.Refresh();
+    }
+
+    [RelayCommand]
+    public void UnlockUser(User user)
+    {
+        user.IsLocked = false;
+        user.FailedLoginAttempts = 0;
+        try { App.Db.SaveChanges(); }
+        catch (Exception ex)
+        {
+            MessageBox.Show($"Could not unlock account:\n{ex.Message}",
+                "Update Failed", MessageBoxButton.OK, MessageBoxImage.Error);
+            return;
+        }
+        AuditService.Log("UserUnlocked", "User", user.Id, user.Username);
+        _view?.Refresh();
+        MessageBox.Show($"Account '{user.Username}' has been unlocked.",
+            "Unlocked", MessageBoxButton.OK, MessageBoxImage.Information);
+    }
+
+    [RelayCommand]
+    public void ResetPassword(User user)
+    {
+        var dlg = new Views.ResetPasswordDialog(user.Username);
+        if (dlg.ShowDialog() != true) return;
+
+        user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(dlg.NewPassword);
+        user.MustChangePassword = true;
+        user.IsLocked = false;
+        user.FailedLoginAttempts = 0;
+        try { App.Db.SaveChanges(); }
+        catch (Exception ex)
+        {
+            MessageBox.Show($"Could not reset password:\n{ex.Message}",
+                "Reset Failed", MessageBoxButton.OK, MessageBoxImage.Error);
+            return;
+        }
+        AuditService.Log("PasswordReset", "User", user.Id, user.Username);
+
+        MessageBox.Show(
+            $"Password reset for '{user.Username}'. They must change it on next login.",
+            "Password Reset", MessageBoxButton.OK, MessageBoxImage.Information);
+    }
+
+    [RelayCommand]
+    public void DeleteUser(User user)
+    {
+        if (user.Id == App.Auth.CurrentUser!.Id)
+        {
+            MessageBox.Show("You cannot delete your own account.",
+                "Not Allowed", MessageBoxButton.OK, MessageBoxImage.Warning);
+            return;
+        }
+
+        var result = MessageBox.Show(
+            $"Permanently delete user '{user.Username}'? This cannot be undone.",
+            "Delete User", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+
+        if (result != MessageBoxResult.Yes) return;
+
+        var username = user.Username;
+        var userId   = user.Id;
+        App.Db.Users.Remove(user);
+        try { App.Db.SaveChanges(); }
+        catch (Exception ex)
+        {
+            MessageBox.Show($"Could not delete user:\n{ex.Message}",
+                "Delete Failed", MessageBoxButton.OK, MessageBoxImage.Error);
+            return;
+        }
+        AuditService.Log("UserDeleted", "User", userId, username);
+        Users.Remove(user);
+        _allUsers.Remove(user);
+        UserCount  = _allUsers.Count;
+        StatusText = $"{_allUsers.Count} users";
+    }
+}
