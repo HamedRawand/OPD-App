@@ -5,7 +5,7 @@
 ; ============================================================
 
 #define AppName        "OPD Clinic"
-#define AppVersion     "1.0.0"
+#define AppVersion     "1.0.1"
 #define AppPublisher   "OPD Clinic"
 #define AppExeName     "OPDClinic.exe"
 #define SourceDir      "publish\OPDClinic"
