@@ -14,7 +14,21 @@
     <sys:String x:Key="Nav.Users">کاربران</sys:String>
     <sys:String x:Key="Nav.Import">وارد کردن</sys:String>
     <sys:String x:Key="Nav.Backup">پشتیبان‌گیری</sys:String>
+    <sys:String x:Key="Nav.Updates">بررسی به‌روزرسانی</sys:String>
     <sys:String x:Key="Nav.Logout">خروج</sys:String>
+
+    <!-- Auto-Update dialog -->
+    <sys:String x:Key="Update.Title">به‌روزرسانی نرم‌افزار</sys:String>
+    <sys:String x:Key="Update.Available">نسخه جدید در دسترس است!</sys:String>
+    <sys:String x:Key="Update.CurrentVersion">نسخه فعلی</sys:String>
+    <sys:String x:Key="Update.NewVersion">نسخه جدید</sys:String>
+    <sys:String x:Key="Update.ReleaseNotes">تغییرات جدید</sys:String>
+    <sys:String x:Key="Update.BtnInstall">به‌روزرسانی</sys:String>
+    <sys:String x:Key="Update.BtnLater">بعداً</sys:String>
+    <sys:String x:Key="Update.Downloading">در حال دانلود به‌روزرسانی…</sys:String>
+    <sys:String x:Key="Update.Installing">دانلود کامل شد. در حال نصب…</sys:String>
+    <sys:String x:Key="Update.UpToDate">شما از آخرین نسخه استفاده می‌کنید.</sys:String>
+    <sys:String x:Key="Update.CheckFailed">بررسی به‌روزرسانی ناموفق بود. اتصال اینترنت خود را بررسی کنید.</sys:String>
 
     <!-- Login -->
     <sys:String x:Key="Login.Subtitle">لطفاً وارد شوید</sys:String>

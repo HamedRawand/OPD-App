@@ -38,6 +38,22 @@
                         <TextBlock x:Name="UserRoleText" Foreground="#7EB3E8"
                                    FontSize="11" Margin="0,2,0,10"/>
 
+                        <!-- Check for Updates -->
+                        <Button x:Name="NavUpdatesBtn"
+                                Style="{StaticResource NavButton}"
+                                Foreground="#7EB3E8"
+                                Click="NavUpdates_Click"
+                                ToolTip="Check for software updates"
+                                Margin="0,0,0,4">
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                <TextBlock Text="&#xE895;" FontFamily="Segoe MDL2 Assets"
+                                           FontSize="14" Width="22" Margin="0,0,10,0"
+                                           VerticalAlignment="Center"/>
+                                <TextBlock Text="{DynamicResource Nav.Updates}"
+                                           VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Button>
+
                         <!-- Language toggle -->
                         <Button x:Name="LangToggleBtn"
                                 Style="{StaticResource NavButton}"

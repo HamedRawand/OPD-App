@@ -14,7 +14,21 @@
     <sys:String x:Key="Nav.Users">Users</sys:String>
     <sys:String x:Key="Nav.Import">Import Data</sys:String>
     <sys:String x:Key="Nav.Backup">Backup &amp; Restore</sys:String>
+    <sys:String x:Key="Nav.Updates">Check for Updates</sys:String>
     <sys:String x:Key="Nav.Logout">Logout</sys:String>
+
+    <!-- Auto-Update dialog -->
+    <sys:String x:Key="Update.Title">Software Update</sys:String>
+    <sys:String x:Key="Update.Available">A new version is available!</sys:String>
+    <sys:String x:Key="Update.CurrentVersion">Current Version</sys:String>
+    <sys:String x:Key="Update.NewVersion">New Version</sys:String>
+    <sys:String x:Key="Update.ReleaseNotes">What's New</sys:String>
+    <sys:String x:Key="Update.BtnInstall">Update Now</sys:String>
+    <sys:String x:Key="Update.BtnLater">Later</sys:String>
+    <sys:String x:Key="Update.Downloading">Downloading update…</sys:String>
+    <sys:String x:Key="Update.Installing">Download complete. Installing…</sys:String>
+    <sys:String x:Key="Update.UpToDate">You are using the latest version.</sys:String>
+    <sys:String x:Key="Update.CheckFailed">Update check failed. Please check your internet connection.</sys:String>
 
     <!-- Login -->
     <sys:String x:Key="Login.Subtitle">Please sign in to continue</sys:String>

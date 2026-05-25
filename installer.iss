@@ -40,6 +40,9 @@ LicenseFile              =
 ShowLanguageDialog       =no
 ; Require Windows 10 or later
 MinVersion               =10.0
+; Auto-update support: close running instances before install, restart after
+CloseApplications        =yes
+RestartApplications      =yes
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"

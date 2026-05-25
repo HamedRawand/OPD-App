@@ -5,6 +5,7 @@ using System.Windows.Threading;
 using OPDClinic.Models;
 using OPDClinic.Services;
 using OPDClinic.Views;
+using Serilog;
 
 namespace OPDClinic;
 
@@ -55,6 +56,9 @@ public partial class MainWindow : Window
         InputManager.Current.PreProcessInput += OnUserActivity;
 
         Closing += OnWindowClosing;
+
+        // Fire background update check (non-blocking, 24h cooldown)
+        _ = CheckForUpdatesInBackground();
     }
 
     private void OnWindowClosing(object? sender, System.ComponentModel.CancelEventArgs e)
@@ -212,5 +216,63 @@ public partial class MainWindow : Window
         App.Auth.Logout();
         new LoginWindow().Show();
         Close();
+    }
+
+    // ── Auto-update ───────────────────────────────────────────────────────────
+
+    /// <summary>
+    /// Startup background check. Respects the 24-hour cooldown so the API is not
+    /// hit on every launch. Shows the update dialog on the UI thread if a newer
+    /// version is available.
+    /// </summary>
+    private async Task CheckForUpdatesInBackground()
+    {
+        if (UpdateService.IsWithinCooldown()) return;
+
+        var info = await UpdateService.CheckForUpdateAsync();
+        if (info is null) return;
+
+        ShowUpdateDialog(info);
+    }
+
+    /// <summary>Manual check — always runs, ignores cooldown.</summary>
+    private async void NavUpdates_Click(object sender, RoutedEventArgs e)
+    {
+        NavUpdatesBtn.IsEnabled = false;
+        try
+        {
+            var info = await UpdateService.CheckForUpdateAsync();
+            if (info is not null)
+            {
+                ShowUpdateDialog(info);
+            }
+            else
+            {
+                MessageBox.Show(
+                    (string)FindResource("Update.UpToDate"),
+                    (string)FindResource("Update.Title"),
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Information);
+            }
+        }
+        catch (Exception ex)
+        {
+            Log.Warning(ex, "Manual update check failed");
+            MessageBox.Show(
+                (string)FindResource("Update.CheckFailed"),
+                (string)FindResource("Update.Title"),
+                MessageBoxButton.OK,
+                MessageBoxImage.Warning);
+        }
+        finally
+        {
+            NavUpdatesBtn.IsEnabled = true;
+        }
+    }
+
+    private void ShowUpdateDialog(UpdateInfo info)
+    {
+        var dlg = new UpdateAvailableDialog(info) { Owner = this };
+        dlg.ShowDialog();
     }
 }
