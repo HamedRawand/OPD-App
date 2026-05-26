@@ -3,7 +3,7 @@
                     xmlns:sys="clr-namespace:System;assembly=mscorlib">
 
     <FlowDirection x:Key="App.FlowDirection">LeftToRight</FlowDirection>
-    <sys:String x:Key="App.Title">OPD Clinic</sys:String>
+    <sys:String x:Key="App.Title">Rx Writer</sys:String>
     <sys:String x:Key="Lang.Toggle">دری</sys:String>
 
     <!-- Navigation -->

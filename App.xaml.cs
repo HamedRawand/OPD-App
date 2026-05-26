@@ -41,7 +41,7 @@ public partial class App : Application
             Log.CloseAndFlush();
         };
 
-        Log.Information("OPD Clinic starting up");
+        Log.Information("Rx Writer starting up");
 
         // ── PDF licence ────────────────────────────────────────────────────────
         QuestPDF.Settings.License = LicenseType.Community;
@@ -89,7 +89,7 @@ public partial class App : Application
 
     protected override void OnExit(ExitEventArgs e)
     {
-        Log.Information("OPD Clinic shutting down");
+        Log.Information("Rx Writer shutting down");
         Log.CloseAndFlush();
         base.OnExit(e);
     }

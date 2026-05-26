@@ -3,7 +3,7 @@
                     xmlns:sys="clr-namespace:System;assembly=mscorlib">
 
     <FlowDirection x:Key="App.FlowDirection">RightToLeft</FlowDirection>
-    <sys:String x:Key="App.Title">کلینیک سرپایی</sys:String>
+    <sys:String x:Key="App.Title">نسخه‌نویس</sys:String>
     <sys:String x:Key="Lang.Toggle">English</sys:String>
 
     <!-- Navigation -->

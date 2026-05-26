@@ -1,7 +1,7 @@
 <Window x:Class="OPDClinic.Views.LoginWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="OPD Clinic — Login"
+        Title="Rx Writer — Login"
         Height="380" Width="420"
         WindowStartupLocation="CenterScreen"
         ResizeMode="NoResize"

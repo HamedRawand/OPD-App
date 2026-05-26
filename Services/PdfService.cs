@@ -132,7 +132,7 @@ public class PrescriptionDocument(PrescriptionData data) : IDocument
                 row.RelativeItem().Column(info =>
                 {
                     info.Item()
-                        .Text(ph?.NameEng ?? "OPD Clinic")
+                        .Text(ph?.NameEng ?? "Rx Writer")
                         .FontFamily(hdr.FontFamily)
                         .FontSize(fs).Bold().FontColor(Accent);
 

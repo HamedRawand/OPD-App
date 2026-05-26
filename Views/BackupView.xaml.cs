@@ -73,7 +73,7 @@ public partial class BackupView : UserControl
         var dlg = new OpenFileDialog
         {
             Title = "Select backup file",
-            Filter = "OPD Clinic Backup (*.zip)|*.zip",
+            Filter = "Rx Writer Backup (*.zip)|*.zip",
             CheckFileExists = true
         };
         if (dlg.ShowDialog() != true) return;
