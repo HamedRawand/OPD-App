@@ -85,7 +85,7 @@
 
                         <!-- App version -->
                         <TextBlock x:Name="AppVersionText"
-                                   Foreground="#4A6FA5" FontSize="10"
+                                   Foreground="#4A6FA5" FontSize="11"
                                    Margin="4,8,0,0" FontStyle="Italic"/>
                     </StackPanel>
                 </Border>

@@ -5,7 +5,7 @@
 ; ============================================================
 
 #define AppName        "Rx Writer"
-#define AppVersion     "1.0.5"
+#define AppVersion     "1.0.6"
 #define AppPublisher   "Rx Writer"
 #define AppExeName     "OPDClinic.exe"
 #define SourceDir      "publish\OPDClinic"
