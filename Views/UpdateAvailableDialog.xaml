@@ -25,7 +25,7 @@
                 <TextBlock Text="{DynamicResource Update.Available}"
                            Foreground="White" FontSize="17" FontWeight="Bold"/>
                 <TextBlock x:Name="SubtitleText"
-                           Foreground="#BBDefFB" FontSize="12" Margin="0,4,0,0"/>
+                           Foreground="#BBDEFB" FontSize="12" Margin="0,4,0,0"/>
             </StackPanel>
         </Border>
 
@@ -69,11 +69,11 @@
             <Border Style="{StaticResource Card}" Padding="0">
                 <DockPanel>
                     <Border DockPanel.Dock="Top"
-                            Background="{StaticResource SectionHeaderBg}"
+                            Background="#F1F5F9"
                             Padding="12,8" CornerRadius="5,5,0,0">
                         <TextBlock Text="{DynamicResource Update.ReleaseNotes}"
                                    FontWeight="SemiBold" FontSize="12"
-                                   Foreground="{StaticResource DimTextBrush}"/>
+                                   Foreground="#6B7280"/>
                     </Border>
                     <ScrollViewer Padding="12,10" VerticalScrollBarVisibility="Auto">
                         <TextBlock x:Name="ReleaseNotesText"
