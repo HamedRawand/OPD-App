@@ -82,18 +82,21 @@ public static class UpdateService
 
         var total = response.Content.Headers.ContentLength ?? -1L;
         await using var stream = await response.Content.ReadAsStreamAsync();
-        await using var file   = File.Create(tempPath);
 
-        var buffer     = new byte[81_920];
-        long downloaded = 0;
-        int  read;
-        while ((read = await stream.ReadAsync(buffer)) > 0)
+        // Use a block scope so the file is fully closed before Process.Start tries to run it.
+        await using (var file = File.Create(tempPath))
         {
-            await file.WriteAsync(buffer.AsMemory(0, read));
-            downloaded += read;
-            if (total > 0)
-                progress?.Report((int)(downloaded * 100L / total));
-        }
+            var buffer     = new byte[81_920];
+            long downloaded = 0;
+            int  read;
+            while ((read = await stream.ReadAsync(buffer)) > 0)
+            {
+                await file.WriteAsync(buffer.AsMemory(0, read));
+                downloaded += read;
+                if (total > 0)
+                    progress?.Report((int)(downloaded * 100L / total));
+            }
+        } // file stream closed & flushed here
 
         progress?.Report(100);
         Log.Information("Update downloaded to {Path}", tempPath);
