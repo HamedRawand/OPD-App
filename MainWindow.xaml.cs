@@ -279,4 +279,19 @@ public partial class MainWindow : Window
         var dlg = new UpdateAvailableDialog(info) { Owner = this };
         dlg.ShowDialog();
     }
+
+    private void NavAbout_Click(object sender, RoutedEventArgs e)
+    {
+        var dlg = new AboutDialog { Owner = this };
+        dlg.ShowDialog();
+    }
+
+    private void ContactEmail_Click(object sender, RoutedEventArgs e)
+    {
+        System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
+        {
+            FileName        = "mailto:info.rxwriter@gmail.com",
+            UseShellExecute = true
+        });
+    }
 }

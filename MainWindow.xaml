@@ -38,6 +38,21 @@
                         <TextBlock x:Name="UserRoleText" Foreground="#7EB3E8"
                                    FontSize="11" Margin="0,2,0,10"/>
 
+                        <!-- About -->
+                        <Button x:Name="NavAboutBtn"
+                                Style="{StaticResource NavButton}"
+                                Foreground="#7EB3E8"
+                                Click="NavAbout_Click"
+                                ToolTip="About Rx Writer"
+                                Margin="0,0,0,4">
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                <TextBlock Text="&#xE946;" FontFamily="Segoe MDL2 Assets"
+                                           FontSize="14" Width="22" Margin="0,0,10,0"
+                                           VerticalAlignment="Center"/>
+                                <TextBlock Text="About" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Button>
+
                         <!-- Check for Updates -->
                         <Button x:Name="NavUpdatesBtn"
                                 Style="{StaticResource NavButton}"
@@ -87,6 +102,16 @@
                         <TextBlock x:Name="AppVersionText"
                                    Foreground="#4A6FA5" FontSize="11"
                                    Margin="4,8,0,0" FontStyle="Italic"/>
+
+                        <!-- Contact email -->
+                        <Button x:Name="ContactEmailBtn"
+                                Content="info.rxwriter@gmail.com"
+                                Foreground="#4A6FA5" FontSize="10"
+                                FontStyle="Italic"
+                                Background="Transparent" BorderThickness="0"
+                                Padding="4,2,0,2" HorizontalAlignment="Left"
+                                Cursor="Hand" Click="ContactEmail_Click"
+                                ToolTip="Send feedback or suggestions"/>
                     </StackPanel>
                 </Border>
 
