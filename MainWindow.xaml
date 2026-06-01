@@ -227,7 +227,8 @@
                             </StackPanel>
                         </Button>
 
-                        <Button Style="{StaticResource NavButton}"
+                        <Button x:Name="NavBackupBtn"
+                                Style="{StaticResource NavButton}"
                                 Click="NavBackup_Click"
                                 ToolTip="Backup and restore the clinic database">
                             <StackPanel Orientation="Horizontal" VerticalAlignment="Center">

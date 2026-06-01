@@ -266,6 +266,17 @@ public partial class MainWindow : Window
         ContentArea.Content = _backupView;
     }
 
+    /// <summary>
+    /// Called by <see cref="DashboardView"/> "Create Backup" so the user lands on the
+    /// full Backup &amp; Restore page where they can set an encryption password.
+    /// </summary>
+    public void NavigateToBackup()
+    {
+        SetActiveNav(NavBackupBtn);
+        _backupView ??= new BackupView();
+        ContentArea.Content = _backupView;
+    }
+
     private void NavOptions_Click(object sender, RoutedEventArgs e)
     {
         SetActiveNav((Button)sender);

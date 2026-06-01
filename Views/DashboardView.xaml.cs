@@ -88,8 +88,12 @@ public partial class DashboardView : UserControl
 
     private void CreateBackup_Click(object sender, RoutedEventArgs e)
     {
-        ViewModel.CreateBackup();
-        BindStats();
+        // Navigate to the full Backup & Restore page so the user can set an
+        // encryption password.  The old path (DashboardViewModel.CreateBackup)
+        // called BackupService.CreateBackup with no password, always producing
+        // an unencrypted .zip — so encrypted backups were never being created
+        // from the Dashboard quick-action button.
+        (Window.GetWindow(this) as MainWindow)?.NavigateToBackup();
     }
 
     private void OpenPatient_Click(object sender, RoutedEventArgs e)
