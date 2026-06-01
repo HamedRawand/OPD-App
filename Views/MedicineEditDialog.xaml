@@ -2,7 +2,7 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="{DynamicResource MedEdit.Title}"
-        Height="450" Width="560"
+        Height="520" Width="560"
         WindowStartupLocation="CenterOwner"
         ResizeMode="CanResizeWithGrip"
         FlowDirection="{DynamicResource App.FlowDirection}"
@@ -63,10 +63,46 @@
                     </StackPanel>
                 </Grid>
 
-                <!-- Row 3: Strength -->
+                <!-- Row 3: Strengths (inline list with add/remove) -->
                 <StackPanel Margin="0,0,0,14">
                     <TextBlock Text="{DynamicResource MedEdit.Strength}" Style="{StaticResource FormLabel}"/>
-                    <TextBox x:Name="StrengthBox" Style="{StaticResource FormTextBox}"/>
+                    <!-- Current strengths chips -->
+                    <ItemsControl x:Name="StrengthsList" Margin="0,4,0,6">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Border Background="#F1F5F9" CornerRadius="4" Padding="8,4" Margin="0,0,0,4">
+                                    <DockPanel>
+                                        <Button DockPanel.Dock="Right"
+                                                Content="✕"
+                                                Style="{StaticResource ActionButton}"
+                                                Foreground="{StaticResource DangerBrush}"
+                                                Tag="{Binding}"
+                                                Click="RemoveStrength_Click"
+                                                Width="26" Height="26" Padding="0"/>
+                                        <TextBlock Text="{Binding}" VerticalAlignment="Center"
+                                                   FontSize="13" FlowDirection="LeftToRight"/>
+                                    </DockPanel>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                    <!-- Add new strength -->
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="8"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBox x:Name="NewStrengthBox" Grid.Column="0"
+                                 Style="{StaticResource FormTextBox}"
+                                 FlowDirection="LeftToRight"
+                                 KeyDown="NewStrengthBox_KeyDown"/>
+                        <Button Grid.Column="2"
+                                Content="{DynamicResource Common.Add}"
+                                Style="{StaticResource SecondaryButton}"
+                                Click="AddStrength_Click"
+                                MinWidth="70"/>
+                    </Grid>
                 </StackPanel>
 
                 <!-- Row 4: Note -->

@@ -39,7 +39,7 @@ public partial class CatalogViewModel : ObservableObject
             await Task.Yield();
             using var db = _factory.CreateDbContext();
             _allMedicines = new ObservableCollection<MedicineList>(
-                db.MedicineLists.OrderBy(m => m.MedicineName).ToList());
+                db.MedicineLists.Include(m => m.Strengths).OrderBy(m => m.MedicineName).ToList());
 
             _view = CollectionViewSource.GetDefaultView(_allMedicines);
             _view.Filter = ApplyFilter;
@@ -65,7 +65,7 @@ public partial class CatalogViewModel : ObservableObject
             return m.MedicineName?.ToLower().Contains(s) == true
                 || m.GenericName?.ToLower().Contains(s) == true
                 || m.Type?.ToLower().Contains(s) == true
-                || m.Strength?.ToLower().Contains(s) == true;
+                || m.StrengthsDisplay.ToLower().Contains(s);
         }
 
         return true;

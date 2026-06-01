@@ -52,6 +52,7 @@ public partial class PrescriptionViewModel : ObservableObject
     // ── Filtered dependent dropdowns ──
     [ObservableProperty] private ObservableCollection<Dosage>       _filteredDosages       = [];
     [ObservableProperty] private ObservableCollection<MedicineNote> _filteredMedicineNotes = [];
+    [ObservableProperty] private ObservableCollection<string>       _filteredStrengths     = [];
 
     // ── Other prescription fields ──
     [ObservableProperty] private string  _currentStrength = "";
@@ -68,7 +69,7 @@ public partial class PrescriptionViewModel : ObservableObject
         // Load catalog data using a short-lived context
         using var db = factory.CreateDbContext();
 
-        AllMedicines      = db.MedicineLists.OrderBy(m => m.MedicineName).ToList();
+        AllMedicines      = db.MedicineLists.Include(m => m.Strengths).OrderBy(m => m.MedicineName).ToList();
         AllDosages        = db.Dosages.ToList();
         MedicineForms     = db.MedicineForms.OrderBy(f => f.FormName).ToList();
         AllMedicineNotes  = db.MedicineNotes.ToList();
@@ -147,9 +148,19 @@ public partial class PrescriptionViewModel : ObservableObject
         _suppressFormFilter     = true;
         try
         {
-            CurrentMedicineName  = value.MedicineName ?? "";
-            CurrentStrength      = value.Strength     ?? "";
+            CurrentMedicineName = value.MedicineName ?? "";
             SelectedMedicineForm = MedicineForms.FirstOrDefault(f => f.FormName == value.Type);
+
+            // Populate strength dropdown from the new Strengths collection;
+            // fall back to the legacy Strength field if no rows exist yet.
+            var strengthValues = value.Strengths.Count > 0
+                ? value.Strengths.OrderBy(s => s.Value).Select(s => s.Value ?? "").ToList()
+                : (string.IsNullOrEmpty(value.Strength) ? [] : [value.Strength]);
+
+            FilteredStrengths = new ObservableCollection<string>(strengthValues);
+
+            // Auto-fill when there is exactly one option; otherwise clear so user chooses.
+            CurrentStrength = strengthValues.Count == 1 ? strengthValues[0] : "";
         }
         finally
         {

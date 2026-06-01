@@ -78,8 +78,8 @@
                         Binding="{Binding Category}"/>
                     <DataGridTextColumn Header="{DynamicResource Catalog.Col.Type}" Width="90"
                         Binding="{Binding Type}"/>
-                    <DataGridTextColumn Header="{DynamicResource Catalog.Col.Strength}" Width="90"
-                        Binding="{Binding Strength}"/>
+                    <DataGridTextColumn Header="{DynamicResource Catalog.Col.Strength}" Width="110"
+                        Binding="{Binding StrengthsDisplay}"/>
                     <DataGridTextColumn Header="{DynamicResource Catalog.Col.Note}" Width="*"
                         Binding="{Binding Note}">
                         <DataGridTextColumn.ElementStyle>

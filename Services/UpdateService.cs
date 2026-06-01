@@ -154,13 +154,19 @@ public static class UpdateService
         using var doc  = JsonDocument.Parse(json);
         var root       = doc.RootElement;
 
-        // Tag: "v1.0.1" → Version(1, 0, 1)
+        // Tag: "v2.0.6" → Version(2, 0, 6)
         var tag        = root.GetProperty("tag_name").GetString() ?? "";
         var versionStr = tag.TrimStart('v');
         if (!Version.TryParse(versionStr, out var latest)) return null;
 
+        // Normalise both to 3-part (Major.Minor.Build) so that tag "2.0.6" and
+        // AssemblyVersion "2.0.6.0" compare as equal rather than 2.0.6 < 2.0.6.0
+        // (Version with 3 parts has Revision=-1 which is less than Revision=0).
+        var latestN  = new Version(latest.Major,  latest.Minor,  Math.Max(latest.Build, 0));
+        var currentN = new Version(current.Major, current.Minor, Math.Max(current.Build, 0));
+
         // Already up to date?
-        if (latest <= current) return null;
+        if (latestN <= currentN) return null;
 
         // Find first .exe asset
         string? downloadUrl = null;

@@ -48,8 +48,11 @@
                             </StackPanel>
                             <StackPanel Grid.Column="2">
                                 <TextBlock Text="{DynamicResource Rx.Strength}" Style="{StaticResource FormLabel}"/>
-                                <TextBox Text="{Binding CurrentStrength, UpdateSourceTrigger=PropertyChanged}"
-                                         Style="{StaticResource FormTextBox}" FlowDirection="LeftToRight"/>
+                                <ComboBox IsEditable="True"
+                                          ItemsSource="{Binding FilteredStrengths}"
+                                          Text="{Binding CurrentStrength, UpdateSourceTrigger=PropertyChanged}"
+                                          Style="{StaticResource FormComboBox}"
+                                          FlowDirection="LeftToRight"/>
                             </StackPanel>
                             <StackPanel Grid.Column="4">
                                 <TextBlock Text="{DynamicResource Rx.Qty}" Style="{StaticResource FormLabel}"/>

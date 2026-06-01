@@ -1,5 +1,7 @@
+using System.Collections.ObjectModel;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using Microsoft.EntityFrameworkCore;
 using OPDClinic.Data;
 using OPDClinic.Models;
@@ -13,11 +15,16 @@ public partial class MedicineEditDialog : Window
     private readonly MedicineList? _existing;
     private List<MedicineForm> _allForms = [];
 
+    /// <summary>In-memory working list of strength values for this medicine.</summary>
+    private readonly ObservableCollection<string> _strengths = [];
+
     public MedicineEditDialog(IDbContextFactory<AppDbContext> factory, MedicineList? medicine = null)
     {
         InitializeComponent();
         _factory  = factory;
         _existing = medicine;
+
+        StrengthsList.ItemsSource = _strengths;
 
         using var db = factory.CreateDbContext();
 
@@ -37,11 +44,20 @@ public partial class MedicineEditDialog : Window
             HeaderTitle.SetResourceReference(TextBlock.TextProperty, "MedEdit.Header.Edit");
             MedicineNameBox.Text = medicine.MedicineName ?? "";
             GenericNameBox.Text  = medicine.GenericName  ?? "";
-            StrengthBox.Text     = medicine.Strength     ?? "";
             NoteBox.Text         = medicine.Note         ?? "";
 
             CategoryBox.SelectedItem = categories.FirstOrDefault(c => c == medicine.Category);
             TypeBox.SelectedItem     = _allForms.FirstOrDefault(f => f.FormName == medicine.Type);
+
+            // Load existing strengths from DB
+            var existingStrengths = db.MedicineStrengths
+                .Where(s => s.MedicineListId == medicine.Id)
+                .OrderBy(s => s.Value)
+                .Select(s => s.Value ?? "")
+                .ToList();
+
+            foreach (var s in existingStrengths)
+                _strengths.Add(s);
         }
         else
         {
@@ -69,6 +85,37 @@ public partial class MedicineEditDialog : Window
         TypeBox.SelectedIndex = filtered.Count > 0 ? 0 : -1;
     }
 
+    private void AddStrength_Click(object sender, RoutedEventArgs e) => TryAddStrength();
+
+    private void NewStrengthBox_KeyDown(object sender, KeyEventArgs e)
+    {
+        if (e.Key == Key.Enter)
+        {
+            TryAddStrength();
+            e.Handled = true;
+        }
+    }
+
+    private void TryAddStrength()
+    {
+        var val = NewStrengthBox.Text.Trim();
+        if (string.IsNullOrEmpty(val)) return;
+        if (_strengths.Contains(val, StringComparer.OrdinalIgnoreCase))
+        {
+            NewStrengthBox.Clear();
+            return;
+        }
+        _strengths.Add(val);
+        NewStrengthBox.Clear();
+        NewStrengthBox.Focus();
+    }
+
+    private void RemoveStrength_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is Button btn && btn.Tag is string val)
+            _strengths.Remove(val);
+    }
+
     private void Save_Click(object sender, RoutedEventArgs e)
     {
         var name = MedicineNameBox.Text.Trim();
@@ -83,17 +130,39 @@ public partial class MedicineEditDialog : Window
         medicine.GenericName  = GenericNameBox.Text.Trim();
         medicine.Category     = CategoryBox.SelectedItem as string;
         medicine.Type         = (TypeBox.SelectedItem as MedicineForm)?.FormName;
-        medicine.Strength     = StrengthBox.Text.Trim();
         medicine.Note         = NoteBox.Text.Trim();
+        // Keep legacy Strength in sync with the first entry (for backward compat with old reports/exports)
+        medicine.Strength     = _strengths.Count > 0 ? _strengths[0] : null;
 
         bool isNew = _existing is null;
         try
         {
             using var db = _factory.CreateDbContext();
+
             if (isNew)
+            {
                 db.MedicineLists.Add(medicine);
+                db.SaveChanges(); // get generated Id
+            }
             else
+            {
                 db.Update(medicine);
+                // Replace all strength rows for this medicine
+                var existing = db.MedicineStrengths
+                    .Where(s => s.MedicineListId == medicine.Id)
+                    .ToList();
+                db.MedicineStrengths.RemoveRange(existing);
+                db.SaveChanges();
+            }
+
+            // Insert new strength rows
+            foreach (var val in _strengths)
+                db.MedicineStrengths.Add(new MedicineStrength
+                {
+                    MedicineListId = medicine.Id,
+                    Value = val
+                });
+
             db.SaveChanges();
             AuditService.Log(
                 isNew ? "MedicineCreated" : "MedicineUpdated",

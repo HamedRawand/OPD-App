@@ -16,6 +16,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     public DbSet<Dosage>                 Dosages           => Set<Dosage>();
     public DbSet<MedicineForm>           MedicineForms     => Set<MedicineForm>();
     public DbSet<RouteOfAdministration>  Routes            => Set<RouteOfAdministration>();
+    public DbSet<MedicineStrength>        MedicineStrengths => Set<MedicineStrength>();
     public DbSet<MedicineNote>           MedicineNotes     => Set<MedicineNote>();
     public DbSet<PrescriptionNote>       PrescriptionNotes => Set<PrescriptionNote>();
     public DbSet<PatientLabTest>         PatientLabTests   => Set<PatientLabTest>();
@@ -63,6 +64,13 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             .HasOne(m => m.Visit)
             .WithMany(v => v.Medicines)
             .HasForeignKey(m => m.VisitId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        // ── MedicineStrength ──────────────────────────────────────────────────
+        modelBuilder.Entity<MedicineStrength>()
+            .HasOne(s => s.Medicine)
+            .WithMany(m => m.Strengths)
+            .HasForeignKey(s => s.MedicineListId)
             .OnDelete(DeleteBehavior.Cascade);
 
         // ── PatientLabTest ────────────────────────────────────────────────────
