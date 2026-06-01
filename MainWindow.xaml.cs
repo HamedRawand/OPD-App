@@ -1,3 +1,4 @@
+using System.IO;
 using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
@@ -289,6 +290,29 @@ public partial class MainWindow : Window
         SetActiveNav((Button)sender);
         _settingsView ??= new ReportDesignView();
         ContentArea.Content = _settingsView;
+    }
+
+    private void NavHelp_Click(object sender, RoutedEventArgs e)
+    {
+        var manualPath = Path.Combine(
+            AppDomain.CurrentDomain.BaseDirectory, "Help", "RxWriter_UserManual.html");
+
+        if (!File.Exists(manualPath))
+        {
+            MessageBox.Show(
+                "The user manual could not be found.\n\n" +
+                "Please contact support at info.rxwriter@gmail.com",
+                "Manual Not Found",
+                MessageBoxButton.OK,
+                MessageBoxImage.Warning);
+            return;
+        }
+
+        System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
+        {
+            FileName        = manualPath,
+            UseShellExecute = true
+        });
     }
 
     private void Logout_Click(object sender, RoutedEventArgs e)

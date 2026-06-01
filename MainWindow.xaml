@@ -39,6 +39,21 @@
                         <TextBlock x:Name="UserRoleText" Foreground="#7EB3E8"
                                    FontSize="11" Margin="0,2,0,10"/>
 
+                        <!-- Help / User Manual -->
+                        <Button x:Name="NavHelpBtn"
+                                Style="{StaticResource NavButton}"
+                                Foreground="#7EB3E8"
+                                Click="NavHelp_Click"
+                                ToolTip="Open the Rx Writer user manual"
+                                Margin="0,0,0,4">
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                <TextBlock Text="&#xE897;" FontFamily="Segoe MDL2 Assets"
+                                           FontSize="14" Width="22" Margin="0,0,10,0"
+                                           VerticalAlignment="Center"/>
+                                <TextBlock Text="Help / Manual" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Button>
+
                         <!-- About -->
                         <Button x:Name="NavAboutBtn"
                                 Style="{StaticResource NavButton}"
