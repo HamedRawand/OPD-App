@@ -20,6 +20,10 @@ public partial class PatientEditViewModel : ObservableObject
     [ObservableProperty] private bool   _isSaved;
     [ObservableProperty] private string? _errorMessage;
 
+    // ── Permission gates (evaluated once at construction time) ────────────────
+    public bool CanEnterClinicalData => App.Auth.Can(Permission.EnterClinicalData);
+    public bool CanWritePrescription  => App.Auth.Can(Permission.WritePrescription);
+
     /// <summary>Set after a successful save — used by callers to open the detail view.</summary>
     public int SavedPatientId { get; private set; }
     public int SavedVisitId   { get; private set; }
@@ -259,18 +263,23 @@ public partial class PatientEditViewModel : ObservableObject
                                $"Visit record (Id={_existingVisit.Id}) was not found.");
             }
 
-            visit.PhysicianId      = SelectedPhysician?.Id;
-            visit.OpdDate          = OpdDate;
-            visit.HijriDate        = ShamsiDate;
-            visit.Age              = Age;
-            visit.BP               = BP.Trim();
-            visit.HR               = HR.Trim();
-            visit.PR               = PR.Trim();
-            visit.RR               = RR.Trim();
-            visit.BT               = BT.Trim();
-            visit.BW               = BW.Trim();
-            visit.ClinicalFindings = ClinicalFindings.Trim();
-            visit.Diagnosis        = Diagnosis.Trim();
+            visit.PhysicianId = SelectedPhysician?.Id;
+            visit.OpdDate     = OpdDate;
+            visit.HijriDate   = ShamsiDate;
+
+            // Clinical fields — only written by roles that hold EnterClinicalData
+            if (CanEnterClinicalData)
+            {
+                visit.Age              = Age;
+                visit.BP               = BP.Trim();
+                visit.HR               = HR.Trim();
+                visit.PR               = PR.Trim();
+                visit.RR               = RR.Trim();
+                visit.BT               = BT.Trim();
+                visit.BW               = BW.Trim();
+                visit.ClinicalFindings = ClinicalFindings.Trim();
+                visit.Diagnosis        = Diagnosis.Trim();
+            }
             if (App.Auth.Can(Permission.WritePrescription))
                 visit.FooterNote = Prescription.SelectedPrescriptionNote?.Notes;
             visit.LastUpdated = DateTime.UtcNow;

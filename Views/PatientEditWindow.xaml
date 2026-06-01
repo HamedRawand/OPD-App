@@ -11,6 +11,10 @@
         Background="{StaticResource ContentBgBrush}"
         FlowDirection="{DynamicResource App.FlowDirection}">
 
+    <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVisible"/>
+    </Window.Resources>
+
     <!-- Ctrl+S = Save,  Ctrl+P = Save & Print -->
     <Window.CommandBindings>
         <CommandBinding Command="ApplicationCommands.Save"  Executed="SaveCommand_Executed"/>
@@ -127,7 +131,9 @@
                                              Style="{StaticResource FormTextBox}"/>
                                 </StackPanel>
 
-                                <StackPanel Grid.Column="2">
+                                <StackPanel Grid.Column="2"
+                                            Visibility="{Binding CanEnterClinicalData,
+                                                         Converter={StaticResource BoolToVisible}}">
                                     <TextBlock Text="{DynamicResource PatEdit.Age}"
                                                Style="{StaticResource FormLabel}"/>
                                     <TextBox Text="{Binding Age, UpdateSourceTrigger=PropertyChanged, TargetNullValue=''}"
@@ -144,77 +150,90 @@
                             </Grid>
                         </Border>
 
-                        <TextBlock Text="{DynamicResource PatEdit.Section.Vitals}"
-                                   Style="{StaticResource SectionHeader}"/>
+                        <!-- ── Vitals — hidden for roles without EnterClinicalData ── -->
+                        <StackPanel Visibility="{Binding CanEnterClinicalData,
+                                                 Converter={StaticResource BoolToVisible}}">
+                            <TextBlock Text="{DynamicResource PatEdit.Section.Vitals}"
+                                       Style="{StaticResource SectionHeader}"/>
+                            <Border Style="{StaticResource Card}" Margin="0,0,0,12">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="10"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="10"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="10"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="10"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="10"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
 
-                        <Border Style="{StaticResource Card}" Margin="0,0,0,12">
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="10"/>
-                                    <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="10"/>
-                                    <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="10"/>
-                                    <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="10"/>
-                                    <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="10"/>
-                                    <ColumnDefinition Width="*"/>
-                                </Grid.ColumnDefinitions>
+                                    <StackPanel Grid.Column="0">
+                                        <TextBlock Text="{DynamicResource PatEdit.Vital.BP}" Style="{StaticResource FormLabel}"/>
+                                        <TextBox Text="{Binding BP, UpdateSourceTrigger=PropertyChanged}"
+                                                 Style="{StaticResource FormTextBox}" FlowDirection="LeftToRight"/>
+                                    </StackPanel>
+                                    <StackPanel Grid.Column="2">
+                                        <TextBlock Text="{DynamicResource PatEdit.Vital.HR}" Style="{StaticResource FormLabel}"/>
+                                        <TextBox Text="{Binding HR, UpdateSourceTrigger=PropertyChanged}"
+                                                 Style="{StaticResource FormTextBox}" FlowDirection="LeftToRight"/>
+                                    </StackPanel>
+                                    <StackPanel Grid.Column="4">
+                                        <TextBlock Text="{DynamicResource PatEdit.Vital.PR}" Style="{StaticResource FormLabel}"/>
+                                        <TextBox Text="{Binding PR, UpdateSourceTrigger=PropertyChanged}"
+                                                 Style="{StaticResource FormTextBox}" FlowDirection="LeftToRight"/>
+                                    </StackPanel>
+                                    <StackPanel Grid.Column="6">
+                                        <TextBlock Text="{DynamicResource PatEdit.Vital.RR}" Style="{StaticResource FormLabel}"/>
+                                        <TextBox Text="{Binding RR, UpdateSourceTrigger=PropertyChanged}"
+                                                 Style="{StaticResource FormTextBox}" FlowDirection="LeftToRight"/>
+                                    </StackPanel>
+                                    <StackPanel Grid.Column="8">
+                                        <TextBlock Text="{DynamicResource PatEdit.Vital.BT}" Style="{StaticResource FormLabel}"/>
+                                        <TextBox Text="{Binding BT, UpdateSourceTrigger=PropertyChanged}"
+                                                 Style="{StaticResource FormTextBox}" FlowDirection="LeftToRight"/>
+                                    </StackPanel>
+                                    <StackPanel Grid.Column="10">
+                                        <TextBlock Text="{DynamicResource PatEdit.Vital.BW}" Style="{StaticResource FormLabel}"/>
+                                        <TextBox Text="{Binding BW, UpdateSourceTrigger=PropertyChanged}"
+                                                 Style="{StaticResource FormTextBox}" FlowDirection="LeftToRight"/>
+                                    </StackPanel>
+                                </Grid>
+                            </Border>
+                        </StackPanel>
 
-                                <StackPanel Grid.Column="0">
-                                    <TextBlock Text="{DynamicResource PatEdit.Vital.BP}" Style="{StaticResource FormLabel}"/>
-                                    <TextBox Text="{Binding BP, UpdateSourceTrigger=PropertyChanged}"
-                                             Style="{StaticResource FormTextBox}" FlowDirection="LeftToRight"/>
-                                </StackPanel>
-                                <StackPanel Grid.Column="2">
-                                    <TextBlock Text="{DynamicResource PatEdit.Vital.HR}" Style="{StaticResource FormLabel}"/>
-                                    <TextBox Text="{Binding HR, UpdateSourceTrigger=PropertyChanged}"
-                                             Style="{StaticResource FormTextBox}" FlowDirection="LeftToRight"/>
-                                </StackPanel>
-                                <StackPanel Grid.Column="4">
-                                    <TextBlock Text="{DynamicResource PatEdit.Vital.PR}" Style="{StaticResource FormLabel}"/>
-                                    <TextBox Text="{Binding PR, UpdateSourceTrigger=PropertyChanged}"
-                                             Style="{StaticResource FormTextBox}" FlowDirection="LeftToRight"/>
-                                </StackPanel>
-                                <StackPanel Grid.Column="6">
-                                    <TextBlock Text="{DynamicResource PatEdit.Vital.RR}" Style="{StaticResource FormLabel}"/>
-                                    <TextBox Text="{Binding RR, UpdateSourceTrigger=PropertyChanged}"
-                                             Style="{StaticResource FormTextBox}" FlowDirection="LeftToRight"/>
-                                </StackPanel>
-                                <StackPanel Grid.Column="8">
-                                    <TextBlock Text="{DynamicResource PatEdit.Vital.BT}" Style="{StaticResource FormLabel}"/>
-                                    <TextBox Text="{Binding BT, UpdateSourceTrigger=PropertyChanged}"
-                                             Style="{StaticResource FormTextBox}" FlowDirection="LeftToRight"/>
-                                </StackPanel>
-                                <StackPanel Grid.Column="10">
-                                    <TextBlock Text="{DynamicResource PatEdit.Vital.BW}" Style="{StaticResource FormLabel}"/>
-                                    <TextBox Text="{Binding BW, UpdateSourceTrigger=PropertyChanged}"
-                                             Style="{StaticResource FormTextBox}" FlowDirection="LeftToRight"/>
-                                </StackPanel>
-                            </Grid>
-                        </Border>
+                        <!-- ── Clinical Findings — hidden for roles without EnterClinicalData ── -->
+                        <StackPanel Visibility="{Binding CanEnterClinicalData,
+                                                 Converter={StaticResource BoolToVisible}}">
+                            <TextBlock Text="{DynamicResource PatEdit.Section.Clinical}"
+                                       Style="{StaticResource SectionHeader}"/>
+                            <Border Style="{StaticResource Card}" Margin="0,0,0,12">
+                                <TextBox Text="{Binding ClinicalFindings, UpdateSourceTrigger=PropertyChanged}"
+                                         Style="{StaticResource MultiLineTextBox}" MinHeight="90"/>
+                            </Border>
+                        </StackPanel>
 
-                        <TextBlock Text="{DynamicResource PatEdit.Section.Clinical}"
-                                   Style="{StaticResource SectionHeader}"/>
-                        <Border Style="{StaticResource Card}" Margin="0,0,0,12">
-                            <TextBox Text="{Binding ClinicalFindings, UpdateSourceTrigger=PropertyChanged}"
-                                     Style="{StaticResource MultiLineTextBox}" MinHeight="90"/>
-                        </Border>
-
-                        <TextBlock Text="{DynamicResource PatEdit.Section.Diagnosis}"
-                                   Style="{StaticResource SectionHeader}"/>
-                        <Border Style="{StaticResource Card}" Margin="0,0,0,12">
-                            <TextBox Text="{Binding Diagnosis, UpdateSourceTrigger=PropertyChanged}"
-                                     Style="{StaticResource MultiLineTextBox}" MinHeight="80"/>
-                        </Border>
+                        <!-- ── Diagnosis — hidden for roles without EnterClinicalData ── -->
+                        <StackPanel Visibility="{Binding CanEnterClinicalData,
+                                                 Converter={StaticResource BoolToVisible}}">
+                            <TextBlock Text="{DynamicResource PatEdit.Section.Diagnosis}"
+                                       Style="{StaticResource SectionHeader}"/>
+                            <Border Style="{StaticResource Card}" Margin="0,0,0,12">
+                                <TextBox Text="{Binding Diagnosis, UpdateSourceTrigger=PropertyChanged}"
+                                         Style="{StaticResource MultiLineTextBox}" MinHeight="80"/>
+                            </Border>
+                        </StackPanel>
 
                     </StackPanel>
                 </ScrollViewer>
             </TabItem>
 
-            <TabItem Header="{DynamicResource PatEdit.Tab.Rx}" FontSize="13">
+            <TabItem Header="{DynamicResource PatEdit.Tab.Rx}" FontSize="13"
+                     Visibility="{Binding CanWritePrescription,
+                                  Converter={StaticResource BoolToVisible}}">
                 <views:PrescriptionView DataContext="{Binding Prescription}" Margin="16,8"/>
             </TabItem>
 
