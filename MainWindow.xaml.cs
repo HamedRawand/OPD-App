@@ -100,7 +100,26 @@ public partial class MainWindow : Window
 
         // Fire background update check (non-blocking, 24h cooldown)
         _ = CheckForUpdatesInBackground();
+
+        // Set initial sidebar width proportional to window width
+        UpdateSidebarWidth(Width);
     }
+
+    // ── Responsive sidebar ────────────────────────────────────────────────────
+
+    /// <summary>
+    /// Sidebar takes ~19 % of the window width, clamped between 175 px (min)
+    /// and 240 px (max) so it never looks too narrow on 800 px windows or too
+    /// wide on large monitors / low-DPI screens.
+    /// </summary>
+    private void UpdateSidebarWidth(double windowWidth)
+    {
+        var w = Math.Clamp(windowWidth * 0.19, 175, 240);
+        SidebarColumn.Width = new GridLength(w);
+    }
+
+    private void Window_SizeChanged(object sender, SizeChangedEventArgs e)
+        => UpdateSidebarWidth(e.NewSize.Width);
 
     private void OnWindowClosing(object? sender, System.ComponentModel.CancelEventArgs e)
     {

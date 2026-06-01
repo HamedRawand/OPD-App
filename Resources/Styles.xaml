@@ -34,6 +34,66 @@
     <SolidColorBrush x:Key="TextSecondaryBrush"  Color="{StaticResource TextSecondaryColor}"/>
     <SolidColorBrush x:Key="DangerBrush"         Color="{StaticResource DangerColor}"/>
 
+    <!-- ── Sidebar ScrollViewer — thin dark thumb ─────────────────────────── -->
+    <Style x:Key="SidebarScrollBar" TargetType="ScrollBar">
+        <Setter Property="Width"       Value="4"/>
+        <Setter Property="MinWidth"    Value="4"/>
+        <Setter Property="Background"  Value="Transparent"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ScrollBar">
+                    <Grid x:Name="Bg" Background="Transparent" SnapsToDevicePixels="True">
+                        <Track x:Name="PART_Track" IsDirectionReversed="True">
+                            <Track.DecreaseRepeatButton>
+                                <RepeatButton Command="ScrollBar.PageUpCommand"
+                                              Opacity="0" Focusable="False"/>
+                            </Track.DecreaseRepeatButton>
+                            <Track.Thumb>
+                                <Thumb>
+                                    <Thumb.Template>
+                                        <ControlTemplate TargetType="Thumb">
+                                            <Border CornerRadius="2"
+                                                    Background="#3A5070"
+                                                    Margin="0,2"/>
+                                        </ControlTemplate>
+                                    </Thumb.Template>
+                                </Thumb>
+                            </Track.Thumb>
+                            <Track.IncreaseRepeatButton>
+                                <RepeatButton Command="ScrollBar.PageDownCommand"
+                                              Opacity="0" Focusable="False"/>
+                            </Track.IncreaseRepeatButton>
+                        </Track>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="SidebarScrollViewer" TargetType="ScrollViewer">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ScrollViewer">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <ScrollContentPresenter Grid.Column="0"
+                                                CanContentScroll="{TemplateBinding CanContentScroll}"/>
+                        <ScrollBar Grid.Column="1"
+                                   Name="PART_VerticalScrollBar"
+                                   Style="{StaticResource SidebarScrollBar}"
+                                   Value="{TemplateBinding VerticalOffset}"
+                                   Maximum="{TemplateBinding ScrollableHeight}"
+                                   ViewportSize="{TemplateBinding ViewportHeight}"
+                                   Visibility="{TemplateBinding ComputedVerticalScrollBarVisibility}"/>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
     <!-- Primary Button -->
     <Style x:Key="PrimaryButton" TargetType="Button">
         <Setter Property="Background"       Value="{StaticResource PrimaryLightBrush}"/>
