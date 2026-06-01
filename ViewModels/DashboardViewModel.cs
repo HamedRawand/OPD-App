@@ -2,6 +2,7 @@ using System.Collections.ObjectModel;
 using System.Globalization;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using OPDClinic.Models;
 using OPDClinic.Services;
 
 namespace OPDClinic.ViewModels;
@@ -10,7 +11,7 @@ public partial class DashboardViewModel : ObservableObject
 {
     // ── Stat cards ────────────────────────────────────────────────────────────
     [ObservableProperty] private int    _totalPatients;
-    [ObservableProperty] private int    _todayPatients;
+    [ObservableProperty] private int    _todayVisits;
     [ObservableProperty] private int    _totalMedicines;
     [ObservableProperty] private int    _totalPhysicians;
 
@@ -36,22 +37,37 @@ public partial class DashboardViewModel : ObservableObject
     public void Load()
     {
         StatusMessage = "";
-        var db    = App.Db;
+        using var db = App.DbFactory.CreateDbContext();
         var today = DateTime.Today;
 
-        TotalPatients   = db.Patients.Count();
+        var currentUser = App.Auth.CurrentUser!;
+        int? doctorPhysicianId = (!App.Auth.Can(Permission.ViewAllPhysicianPatients)
+                                   && currentUser.PhysicianId.HasValue)
+                                 ? currentUser.PhysicianId
+                                 : null;
+
+        // ── Stat counts ───────────────────────────────────────────────────────
+        var visitQuery = doctorPhysicianId.HasValue
+            ? db.Visits.Where(v => v.PhysicianId == doctorPhysicianId.Value)
+            : db.Visits.AsQueryable();
+
+        // Total unique patients (filtered for doctors)
+        TotalPatients = doctorPhysicianId.HasValue
+            ? db.Patients.Count(p => p.Visits.Any(v => v.PhysicianId == doctorPhysicianId.Value))
+            : db.Patients.Count();
+
         TotalMedicines  = db.MedicineLists.Count();
         TotalPhysicians = db.Physicians.Count();
 
-        // Today's visits (OpdDate between midnight and next midnight)
+        // Today's visits
         var todayEnd = today.AddDays(1);
-        TodayPatients = db.Patients.Count(p => p.OpdDate >= today && p.OpdDate < todayEnd);
+        TodayVisits = visitQuery.Count(v => v.OpdDate >= today && v.OpdDate < todayEnd);
 
-        // Today's date labels
+        // ── Date labels ───────────────────────────────────────────────────────
         TodayDateText   = today.ToString("dddd, MMMM d, yyyy", CultureInfo.InvariantCulture);
         TodayShamsiText = HijriService.ToShamsi(today);
 
-        // Last backup info
+        // ── Last backup ───────────────────────────────────────────────────────
         var backups = BackupService.ListBackups(BackupService.DefaultBackupFolder);
         if (backups.Count > 0)
         {
@@ -66,7 +82,7 @@ public partial class DashboardViewModel : ObservableObject
             LastBackupSubText = "";
         }
 
-        // Database size
+        // ── Database size ─────────────────────────────────────────────────────
         try
         {
             var fi = new System.IO.FileInfo(App.DbPath);
@@ -76,23 +92,25 @@ public partial class DashboardViewModel : ObservableObject
         }
         catch { DatabaseSizeText = "–"; }
 
-        // Recent visits (last 10 with a date)
-        var rows = db.Patients
-            .Where(p => p.OpdDate.HasValue)
-            .OrderByDescending(p => p.OpdDate)
+        // ── Recent visits (last 10 with a date) ───────────────────────────────
+        var rows = visitQuery
+            .Where(v => v.OpdDate.HasValue)
+            .OrderByDescending(v => v.OpdDate)
             .Take(10)
-            .Select(p => new
+            .Select(v => new
             {
-                p.PatientName,
-                PhysName  = p.Physician != null ? p.Physician.NameEng : "",
-                p.OpdDate,
-                p.HijriDate,
-                p.Diagnosis
+                v.PatientId,
+                PatientName = v.Patient != null ? v.Patient.PatientName : "–",
+                PhysName    = v.Physician != null ? v.Physician.NameEng : "",
+                v.OpdDate,
+                v.HijriDate,
+                v.Diagnosis
             })
             .ToList();
 
         RecentVisits = new ObservableCollection<RecentVisitRow>(
             rows.Select(r => new RecentVisitRow(
+                r.PatientId,
                 r.PatientName ?? "–",
                 r.PhysName    ?? "–",
                 r.OpdDate.HasValue ? r.OpdDate.Value.ToString("yyyy-MM-dd") : "",
@@ -108,7 +126,7 @@ public partial class DashboardViewModel : ObservableObject
             var path = BackupService.CreateBackup(BackupService.DefaultBackupFolder);
             StatusIsError   = false;
             StatusMessage   = $"Backup created: {System.IO.Path.GetFileName(path)}";
-            Load();   // refresh last-backup display
+            Load();
         }
         catch (Exception ex)
         {
@@ -120,6 +138,7 @@ public partial class DashboardViewModel : ObservableObject
 
 /// <summary>Display-only row for the Recent Visits DataGrid.</summary>
 public record RecentVisitRow(
+    int    PatientId,
     string PatientName,
     string Physician,
     string VisitDate,

@@ -1,6 +1,7 @@
 using System.Windows;
 using System.Windows.Controls;
 using OPDClinic.Models;
+using OPDClinic.Services;
 using OPDClinic.ViewModels;
 using Application = System.Windows.Application;
 
@@ -15,6 +16,7 @@ public partial class PrescriptionView : UserControl
 
     private void DeleteLine_Click(object sender, RoutedEventArgs e)
     {
+        if (!App.Auth.Can(Permission.WritePrescription)) return;
         if (sender is Button btn && btn.Tag is MedicineUsage line &&
             DataContext is PrescriptionViewModel vm)
         {
@@ -30,10 +32,11 @@ public partial class PrescriptionView : UserControl
 
     private void EditLine_Click(object sender, RoutedEventArgs e)
     {
+        if (!App.Auth.Can(Permission.WritePrescription)) return;
         if (sender is not Button btn || btn.Tag is not MedicineUsage line) return;
         if (DataContext is not PrescriptionViewModel vm) return;
 
-        var dlg = new PrescriptionLineEditDialog(App.Db, line)
+        var dlg = new PrescriptionLineEditDialog(App.DbFactory, line)
         {
             Owner = Window.GetWindow(this) ?? App.Current.MainWindow
         };

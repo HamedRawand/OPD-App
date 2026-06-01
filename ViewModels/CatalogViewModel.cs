@@ -4,6 +4,7 @@ using System.Windows;
 using System.Windows.Data;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Microsoft.EntityFrameworkCore;
 using OPDClinic.Data;
 using OPDClinic.Models;
 
@@ -11,7 +12,7 @@ namespace OPDClinic.ViewModels;
 
 public partial class CatalogViewModel : ObservableObject
 {
-    private readonly AppDbContext _db;
+    private readonly IDbContextFactory<AppDbContext> _factory;
     private ObservableCollection<MedicineList> _allMedicines = [];
     private ICollectionView? _view;
 
@@ -23,9 +24,9 @@ public partial class CatalogViewModel : ObservableObject
 
     public List<string> Categories { get; } = ["All", "Enteral", "Parenteral"];
 
-    public CatalogViewModel(AppDbContext db)
+    public CatalogViewModel(IDbContextFactory<AppDbContext> factory)
     {
-        _db = db;
+        _factory = factory;
         _ = LoadMedicines();
     }
 
@@ -36,8 +37,9 @@ public partial class CatalogViewModel : ObservableObject
         try
         {
             await Task.Yield();
+            using var db = _factory.CreateDbContext();
             _allMedicines = new ObservableCollection<MedicineList>(
-                _db.MedicineLists.OrderBy(m => m.MedicineName).ToList());
+                db.MedicineLists.OrderBy(m => m.MedicineName).ToList());
 
             _view = CollectionViewSource.GetDefaultView(_allMedicines);
             _view.Filter = ApplyFilter;
@@ -87,8 +89,9 @@ public partial class CatalogViewModel : ObservableObject
 
         try
         {
-            _db.MedicineLists.Remove(m);
-            _db.SaveChanges();
+            using var db = _factory.CreateDbContext();
+            db.Remove(m);
+            db.SaveChanges();
         }
         catch (Exception ex)
         {

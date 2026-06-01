@@ -2,6 +2,7 @@ using System.Collections.ObjectModel;
 using System.Windows;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Microsoft.EntityFrameworkCore;
 using OPDClinic.Data;
 using OPDClinic.Models;
 using OPDClinic.Services;
@@ -10,22 +11,23 @@ namespace OPDClinic.ViewModels;
 
 public partial class PhysicianViewModel : ObservableObject
 {
-    private readonly AppDbContext _db;
+    private readonly IDbContextFactory<AppDbContext> _factory;
 
     [ObservableProperty] private ObservableCollection<Physician> _physicians = [];
     [ObservableProperty] private int _physicianCount;
 
-    public PhysicianViewModel(AppDbContext db)
+    public PhysicianViewModel(IDbContextFactory<AppDbContext> factory)
     {
-        _db = db;
+        _factory = factory;
         LoadPhysicians();
     }
 
     [RelayCommand]
     public void LoadPhysicians()
     {
+        using var db = _factory.CreateDbContext();
         Physicians = new ObservableCollection<Physician>(
-            _db.Physicians.OrderBy(p => p.NameEng).ToList());
+            db.Physicians.OrderBy(p => p.NameEng).ToList());
         PhysicianCount = Physicians.Count;
     }
 
@@ -42,8 +44,9 @@ public partial class PhysicianViewModel : ObservableObject
 
         try
         {
-            _db.Physicians.Remove(p);
-            _db.SaveChanges();
+            using var db = _factory.CreateDbContext();
+            db.Remove(p);
+            db.SaveChanges();
             AuditService.Log("PhysicianDeleted", "Physician", p.Id, p.NameEng);
         }
         catch (Exception ex)

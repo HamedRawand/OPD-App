@@ -1,0 +1,94 @@
+<Window x:Class="OPDClinic.Views.CustomRoleEditDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Custom Role"
+        Width="520" SizeToContent="Height"
+        WindowStartupLocation="CenterOwner"
+        ResizeMode="NoResize"
+        Background="{StaticResource ContentBgBrush}"
+        FlowDirection="LeftToRight">
+
+    <StackPanel Margin="28,24">
+
+        <!-- Title -->
+        <TextBlock x:Name="TitleText"
+                   FontSize="17" FontWeight="Bold"
+                   Foreground="{StaticResource TextPrimaryBrush}"
+                   Margin="0,0,0,20"/>
+
+        <!-- Role Name -->
+        <TextBlock Text="Role Name" Style="{StaticResource FormLabel}"/>
+        <TextBox x:Name="NameBox"
+                 Style="{StaticResource FormTextBox}"
+                 Margin="0,0,0,12"/>
+
+        <!-- Description -->
+        <TextBlock Text="Description (one sentence)" Style="{StaticResource FormLabel}"/>
+        <TextBox x:Name="DescriptionBox"
+                 Style="{StaticResource FormTextBox}"
+                 TextWrapping="Wrap" AcceptsReturn="False"
+                 Margin="0,0,0,16"/>
+
+        <!-- Permissions -->
+        <TextBlock Text="PERMISSIONS" FontSize="10" FontWeight="SemiBold"
+                   Foreground="#4A6FA5" Margin="0,0,0,8"/>
+
+        <Border BorderBrush="{StaticResource BorderBrush}" BorderThickness="1"
+                CornerRadius="6" Padding="16,12" Margin="0,0,0,16">
+            <ItemsControl x:Name="PermissionsList">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Grid Margin="0,0,0,10">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="24"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <CheckBox Grid.Column="0"
+                                      IsChecked="{Binding IsSelected}"
+                                      VerticalAlignment="Top" Margin="0,2,0,0"/>
+                            <StackPanel Grid.Column="1" Margin="8,0,0,0">
+                                <TextBlock Text="{Binding Name}"
+                                           FontWeight="SemiBold" FontSize="13"
+                                           Foreground="{StaticResource TextPrimaryBrush}"/>
+                                <TextBlock Text="{Binding Description}"
+                                           FontSize="11"
+                                           Foreground="{StaticResource TextSecondaryBrush}"
+                                           TextWrapping="Wrap"/>
+                            </StackPanel>
+                        </Grid>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </Border>
+
+        <!-- Additional Notes -->
+        <TextBlock Text="Additional Notes (optional)" Style="{StaticResource FormLabel}"/>
+        <TextBox x:Name="NotesBox"
+                 Style="{StaticResource FormTextBox}"
+                 TextWrapping="Wrap" AcceptsReturn="True"
+                 Height="60" VerticalScrollBarVisibility="Auto"
+                 Margin="0,0,0,4"/>
+        <TextBlock Text="Document any responsibilities beyond the standard permission list above."
+                   FontSize="11" FontStyle="Italic"
+                   Foreground="{StaticResource TextSecondaryBrush}"
+                   Margin="0,0,0,20" TextWrapping="Wrap"/>
+
+        <!-- Error -->
+        <TextBlock x:Name="ErrorText"
+                   Foreground="{StaticResource DangerBrush}"
+                   FontSize="12" TextWrapping="Wrap"
+                   Visibility="Collapsed" Margin="0,0,0,12"/>
+
+        <!-- Buttons -->
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+            <Button Content="Cancel"
+                    Style="{StaticResource SecondaryButton}"
+                    IsCancel="True" Padding="20,8" Margin="0,0,10,0"/>
+            <Button x:Name="SaveBtn"
+                    Content="Save Role"
+                    Style="{StaticResource PrimaryButton}"
+                    Padding="20,8" Click="Save_Click"/>
+        </StackPanel>
+
+    </StackPanel>
+</Window>

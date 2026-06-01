@@ -43,6 +43,21 @@
                                      IsReadOnly="True"/>
                         </DockPanel>
 
+                        <!-- Encryption password row -->
+                        <TextBlock Text="Encryption password (optional) / رمز رمزگذاری"
+                                   Style="{StaticResource FormLabel}"/>
+                        <DockPanel Margin="0,4,0,4">
+                            <PasswordBox x:Name="BackupPasswordBox"
+                                         Height="36" FontSize="13"
+                                         Padding="10,0"
+                                         PasswordChanged="BackupPassword_Changed"/>
+                        </DockPanel>
+                        <!-- Encryption status hint -->
+                        <TextBlock x:Name="EncryptionHint"
+                                   FontSize="11" Margin="0,0,0,16" TextWrapping="Wrap"
+                                   Text="⚠  No password — backup will be unencrypted (.zip). Anyone with the file can read patient data."
+                                   Foreground="#92400E"/>
+
                         <Button x:Name="BackupBtn"
                                 Content="{DynamicResource Backup.Btn.Create}"
                                 Style="{StaticResource PrimaryButton}"
@@ -77,7 +92,7 @@
                         <!-- File picker -->
                         <TextBlock Text="Select backup file / انتخاب فایل پشتیبان"
                                    Style="{StaticResource FormLabel}"/>
-                        <DockPanel Margin="0,4,0,16">
+                        <DockPanel Margin="0,4,0,12">
                             <Button DockPanel.Dock="Right" Content="Browse…"
                                     Style="{StaticResource SecondaryButton}"
                                     Padding="14,7" Margin="10,0,0,0"
@@ -87,6 +102,16 @@
                                      IsReadOnly="True"
                                      Tag="No file selected…"/>
                         </DockPanel>
+
+                        <!-- Encrypted backup password row — shown only for .rxb files -->
+                        <StackPanel x:Name="RestorePasswordPanel" Visibility="Collapsed" Margin="0,0,0,16">
+                            <TextBlock Text="Backup password / رمز عبور پشتیبان‌گیری"
+                                       Style="{StaticResource FormLabel}"/>
+                            <PasswordBox x:Name="RestorePasswordBox"
+                                         Height="36" FontSize="13" Padding="10,0"/>
+                            <TextBlock Text="🔒 This backup is encrypted. Enter the password used when it was created."
+                                       FontSize="11" Foreground="#1565C0" Margin="0,4,0,0"/>
+                        </StackPanel>
 
                         <Button x:Name="RestoreBtn"
                                 Content="{DynamicResource Backup.Btn.Restore}"
@@ -150,10 +175,29 @@
                                                         Click="DeleteBackup_Click"/>
                                             </StackPanel>
                                             <StackPanel VerticalAlignment="Center">
-                                                <TextBlock Text="{Binding FileName}"
-                                                           FontSize="13"
-                                                           Foreground="{StaticResource TextPrimaryBrush}"
-                                                           FontWeight="SemiBold"/>
+                                                <StackPanel Orientation="Horizontal">
+                                                    <TextBlock Text="{Binding FileName}"
+                                                               FontSize="13"
+                                                               Foreground="{StaticResource TextPrimaryBrush}"
+                                                               FontWeight="SemiBold"/>
+                                                    <!-- Encrypted badge -->
+                                                    <Border Background="#EFF6FF" CornerRadius="3"
+                                                            Padding="6,1" Margin="8,0,0,0"
+                                                            VerticalAlignment="Center">
+                                                        <Border.Style>
+                                                            <Style TargetType="Border">
+                                                                <Setter Property="Visibility" Value="Collapsed"/>
+                                                                <Style.Triggers>
+                                                                    <DataTrigger Binding="{Binding IsEncrypted}" Value="True">
+                                                                        <Setter Property="Visibility" Value="Visible"/>
+                                                                    </DataTrigger>
+                                                                </Style.Triggers>
+                                                            </Style>
+                                                        </Border.Style>
+                                                        <TextBlock Text="🔒 Encrypted" FontSize="10"
+                                                                   Foreground="#1565C0" FontWeight="SemiBold"/>
+                                                    </Border>
+                                                </StackPanel>
                                                 <StackPanel Orientation="Horizontal" Margin="0,2,0,0">
                                                     <TextBlock Text="{Binding CreatedText}"
                                                                FontSize="11"

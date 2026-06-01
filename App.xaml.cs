@@ -11,7 +11,7 @@ namespace OPDClinic;
 
 public partial class App : Application
 {
-    public static AppDbContext Db { get; private set; } = null!;
+    public static IDbContextFactory<AppDbContext> DbFactory { get; private set; } = null!;
     public static AuthService Auth { get; private set; } = null!;
     public static string DbPath { get; private set; } = "";
 
@@ -35,9 +35,11 @@ public partial class App : Application
         // ── Global unhandled-exception hook (non-UI thread) ───────────────────
         AppDomain.CurrentDomain.UnhandledException += (_, args) =>
         {
-            Log.Fatal(args.ExceptionObject as Exception,
-                "Fatal unhandled exception (CLR). IsTerminating={IsTerminating}",
+            var ex = args.ExceptionObject as Exception;
+            Log.Fatal(ex, "Fatal unhandled exception (CLR). IsTerminating={IsTerminating}",
                 args.IsTerminating);
+            if (ex is not null)
+                Services.CrashReportService.WriteCrashReport(ex, "CLR non-UI thread");
             Log.CloseAndFlush();
         };
 
@@ -60,11 +62,26 @@ public partial class App : Application
             .UseSqlite($"Data Source={dbPath}")
             .Options;
 
-        Db = new AppDbContext(options);
-        Db.Database.Migrate();
-        DbSeeder.Seed(Db);
+        DbFactory = new SimpleDbContextFactory(options);
 
-        Auth = new AuthService(Db);
+        // Short-lived context for one-time startup operations
+        using (var startupDb = DbFactory.CreateDbContext())
+        {
+            startupDb.Database.Migrate();
+            DbSeeder.Seed(startupDb);
+
+            // R12 migration: rename CreateEditPatient → RegisterPatient + EnterClinicalData
+            // in any existing CustomRole.PermissionsJson rows
+            var legacyRoles = startupDb.CustomRoles
+                .Where(r => r.PermissionsJson != null && r.PermissionsJson.Contains("CreateEditPatient"))
+                .ToList();
+            foreach (var role in legacyRoles)
+                role.PermissionsJson = role.PermissionsJson!
+                    .Replace("CreateEditPatient", "RegisterPatient,EnterClinicalData");
+            if (legacyRoles.Count > 0) startupDb.SaveChanges();
+        }
+
+        Auth = new AuthService(DbFactory);
 
         Log.Information("Database ready at {DbPath}", dbPath);
 
@@ -76,13 +93,21 @@ public partial class App : Application
     private void App_DispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
     {
         Log.Error(e.Exception, "Unhandled UI-thread exception");
+
+        var crashPath = Services.CrashReportService.WriteCrashReport(e.Exception, "UI thread");
         Log.CloseAndFlush();
 
-        MessageBox.Show(
-            $"An unexpected error occurred:\n\n{e.Exception.Message}\n\nDetails have been saved to the log file.",
+        var open = MessageBox.Show(
+            $"An unexpected error occurred:\n\n" +
+            $"{e.Exception.GetType().Name}: {e.Exception.Message}\n\n" +
+            $"A crash report was saved to:\n{crashPath}\n\n" +
+            "Open the log folder now?",
             "Unexpected Error",
-            MessageBoxButton.OK,
+            MessageBoxButton.YesNo,
             MessageBoxImage.Error);
+
+        if (open == MessageBoxResult.Yes)
+            Services.CrashReportService.OpenLogFolder();
 
         e.Handled = true; // prevent crash — keep app running
     }
@@ -92,6 +117,12 @@ public partial class App : Application
         Log.Information("Rx Writer shutting down");
         Log.CloseAndFlush();
         base.OnExit(e);
+    }
+
+    /// <summary>Simple per-call factory — creates a fresh <see cref="AppDbContext"/> on every <c>CreateDbContext()</c>.</summary>
+    private sealed class SimpleDbContextFactory(DbContextOptions<AppDbContext> options) : IDbContextFactory<AppDbContext>
+    {
+        public AppDbContext CreateDbContext() => new(options);
     }
 
     private static void CleanupTempPdfs()

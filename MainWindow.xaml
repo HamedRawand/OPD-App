@@ -118,6 +118,11 @@
                 <!-- Nav items -->
                 <StackPanel Margin="8,12">
 
+                    <!-- ── CLINICAL ──────────────────────────────────────────── -->
+                    <TextBlock Text="CLINICAL"
+                               FontSize="10" FontWeight="SemiBold"
+                               Foreground="#4A6FA5" Margin="10,0,0,6"/>
+
                     <Button x:Name="NavDashboardBtn"
                             Style="{StaticResource NavButton}"
                             Click="NavDashboard_Click"
@@ -131,7 +136,9 @@
                         </StackPanel>
                     </Button>
 
-                    <Button Style="{StaticResource NavButton}"
+                    <Button x:Name="NavPatientsBtn"
+                            Visibility="Collapsed"
+                            Style="{StaticResource NavButton}"
                             Click="NavPatients_Click"
                             ToolTip="View and manage patient visits">
                         <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
@@ -143,32 +150,42 @@
                         </StackPanel>
                     </Button>
 
-                    <!-- Admin-only items -->
+                    <!-- Physicians — visible when ManagePhysicians or Admin -->
+                    <Button x:Name="NavPhysiciansBtn"
+                            Visibility="Collapsed"
+                            Style="{StaticResource NavButton}"
+                            Click="NavPhysicians_Click"
+                            ToolTip="Manage physician profiles">
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                            <TextBlock Text="&#xE77B;" FontFamily="Segoe MDL2 Assets"
+                                       FontSize="15" Width="22" Margin="0,0,10,0"
+                                       VerticalAlignment="Center"/>
+                            <TextBlock Text="{DynamicResource Nav.Physicians}"
+                                       VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
+
+                    <!-- Medicines — visible when ManageMedicineCatalog or Admin -->
+                    <Button x:Name="NavMedicinesBtn"
+                            Visibility="Collapsed"
+                            Style="{StaticResource NavButton}"
+                            Click="NavMedicines_Click"
+                            ToolTip="Manage the medicine catalog">
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                            <TextBlock Text="&#xE734;" FontFamily="Segoe MDL2 Assets"
+                                       FontSize="15" Width="22" Margin="0,0,10,0"
+                                       VerticalAlignment="Center"/>
+                            <TextBlock Text="{DynamicResource Nav.Medicines}"
+                                       VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
+
+                    <!-- ── ADMINISTRATION — visible only to Admin / ManageUsers ── -->
                     <StackPanel x:Name="AdminNav" Visibility="Collapsed">
-
-                        <Button Style="{StaticResource NavButton}"
-                                Click="NavPhysicians_Click"
-                                ToolTip="Manage physician profiles">
-                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                                <TextBlock Text="&#xE77B;" FontFamily="Segoe MDL2 Assets"
-                                           FontSize="15" Width="22" Margin="0,0,10,0"
-                                           VerticalAlignment="Center"/>
-                                <TextBlock Text="{DynamicResource Nav.Physicians}"
-                                           VerticalAlignment="Center"/>
-                            </StackPanel>
-                        </Button>
-
-                        <Button Style="{StaticResource NavButton}"
-                                Click="NavMedicines_Click"
-                                ToolTip="Manage the medicine catalog">
-                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                                <TextBlock Text="&#xE734;" FontFamily="Segoe MDL2 Assets"
-                                           FontSize="15" Width="22" Margin="0,0,10,0"
-                                           VerticalAlignment="Center"/>
-                                <TextBlock Text="{DynamicResource Nav.Medicines}"
-                                           VerticalAlignment="Center"/>
-                            </StackPanel>
-                        </Button>
+                        <Border Height="1" Background="#2E4A6A" Margin="4,10,4,8"/>
+                        <TextBlock Text="ADMINISTRATION"
+                                   FontSize="10" FontWeight="SemiBold"
+                                   Foreground="#4A6FA5" Margin="10,0,0,6"/>
 
                         <Button Style="{StaticResource NavButton}"
                                 Click="NavUsers_Click"
@@ -179,6 +196,17 @@
                                            VerticalAlignment="Center"/>
                                 <TextBlock Text="{DynamicResource Nav.Users}"
                                            VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Button>
+
+                        <Button Style="{StaticResource NavButton}"
+                                Click="NavCustomRoles_Click"
+                                ToolTip="Define custom role permissions for non-standard staff">
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                <TextBlock Text="&#xE8D7;" FontFamily="Segoe MDL2 Assets"
+                                           FontSize="15" Width="22" Margin="0,0,10,0"
+                                           VerticalAlignment="Center"/>
+                                <TextBlock Text="Custom Roles" VerticalAlignment="Center"/>
                             </StackPanel>
                         </Button>
 

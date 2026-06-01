@@ -102,14 +102,33 @@ public static class UpdateService
         Log.Information("Update downloaded to {Path}", tempPath);
 
         // ── Launch installer & exit ───────────────────────────────────────────
-        System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
+        // UseShellExecute=true honours the installer's UAC manifest (requires admin).
+        // Catch error 1223 (ERROR_CANCELLED) so we can show a helpful message if
+        // the user declines the UAC elevation prompt instead of silently failing.
+        try
         {
-            FileName        = tempPath,
-            Arguments       = "/SILENT /RESTARTAPPLICATIONS",
-            UseShellExecute = true
-        });
+            System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
+            {
+                FileName        = tempPath,
+                Arguments       = "/SILENT /RESTARTAPPLICATIONS",
+                UseShellExecute = true
+            });
 
-        Application.Current.Dispatcher.Invoke(Application.Current.Shutdown);
+            Application.Current.Dispatcher.Invoke(Application.Current.Shutdown);
+        }
+        catch (System.ComponentModel.Win32Exception ex) when (ex.NativeErrorCode == 1223)
+        {
+            // User clicked "No" on the UAC prompt — installer was not launched.
+            Log.Warning("Update installer launch cancelled — user declined UAC elevation");
+            Application.Current.Dispatcher.Invoke(() =>
+                MessageBox.Show(
+                    "The update was not installed because administrator permission was denied.\n\n" +
+                    "To update manually, close Rx Writer and run the installer as Administrator:\n" +
+                    tempPath,
+                    "Update Cancelled",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Information));
+        }
     }
 
     // ── Helpers ───────────────────────────────────────────────────────────────

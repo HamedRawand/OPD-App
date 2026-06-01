@@ -11,6 +11,7 @@ namespace OPDClinic.Services;
 // ── Data record passed to the PDF document ──────────────────────────────────
 public record PrescriptionData(
     Patient             Patient,
+    Visit               Visit,
     Physician?          Physician,
     List<MedicineUsage> Lines,
     List<LabTest>       LabTests,
@@ -18,35 +19,41 @@ public record PrescriptionData(
 );
 
 // ── Service: loads data from DB and returns a temp PDF path ─────────────────
-public class PdfService(AppDbContext db)
+public class PdfService(IDbContextFactory<AppDbContext> factory)
 {
-    public string GenerateForPatient(int patientId)
+    public string GenerateForVisit(int visitId)
     {
-        var patient = db.Patients
-            .Include(p => p.Physician)
-            .FirstOrDefault(p => p.Id == patientId)
-            ?? throw new InvalidOperationException("Patient not found.");
+        using var db = factory.CreateDbContext();
+
+        var visit = db.Visits
+            .Include(v => v.Patient)
+            .Include(v => v.Physician)
+            .FirstOrDefault(v => v.Id == visitId)
+            ?? throw new InvalidOperationException("Visit not found.");
+
+        var patient = visit.Patient
+            ?? throw new InvalidOperationException("Patient not found for this visit.");
 
         var lines = db.MedicineUsages
-            .Where(m => m.PatientId == patientId)
+            .Where(m => m.VisitId == visitId)
             .OrderBy(m => m.LineNumber)
             .ToList();
 
         var labTests = db.PatientLabTests
             .Include(pt => pt.LabTest)
-            .Where(pt => pt.PatientId == patientId)
+            .Where(pt => pt.VisitId == visitId)
             .OrderBy(pt => pt.LabTest!.Category)
             .ThenBy(pt => pt.LabTest!.TestName)
             .Select(pt => pt.LabTest!)
             .ToList();
 
         var data = new PrescriptionData(
-            patient, patient.Physician, lines, labTests,
-            string.IsNullOrWhiteSpace(patient.FooterNote) ? null : patient.FooterNote);
+            patient, visit, visit.Physician, lines, labTests,
+            string.IsNullOrWhiteSpace(visit.FooterNote) ? null : visit.FooterNote);
 
         var safeName  = string.Concat((patient.PatientName ?? "Patient")
             .Where(c => char.IsLetterOrDigit(c) || c == '_'));
-        var visitDate = patient.OpdDate?.ToString("yyyy-MM-dd") ?? DateTime.Now.ToString("yyyy-MM-dd");
+        var visitDate = visit.OpdDate?.ToString("yyyy-MM-dd") ?? DateTime.Now.ToString("yyyy-MM-dd");
         var path      = Path.Combine(Path.GetTempPath(),
                             $"Rx_{safeName}_{visitDate}_{DateTime.Now:HHmmss}.pdf");
 
@@ -122,7 +129,7 @@ public class PrescriptionDocument(PrescriptionData data) : IDocument
     {
         var ph   = data.Physician;
         var hdr  = S_Hdr;
-        float fs = hdr.FontSize; // default 17f
+        float fs = hdr.FontSize;
 
         c.Column(col =>
         {
@@ -213,9 +220,10 @@ public class PrescriptionDocument(PrescriptionData data) : IDocument
     // ── PATIENT INFO BAR ─────────────────────────────────────────────────────
     private void ComposePatientBar(IContainer c)
     {
-        var p   = data.Patient;
-        var pb  = S_PBar;
-        float fs = pb.FontSize; // default 9f
+        var p  = data.Patient;
+        var v  = data.Visit;
+        var pb = S_PBar;
+        float fs = pb.FontSize;
 
         var container = c.Background(Clr(pb.BackgroundColor));
         if (pb.ShowBorder)
@@ -228,7 +236,7 @@ public class PrescriptionDocument(PrescriptionData data) : IDocument
                 e.ContentFromRightToLeft().Text(text =>
                 {
                     text.Span("تاریخ مراجعه:  ").Bold().FontFamily(pb.FontFamily).FontSize(fs);
-                    text.Span(p.HijriDate ?? p.OpdDate?.ToString("yyyy-MM-dd") ?? "—")
+                    text.Span(v.HijriDate ?? v.OpdDate?.ToString("yyyy-MM-dd") ?? "—")
                         .FontFamily(pb.FontFamily).FontSize(fs);
                 }));
 
@@ -239,7 +247,7 @@ public class PrescriptionDocument(PrescriptionData data) : IDocument
                     e.ContentFromRightToLeft().Text(text =>
                     {
                         text.Span("سن مریض:  ").Bold().FontFamily(pb.FontFamily).FontSize(fs);
-                        text.Span(p.Age.HasValue ? p.Age.Value.ToString() : "—")
+                        text.Span(v.Age.HasValue ? v.Age.Value.ToString() : "—")
                             .FontFamily(pb.FontFamily).FontSize(fs);
                     }));
                 col.Item().AlignCenter().PaddingTop(4).Element(e =>
@@ -251,13 +259,24 @@ public class PrescriptionDocument(PrescriptionData data) : IDocument
                     }));
             });
 
-            // Name — rightmost, RTL (no patient number)
+            // Name + Patient ID — rightmost, RTL
             row.RelativeItem(3).AlignRight().Element(e =>
-                e.ContentFromRightToLeft().Text(text =>
+                e.ContentFromRightToLeft().Column(col =>
                 {
-                    text.Span("نام مریض:  ").Bold().FontFamily(pb.FontFamily).FontSize(fs);
-                    text.Span(p.PatientName ?? "—").Bold()
-                        .FontFamily(pb.FontFamily).FontSize(fs + 2).FontColor(Accent);
+                    col.Item().Text(text =>
+                    {
+                        text.Span("نام مریض:  ").Bold().FontFamily(pb.FontFamily).FontSize(fs);
+                        text.Span(p.PatientName ?? "—").Bold()
+                            .FontFamily(pb.FontFamily).FontSize(fs + 2).FontColor(Accent);
+                    });
+                    if (!string.IsNullOrWhiteSpace(p.PatientCode))
+                        col.Item().Text(text =>
+                        {
+                            text.Span("ID:  ").Bold().FontFamily(pb.FontFamily).FontSize(fs - 1)
+                                .FontColor(Clr("#555555"));
+                            text.Span(p.PatientCode).FontFamily(pb.FontFamily).FontSize(fs - 1)
+                                .FontColor(Clr("#555555"));
+                        });
                 }));
         });
     }
@@ -265,6 +284,7 @@ public class PrescriptionDocument(PrescriptionData data) : IDocument
     // ── BODY: [Clinical left] | [Rx right] ───────────────────────────────────
     private void ComposeBody(IContainer c)
     {
+        var v = data.Visit;
         c.Row(row =>
         {
             // Left: Vital Signs + Clinical Findings + Diagnosis + Lab Tests
@@ -272,9 +292,9 @@ public class PrescriptionDocument(PrescriptionData data) : IDocument
             {
                 col.Item().Element(ComposeVitalsBox);
                 col.Item().PaddingTop(6).Element(ctx =>
-                    ComposeLabelledBox(ctx, "Clinical Findings", data.Patient.ClinicalFindings, S_CF));
+                    ComposeLabelledBox(ctx, "Clinical Findings", v.ClinicalFindings, S_CF));
                 col.Item().PaddingTop(6).Element(ctx =>
-                    ComposeLabelledBox(ctx, "Diagnosis", data.Patient.Diagnosis, S_Dx));
+                    ComposeLabelledBox(ctx, "Diagnosis", v.Diagnosis, S_Dx));
 
                 if (data.LabTests.Any())
                     col.Item().PaddingTop(6).Element(ComposeLabTests);
@@ -294,9 +314,9 @@ public class PrescriptionDocument(PrescriptionData data) : IDocument
     // ── VITAL SIGNS BOX ──────────────────────────────────────────────────────
     private void ComposeVitalsBox(IContainer c)
     {
-        var p   = data.Patient;
+        var v   = data.Visit;
         var st  = S_VS;
-        float fs = st.FontSize; // default 9f
+        float fs = st.FontSize;
 
         var outer = c;
         if (st.ShowBorder)
@@ -304,7 +324,6 @@ public class PrescriptionDocument(PrescriptionData data) : IDocument
 
         outer.Column(col =>
         {
-            // Title bar
             var titleRow = col.Item().Background(Clr(st.TitleBgColor)).Padding(5);
             var titleText = titleRow.Text("Vital Signs")
                 .FontFamily(st.FontFamily)
@@ -312,45 +331,44 @@ public class PrescriptionDocument(PrescriptionData data) : IDocument
                 .FontColor(Clr(st.TitleFontColor));
             if (st.TitleBold) titleText.Bold();
 
-            col.Item().Padding(st.Padding).Column(v =>
+            col.Item().Padding(st.Padding).Column(vs =>
             {
                 // BP + PR
-                if (!string.IsNullOrEmpty(p.BP) || !string.IsNullOrEmpty(p.PR))
-                    v.Item().PaddingBottom(2).Row(r =>
+                if (!string.IsNullOrEmpty(v.BP) || !string.IsNullOrEmpty(v.PR))
+                    vs.Item().PaddingBottom(2).Row(r =>
                     {
                         r.AutoItem().Text("BP: ").FontFamily(st.FontFamily).FontSize(fs).Bold();
-                        r.AutoItem().Text(p.BP ?? "—").FontFamily(st.FontFamily).FontSize(fs);
-                        r.ConstantItem(18); // spacer between pairs
+                        r.AutoItem().Text(v.BP ?? "—").FontFamily(st.FontFamily).FontSize(fs);
+                        r.ConstantItem(18);
                         r.AutoItem().Text("PR: ").FontFamily(st.FontFamily).FontSize(fs).Bold();
-                        r.AutoItem().Text(p.PR ?? "—").FontFamily(st.FontFamily).FontSize(fs);
+                        r.AutoItem().Text(v.PR ?? "—").FontFamily(st.FontFamily).FontSize(fs);
                     });
 
                 // RR
-                if (!string.IsNullOrEmpty(p.RR))
-                    v.Item().PaddingTop(6).Row(r =>
+                if (!string.IsNullOrEmpty(v.RR))
+                    vs.Item().PaddingTop(6).Row(r =>
                     {
                         r.AutoItem().Text("RR: ").FontFamily(st.FontFamily).FontSize(fs).Bold();
-                        r.AutoItem().Text(p.RR).FontFamily(st.FontFamily).FontSize(fs);
+                        r.AutoItem().Text(v.RR).FontFamily(st.FontFamily).FontSize(fs);
                     });
 
                 // BT + BW
-                if (!string.IsNullOrEmpty(p.BT) || !string.IsNullOrEmpty(p.BW))
-                    v.Item().PaddingTop(6).Row(r =>
+                if (!string.IsNullOrEmpty(v.BT) || !string.IsNullOrEmpty(v.BW))
+                    vs.Item().PaddingTop(6).Row(r =>
                     {
                         r.AutoItem().Text("BT: ").FontFamily(st.FontFamily).FontSize(fs).Bold();
-                        r.AutoItem().Text(p.BT ?? "—").FontFamily(st.FontFamily).FontSize(fs);
-                        r.ConstantItem(18); // spacer between pairs
+                        r.AutoItem().Text(v.BT ?? "—").FontFamily(st.FontFamily).FontSize(fs);
+                        r.ConstantItem(18);
                         r.AutoItem().Text("BW: ").FontFamily(st.FontFamily).FontSize(fs).Bold();
-                        r.AutoItem().Text(p.BW ?? "—").FontFamily(st.FontFamily).FontSize(fs);
+                        r.AutoItem().Text(v.BW ?? "—").FontFamily(st.FontFamily).FontSize(fs);
                     });
 
-                // All empty
-                var anyVital = !string.IsNullOrEmpty(p.BP) || !string.IsNullOrEmpty(p.PR)
-                            || !string.IsNullOrEmpty(p.RR) || !string.IsNullOrEmpty(p.BT)
-                            || !string.IsNullOrEmpty(p.BW);
+                var anyVital = !string.IsNullOrEmpty(v.BP) || !string.IsNullOrEmpty(v.PR)
+                            || !string.IsNullOrEmpty(v.RR) || !string.IsNullOrEmpty(v.BT)
+                            || !string.IsNullOrEmpty(v.BW);
                 if (!anyVital)
-                    v.Item().Text("—").FontFamily(st.FontFamily)
-                            .FontSize(Math.Max(fs - 0.5f, 6)).FontColor(Gray).Italic();
+                    vs.Item().Text("—").FontFamily(st.FontFamily)
+                             .FontSize(Math.Max(fs - 0.5f, 6)).FontColor(Gray).Italic();
             });
         });
     }
@@ -358,7 +376,7 @@ public class PrescriptionDocument(PrescriptionData data) : IDocument
     // ── LABELLED BOX (Clinical Findings / Diagnosis / Lab Tests) ─────────────
     private void ComposeLabelledBox(IContainer c, string title, string? content, SectionStyle st)
     {
-        float fs = st.FontSize; // default 9f
+        float fs = st.FontSize;
 
         var outer = c;
         if (st.ShowBorder)
@@ -366,7 +384,6 @@ public class PrescriptionDocument(PrescriptionData data) : IDocument
 
         outer.Column(col =>
         {
-            // Title bar
             var titleRow  = col.Item().Background(Clr(st.TitleBgColor)).Padding(5);
             var titleText = titleRow.Text(title)
                 .FontFamily(st.FontFamily)
@@ -390,7 +407,6 @@ public class PrescriptionDocument(PrescriptionData data) : IDocument
         if (st.ShowBorder)
             outer = outer.Border(st.BorderThickness).BorderColor(Clr(st.BorderColor));
 
-        // Group tests by category — null/empty category falls back to "General"
         var groups = data.LabTests
             .GroupBy(t => string.IsNullOrWhiteSpace(t.Category) ? "General" : t.Category)
             .OrderBy(g => g.Key)
@@ -400,7 +416,6 @@ public class PrescriptionDocument(PrescriptionData data) : IDocument
 
         outer.Column(col =>
         {
-            // Title bar
             var titleRow  = col.Item().Background(Clr(st.TitleBgColor)).Padding(5);
             var titleText = titleRow.Text("Lab Tests")
                 .FontFamily(st.FontFamily)
@@ -408,14 +423,12 @@ public class PrescriptionDocument(PrescriptionData data) : IDocument
                 .FontColor(Clr(st.TitleFontColor));
             if (st.TitleBold) titleText.Bold();
 
-            // Content — one bullet line per test, grouped by category
             col.Item().Padding(st.Padding).Column(body =>
             {
                 foreach (var grp in groups)
                 {
                     if (multiGroup)
                     {
-                        // Category heading (bold, slightly smaller)
                         var catText = body.Item().PaddingBottom(3)
                             .Text(grp.Key)
                             .FontFamily(st.FontFamily)
@@ -424,7 +437,6 @@ public class PrescriptionDocument(PrescriptionData data) : IDocument
                         catText.Bold();
                     }
 
-                    // Each test on its own line with a bullet
                     foreach (var t in grp)
                     {
                         var label = string.IsNullOrEmpty(t.Abbreviation)
@@ -438,7 +450,6 @@ public class PrescriptionDocument(PrescriptionData data) : IDocument
                             .FontFamily(st.FontFamily).FontSize(fs).FontColor(Clr(st.FontColor));
                     }
 
-                    // Gap between groups
                     if (multiGroup)
                         body.Item().Height(4);
                 }
@@ -451,7 +462,6 @@ public class PrescriptionDocument(PrescriptionData data) : IDocument
     {
         c.Column(col =>
         {
-            // Large "Rx" heading — decorative, always uses accent color
             col.Item()
                .Text("Rx")
                .FontSize(24).Bold().Italic().FontColor(Accent);
@@ -463,7 +473,7 @@ public class PrescriptionDocument(PrescriptionData data) : IDocument
     private void ComposeRxLines(IContainer c)
     {
         var st  = S_Rx;
-        float fs = st.FontSize; // default 10.5f
+        float fs = st.FontSize;
 
         if (!data.Lines.Any())
         {
@@ -483,20 +493,16 @@ public class PrescriptionDocument(PrescriptionData data) : IDocument
                    .PaddingVertical(6).PaddingHorizontal(4)
                    .Column(entry =>
                    {
-                       // ── Main row: [N)] [Form] [Medicine  Strength] [Dari dosage] ──
                        entry.Item().Row(row =>
                        {
-                           // Number
                            row.ConstantItem(24)
                               .Text($"{i + 1} )")
                               .FontFamily(st.FontFamily).FontSize(fs).Bold().FontColor(Accent);
 
-                           // Form (muted)
                            row.ConstantItem(58)
                               .Text(line.Type ?? "")
                               .FontFamily(st.FontFamily).FontSize(fs).FontColor(Gray);
 
-                           // Medicine name + Strength
                            row.RelativeItem().Text(text =>
                            {
                                var nameSpan = text.Span(line.Prescription ?? "")
@@ -508,7 +514,6 @@ public class PrescriptionDocument(PrescriptionData data) : IDocument
                                        .FontSize(Math.Max(fs - 1.5f, 6)).FontColor(Gray);
                            });
 
-                           // Dari dosage (RTL, right-aligned)
                            if (!string.IsNullOrEmpty(line.Usage))
                                row.RelativeItem().Element(e =>
                                    e.AlignRight().ContentFromRightToLeft()
@@ -518,14 +523,12 @@ public class PrescriptionDocument(PrescriptionData data) : IDocument
                                     .FontColor(Clr(st.FontColor)));
                        });
 
-                       // ── N = qty ──────────────────────────────────────────
                        if (line.Qty.HasValue)
                            entry.Item().PaddingTop(2).PaddingLeft(82)
                                 .Text($"N = {line.Qty}")
                                 .FontFamily(st.FontFamily)
                                 .FontSize(Math.Max(fs - 1.5f, 6)).FontColor(Gray);
 
-                       // ── Medicine note (RTL, bold) ─────────────────────────
                        if (!string.IsNullOrEmpty(line.Note))
                            entry.Item().PaddingTop(3).Element(e =>
                                e.ContentFromRightToLeft()
@@ -555,7 +558,7 @@ public class PrescriptionDocument(PrescriptionData data) : IDocument
     {
         var ph  = data.Physician;
         var st  = S_Ftr;
-        float fs = st.FontSize; // default 8f
+        float fs = st.FontSize;
 
         string imgDir     = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "image");
         byte[]? phoneIcon = TryLoadImage(Path.Combine(imgDir, "PhoneNumber.png"));
@@ -615,7 +618,6 @@ public class PrescriptionDocument(PrescriptionData data) : IDocument
                 });
             }
 
-            // "Bring prescription on next visit" reminder — same RTL row style as other footer lines
             col.Item().PaddingTop(4).AlignRight().Row(row =>
             {
                 row.AutoItem()
@@ -645,15 +647,12 @@ public class PrescriptionDocument(PrescriptionData data) : IDocument
 
     // ── Helpers ───────────────────────────────────────────────────────────────
 
-    /// <summary>Safely reads an image file; returns null if the file is missing or unreadable.</summary>
     private static byte[]? TryLoadImage(string path)
     {
         try { return File.Exists(path) ? File.ReadAllBytes(path) : null; }
         catch { return null; }
     }
 
-    /// <summary>Returns the canonical Dari sex label.
-    /// Handles new Dari-stored values, legacy English values, and ComboBoxItem prefix.</summary>
     private static string TranslateSex(string value)
     {
         const string prefix = "System.Windows.Controls.ComboBoxItem: ";
@@ -667,8 +666,6 @@ public class PrescriptionDocument(PrescriptionData data) : IDocument
         };
     }
 
-    /// <summary>Strips the "System.Windows.Controls.ComboBoxItem: " prefix that
-    /// WPF can inject when a ComboBox item is stored as its ToString() value.</summary>
     private static string CleanFieldValue(string? value)
     {
         if (string.IsNullOrWhiteSpace(value)) return "—";

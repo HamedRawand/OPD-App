@@ -30,4 +30,18 @@ public class User
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
     public DateTime? LastLogin { get; set; }
+
+    /// <summary>Links a Doctor user to their Physician profile for patient filtering.</summary>
+    public int? PhysicianId { get; set; }
+    public Physician? Physician { get; set; }
+
+    /// <summary>
+    /// When set, this user's permissions come from the CustomRole rather than the built-in Role map.
+    /// User.Role is set to Receptionist as the non-admin base for sidebar gating.
+    /// </summary>
+    public int? CustomRoleId { get; set; }
+    public CustomRole? CustomRole { get; set; }
+
+    /// <summary>Custom role name when assigned, otherwise the built-in role enum name.</summary>
+    public string RoleDisplayName => CustomRole?.Name ?? Role.ToString();
 }

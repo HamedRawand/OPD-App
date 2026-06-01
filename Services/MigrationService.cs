@@ -9,7 +9,7 @@ namespace OPDClinic.Services;
 /// One-time importer: reads the original Access .accdb and populates SQLite.
 /// Run from admin settings menu. Safe to call repeatedly — skips tables already populated.
 /// </summary>
-public class MigrationService(AppDbContext db)
+public class MigrationService(IDbContextFactory<AppDbContext> factory)
 {
     public MigrationResult Import(string accdbPath)
     {
@@ -21,16 +21,19 @@ public class MigrationService(AppDbContext db)
             using var conn = new OleDbConnection(connStr);
             conn.Open();
 
-            result.Physicians   = ImportPhysicians(conn);
-            result.MedicineForms = ImportMedicineForms(conn);
-            result.Routes       = ImportRoutes(conn);
-            result.Dosages      = ImportDosages(conn);
-            result.MedicineNotes = ImportMedicineNotes(conn);
-            result.PrescriptionNotes = ImportPrescriptionNotes(conn);
-            result.LabTests     = ImportLabTests(conn);
-            result.Medicines    = ImportMedicineList(conn);
-            result.Patients     = ImportPatients(conn);
-            result.Prescriptions = ImportMedicineUsage(conn);
+            // One context for the entire import — keeps identity map consistent
+            using var db = factory.CreateDbContext();
+
+            result.Physicians        = ImportPhysicians(conn, db);
+            result.MedicineForms     = ImportMedicineForms(conn, db);
+            result.Routes            = ImportRoutes(conn, db);
+            result.Dosages           = ImportDosages(conn, db);
+            result.MedicineNotes     = ImportMedicineNotes(conn, db);
+            result.PrescriptionNotes = ImportPrescriptionNotes(conn, db);
+            result.LabTests          = ImportLabTests(conn, db);
+            result.Medicines         = ImportMedicineList(conn, db);
+            result.Patients          = ImportPatients(conn, db);
+            result.Prescriptions     = ImportMedicineUsage(conn, db);
 
             result.Success = true;
         }
@@ -42,7 +45,7 @@ public class MigrationService(AppDbContext db)
         return result;
     }
 
-    private int ImportPhysicians(OleDbConnection conn)
+    private static int ImportPhysicians(OleDbConnection conn, AppDbContext db)
     {
         if (db.Physicians.Any()) return 0;
         int count = 0;
@@ -52,16 +55,16 @@ public class MigrationService(AppDbContext db)
         {
             db.Physicians.Add(new Physician
             {
-                NameEng            = reader["Physician_name_Eng"] as string,
-                NameDari           = reader["Physician_name_Dari"] as string,
-                SpecialityEng      = reader["Specialities_Eng"] as string,
-                SpecialityDari     = reader["Specialities_Dari"] as string,
-                OtherSpecialityEng = reader["Other_specialities_Eng"] as string,
-                OtherSpecialityDari= reader["Other_specialities_Dari"] as string,
-                ContactNumber      = reader["Contact_number"] as string,
-                WhatsAppNumber     = reader["WhatsApp_number"] as string,
+                NameEng                = reader["Physician_name_Eng"] as string,
+                NameDari               = reader["Physician_name_Dari"] as string,
+                SpecialityEng          = reader["Specialities_Eng"] as string,
+                SpecialityDari         = reader["Specialities_Dari"] as string,
+                OtherSpecialityEng     = reader["Other_specialities_Eng"] as string,
+                OtherSpecialityDari    = reader["Other_specialities_Dari"] as string,
+                ContactNumber          = reader["Contact_number"] as string,
+                WhatsAppNumber         = reader["WhatsApp_number"] as string,
                 ReceptionContactNumber = reader["Receiption_contact_number"] as string,
-                Address            = reader["Address"] as string,
+                Address                = reader["Address"] as string,
             });
             count++;
         }
@@ -69,7 +72,7 @@ public class MigrationService(AppDbContext db)
         return count;
     }
 
-    private int ImportMedicineForms(OleDbConnection conn)
+    private static int ImportMedicineForms(OleDbConnection conn, AppDbContext db)
     {
         if (db.MedicineForms.Any()) return 0;
         int count = 0;
@@ -90,7 +93,7 @@ public class MigrationService(AppDbContext db)
         return count;
     }
 
-    private int ImportRoutes(OleDbConnection conn)
+    private static int ImportRoutes(OleDbConnection conn, AppDbContext db)
     {
         if (db.Routes.Any()) return 0;
         int count = 0;
@@ -111,7 +114,7 @@ public class MigrationService(AppDbContext db)
         return count;
     }
 
-    private int ImportDosages(OleDbConnection conn)
+    private static int ImportDosages(OleDbConnection conn, AppDbContext db)
     {
         if (db.Dosages.Any()) return 0;
         int count = 0;
@@ -131,7 +134,7 @@ public class MigrationService(AppDbContext db)
         return count;
     }
 
-    private int ImportMedicineNotes(OleDbConnection conn)
+    private static int ImportMedicineNotes(OleDbConnection conn, AppDbContext db)
     {
         if (db.MedicineNotes.Any()) return 0;
         int count = 0;
@@ -146,7 +149,7 @@ public class MigrationService(AppDbContext db)
         return count;
     }
 
-    private int ImportPrescriptionNotes(OleDbConnection conn)
+    private static int ImportPrescriptionNotes(OleDbConnection conn, AppDbContext db)
     {
         if (db.PrescriptionNotes.Any()) return 0;
         int count = 0;
@@ -161,7 +164,7 @@ public class MigrationService(AppDbContext db)
         return count;
     }
 
-    private int ImportLabTests(OleDbConnection conn)
+    private static int ImportLabTests(OleDbConnection conn, AppDbContext db)
     {
         if (db.LabTests.Any()) return 0;
         int count = 0;
@@ -183,7 +186,7 @@ public class MigrationService(AppDbContext db)
         return count;
     }
 
-    private int ImportMedicineList(OleDbConnection conn)
+    private static int ImportMedicineList(OleDbConnection conn, AppDbContext db)
     {
         if (db.MedicineLists.Any()) return 0;
         int count = 0;
@@ -206,59 +209,112 @@ public class MigrationService(AppDbContext db)
         return count;
     }
 
-    private int ImportPatients(OleDbConnection conn)
+    private static int ImportPatients(OleDbConnection conn, AppDbContext db)
     {
         if (db.Patients.Any()) return 0;
-        int count = 0;
 
         // Build physician name → ID lookup
         var physicianMap = db.Physicians
             .Where(p => p.NameDari != null)
             .ToDictionary(p => p.NameDari!, p => p.Id);
 
-        using var cmd = new OleDbCommand("SELECT * FROM [Patients Table]", conn);
-        using var reader = cmd.ExecuteReader();
-        while (reader.Read())
-        {
-            var physicianName = reader["Physician_name"] as string;
-            int? physicianId = physicianName != null && physicianMap.TryGetValue(physicianName, out var pid)
-                ? pid : null;
+        // Read all rows from Access into memory first
+        var rawRows = new List<(
+            string?   PhysicianName,
+            DateTime? OpdDate,
+            string?   HijriDate,
+            string?   PatientName,
+            int?      Age,
+            string?   Sex,
+            string?   PhoneNumber,
+            string?   BP, string? HR, string? PR, string? RR, string? BT, string? BW,
+            string?   ClinicalFindings,
+            string?   Diagnosis,
+            string?   Note,
+            DateTime? LastUpdated
+        )>();
 
-            db.Patients.Add(new Patient
+        using (var cmd = new OleDbCommand("SELECT * FROM [Patients Table]", conn))
+        using (var reader = cmd.ExecuteReader())
+        {
+            while (reader.Read())
             {
-                PhysicianId      = physicianId,
-                OpdDate          = reader["OPD Date"] as DateTime?,
-                HijriDate        = reader["Hijri Date"] as string,
-                PatientName      = reader["Patient Name"] as string,
-                Age              = reader["Age"] as int?,
-                Sex              = reader["Sex"] as string,
-                PatientNumber    = reader["Patient_Number"] as string,
-                BP               = reader["BP"] as string,
-                HR               = reader["HR"] as string,
-                PR               = reader["PR"] as string,
-                RR               = reader["RR"] as string,
-                BT               = reader["BT"] as string,
-                BW               = reader["BW"] as string,
-                ClinicalFindings = reader["Clinical Findings"] as string,
-                Diagnosis        = reader["Diagnosis"] as string,
-                Note             = reader["Note_1"] as string,
-                LastUpdated      = reader["Last_updated"] as DateTime?,
+                rawRows.Add((
+                    reader["Physician_name"]    as string,
+                    reader["OPD Date"]          as DateTime?,
+                    reader["Hijri Date"]        as string,
+                    reader["Patient Name"]      as string,
+                    reader["Age"]               as int?,
+                    reader["Sex"]               as string,
+                    reader["Patient_Number"]    as string,
+                    reader["BP"]                as string,
+                    reader["HR"]                as string,
+                    reader["PR"]                as string,
+                    reader["RR"]                as string,
+                    reader["BT"]                as string,
+                    reader["BW"]                as string,
+                    reader["Clinical Findings"] as string,
+                    reader["Diagnosis"]         as string,
+                    reader["Note_1"]            as string,
+                    reader["Last_updated"]      as DateTime?
+                ));
+            }
+        }
+
+        // Create Patient demographic records first (to get auto-increment IDs)
+        var patients = rawRows.Select(r => new Patient
+        {
+            PatientName = r.PatientName,
+            Sex         = r.Sex,
+            PhoneNumber = r.PhoneNumber,
+            CreatedAt   = DateTime.UtcNow,
+        }).ToList();
+
+        foreach (var p in patients)
+            db.Patients.Add(p);
+        db.SaveChanges();
+
+        // Generate PatientCodes + create Visit records (one per imported row)
+        for (int i = 0; i < patients.Count; i++)
+        {
+            var p = patients[i];
+            var r = rawRows[i];
+
+            p.PatientCode = $"P-{p.Id:D5}";
+
+            physicianMap.TryGetValue(r.PhysicianName ?? "", out var physicianId);
+
+            db.Visits.Add(new Visit
+            {
+                PatientId        = p.Id,
+                PhysicianId      = physicianId > 0 ? physicianId : null,
+                OpdDate          = r.OpdDate,
+                HijriDate        = r.HijriDate,
+                Age              = r.Age,
+                BP               = r.BP,
+                HR               = r.HR,
+                PR               = r.PR,
+                RR               = r.RR,
+                BT               = r.BT,
+                BW               = r.BW,
+                ClinicalFindings = r.ClinicalFindings,
+                Diagnosis        = r.Diagnosis,
+                Note             = r.Note,
+                LastUpdated      = r.LastUpdated,
             });
-            count++;
         }
         db.SaveChanges();
-        return count;
+
+        return patients.Count;
     }
 
-    private int ImportMedicineUsage(OleDbConnection conn)
+    private static int ImportMedicineUsage(OleDbConnection conn, AppDbContext db)
     {
         if (db.MedicineUsages.Any()) return 0;
         int count = 0;
 
-        // Access F_Key maps to original Access Patient ID — we stored patients in insertion order.
-        // Build a map: original Access ID → new SQLite Patient ID via OpdDate+PatientNumber.
-        // Simpler: re-read Access patients to get original IDs.
-        var accessIdToSqliteId = BuildPatientIdMap(conn);
+        // Map Access patient ID → SQLite visit ID
+        var accessIdToVisitId = BuildPatientToVisitIdMap(conn, db);
 
         using var cmd = new OleDbCommand("SELECT * FROM [Medicine Usage]", conn);
         using var reader = cmd.ExecuteReader();
@@ -266,11 +322,11 @@ public class MigrationService(AppDbContext db)
         {
             var accessPatientId = reader["F_Key"] as int?;
             if (accessPatientId is null) continue;
-            if (!accessIdToSqliteId.TryGetValue(accessPatientId.Value, out var sqlitePatientId)) continue;
+            if (!accessIdToVisitId.TryGetValue(accessPatientId.Value, out var visitId)) continue;
 
             db.MedicineUsages.Add(new MedicineUsage
             {
-                PatientId    = sqlitePatientId,
+                VisitId      = visitId,
                 LineNumber   = reader["Custom_ID"] as int? ?? 0,
                 Type         = reader["Type"] as string,
                 Prescription = reader["Prescription"] as string,
@@ -286,11 +342,15 @@ public class MigrationService(AppDbContext db)
         return count;
     }
 
-    private Dictionary<int, int> BuildPatientIdMap(OleDbConnection conn)
+    /// <summary>
+    /// Returns a mapping of Access patient ID → SQLite Visit ID.
+    /// Matches by phone number + OPD date (same criteria as before, now resolving to Visit).
+    /// </summary>
+    private static Dictionary<int, int> BuildPatientToVisitIdMap(OleDbConnection conn, AppDbContext db)
     {
-        // Read Access patient IDs + a unique key (PatientNumber + OpdDate) to match SQLite rows
         var accessRows = new List<(int AccessId, string? Number, DateTime? Date)>();
-        using var cmd = new OleDbCommand("SELECT ID, [Patient_Number], [OPD Date] FROM [Patients Table]", conn);
+        using var cmd = new OleDbCommand(
+            "SELECT ID, [Patient_Number], [OPD Date] FROM [Patients Table]", conn);
         using var reader = cmd.ExecuteReader();
         while (reader.Read())
             accessRows.Add((
@@ -299,17 +359,23 @@ public class MigrationService(AppDbContext db)
                 reader["OPD Date"] as DateTime?
             ));
 
-        var sqlitePatients = db.Patients
-            .Select(p => new { p.Id, p.PatientNumber, p.OpdDate })
+        // Load visits joined to patient phone + visit date
+        var sqliteVisits = db.Visits
+            .Select(v => new
+            {
+                VisitId     = v.Id,
+                PhoneNumber = v.Patient != null ? v.Patient.PhoneNumber : null,
+                v.OpdDate
+            })
             .ToList();
 
         var map = new Dictionary<int, int>();
         foreach (var (accessId, number, date) in accessRows)
         {
-            var match = sqlitePatients.FirstOrDefault(p =>
-                p.PatientNumber == number && p.OpdDate == date);
+            var match = sqliteVisits.FirstOrDefault(v =>
+                v.PhoneNumber == number && v.OpdDate == date);
             if (match is not null)
-                map[accessId] = match.Id;
+                map[accessId] = match.VisitId;
         }
         return map;
     }
@@ -317,16 +383,16 @@ public class MigrationService(AppDbContext db)
 
 public class MigrationResult
 {
-    public bool Success { get; set; }
-    public string? Error { get; set; }
-    public int Physicians { get; set; }
-    public int MedicineForms { get; set; }
-    public int Routes { get; set; }
-    public int Dosages { get; set; }
-    public int MedicineNotes { get; set; }
-    public int PrescriptionNotes { get; set; }
-    public int LabTests { get; set; }
-    public int Medicines { get; set; }
-    public int Patients { get; set; }
-    public int Prescriptions { get; set; }
+    public bool    Success          { get; set; }
+    public string? Error            { get; set; }
+    public int     Physicians       { get; set; }
+    public int     MedicineForms    { get; set; }
+    public int     Routes           { get; set; }
+    public int     Dosages          { get; set; }
+    public int     MedicineNotes    { get; set; }
+    public int     PrescriptionNotes { get; set; }
+    public int     LabTests         { get; set; }
+    public int     Medicines        { get; set; }
+    public int     Patients         { get; set; }
+    public int     Prescriptions    { get; set; }
 }

@@ -1,5 +1,6 @@
 using System.ComponentModel;
 using System.Windows;
+using System.Windows.Input;
 using OPDClinic.Services;
 using OPDClinic.ViewModels;
 
@@ -63,12 +64,24 @@ public partial class PatientEditWindow : Window
         if (!_vm.IsSaved) _printAfterSave = false;
     }
 
+    // ── Keyboard shortcuts ────────────────────────────────────────────────────
+    // Ctrl+S → Save,  Ctrl+P → Save & Print
+
+    private void SaveCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        => _vm.SaveCommand.Execute(null);
+
+    private void PrintCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        => SaveAndPrint_Click(sender, new RoutedEventArgs());
+
+    // ─────────────────────────────────────────────────────────────────────────
+
     private void GenerateAndOpenPdf()
     {
         try
         {
-            var path = new PdfService(App.Db).GenerateForPatient(_vm.SavedPatientId);
+            var path = new PdfService(App.DbFactory).GenerateForVisit(_vm.SavedVisitId);
             PrintService.OpenPdf(path);
+            AuditService.Log("PrescriptionPrinted", "Visit", _vm.SavedVisitId, _vm.PatientName);
         }
         catch (Exception ex)
         {

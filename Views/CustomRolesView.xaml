@@ -1,0 +1,222 @@
+<UserControl x:Class="OPDClinic.Views.CustomRolesView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:OPDClinic">
+
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVis"/>
+    </UserControl.Resources>
+
+    <Grid Background="{StaticResource ContentBgBrush}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <Border Grid.Row="0" Background="White" Padding="24,16"
+                BorderBrush="{StaticResource BorderBrush}" BorderThickness="0,0,0,1">
+            <DockPanel LastChildFill="False">
+                <StackPanel DockPanel.Dock="Left">
+                    <TextBlock Text="Custom Roles"
+                               FontSize="20" FontWeight="Bold"
+                               Foreground="{StaticResource TextPrimaryBrush}"/>
+                    <TextBlock Text="Define roles with custom permission sets for non-standard staff."
+                               FontSize="12" Foreground="{StaticResource TextSecondaryBrush}"
+                               Margin="0,2,0,0"/>
+                </StackPanel>
+                <Button DockPanel.Dock="Right"
+                        Content="+ New Role"
+                        Style="{StaticResource PrimaryButton}"
+                        Command="{Binding AddRoleCommand}"
+                        VerticalAlignment="Center"/>
+            </DockPanel>
+        </Border>
+
+        <!-- Body: list + detail panel -->
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="380"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- ── Role list ───────────────────────────────────────────────── -->
+            <Border Grid.Column="0" Padding="24,20"
+                    BorderBrush="{StaticResource BorderBrush}" BorderThickness="0,0,1,0">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- DataGrid -->
+                    <Border Grid.Row="0"
+                            BorderBrush="{StaticResource BorderBrush}" BorderThickness="1"
+                            CornerRadius="6">
+                        <DataGrid x:Name="RolesGrid"
+                                  ItemsSource="{Binding Roles}"
+                                  SelectedItem="{Binding SelectedRole}"
+                                  Style="{StaticResource AppDataGrid}"
+                                  MinHeight="120">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="Role Name" Width="*"
+                                                    Binding="{Binding Name}"/>
+                                <DataGridTextColumn Header="Description" Width="2*"
+                                                    Binding="{Binding Description}">
+                                    <DataGridTextColumn.ElementStyle>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
+                                            <Setter Property="ToolTip" Value="{Binding Description}"/>
+                                        </Style>
+                                    </DataGridTextColumn.ElementStyle>
+                                </DataGridTextColumn>
+                                <!-- Edit -->
+                                <DataGridTemplateColumn Header="" Width="40" CanUserResize="False">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <Button Content="✏" Style="{StaticResource ActionButton}"
+                                                    Tag="{Binding}"
+                                                    Click="EditRole_Click"/>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+                                <!-- Delete -->
+                                <DataGridTemplateColumn Header="" Width="40" CanUserResize="False">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <Button Content="✕" Style="{StaticResource ActionButton}"
+                                                    Foreground="{StaticResource DangerBrush}"
+                                                    Tag="{Binding}"
+                                                    Click="DeleteRole_Click"/>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </Border>
+
+                    <!-- Empty state -->
+                    <Border Grid.Row="0" Background="#F8FAFF" CornerRadius="6"
+                            Visibility="{Binding Roles.Count,
+                                         Converter={x:Static local:Converters.ZeroToVisible}}">
+                        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                            <TextBlock Text="&#xE8D7;" FontFamily="Segoe MDL2 Assets"
+                                       FontSize="40" HorizontalAlignment="Center"
+                                       Foreground="#BFC9D9" Margin="0,0,0,12"/>
+                            <TextBlock Text="No custom roles yet"
+                                       FontSize="14" FontWeight="SemiBold"
+                                       Foreground="{StaticResource TextSecondaryBrush}"
+                                       HorizontalAlignment="Center"/>
+                            <TextBlock Text="Click &quot;+ New Role&quot; to create the first one."
+                                       FontSize="12" Foreground="{StaticResource TextSecondaryBrush}"
+                                       HorizontalAlignment="Center" Margin="0,4,0,0"/>
+                        </StackPanel>
+                    </Border>
+
+                    <TextBlock Grid.Row="1"
+                               Text="Select a role to view its full permission breakdown."
+                               FontSize="11" Foreground="{StaticResource TextSecondaryBrush}"
+                               Margin="0,10,0,0" FontStyle="Italic"/>
+                </Grid>
+            </Border>
+
+            <!-- ── Detail panel ───────────────────────────────────────────── -->
+            <ScrollViewer Grid.Column="1" VerticalScrollBarVisibility="Auto" Padding="24,20">
+                <Grid>
+
+                <!-- No-selection placeholder — visibility managed in code-behind -->
+                <StackPanel x:Name="NoSelectionPanel"
+                            HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,60,0,0">
+                    <TextBlock Text="&#xE8D7;" FontFamily="Segoe MDL2 Assets"
+                               FontSize="40" HorizontalAlignment="Center"
+                               Foreground="#BFC9D9" Margin="0,0,0,10"/>
+                    <TextBlock Text="Select a role to see details"
+                               FontSize="13" Foreground="{StaticResource TextSecondaryBrush}"
+                               HorizontalAlignment="Center"/>
+                </StackPanel>
+
+                <!-- Role detail -->
+                <StackPanel x:Name="RoleDetailPanel" Visibility="Collapsed">
+
+                    <!-- 1. Role name -->
+                    <TextBlock Text="{Binding SelectedRole.Name}"
+                               FontSize="18" FontWeight="Bold"
+                               Foreground="{StaticResource TextPrimaryBrush}"
+                               Margin="0,0,0,4"/>
+
+                    <!-- 2. Description -->
+                    <TextBlock Text="{Binding SelectedRole.Description}"
+                               FontSize="12" Foreground="{StaticResource TextSecondaryBrush}"
+                               TextWrapping="Wrap" Margin="0,0,0,16"/>
+
+                    <Border Height="1" Background="{StaticResource BorderBrush}" Margin="0,0,0,16"/>
+
+                    <!-- 3. Permissions ✅ / ❌ -->
+                    <TextBlock Text="PERMISSIONS" FontSize="10" FontWeight="SemiBold"
+                               Foreground="#4A6FA5" Margin="0,0,0,10"/>
+
+                    <ItemsControl x:Name="DetailPermList">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Grid Margin="0,0,0,8">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="22"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Grid.Column="0"
+                                               Text="{Binding Granted}"
+                                               FontSize="13" VerticalAlignment="Top"/>
+                                    <StackPanel Grid.Column="1" Margin="6,0,0,0">
+                                        <TextBlock Text="{Binding Name}"
+                                                   FontSize="12" FontWeight="SemiBold"
+                                                   Foreground="{StaticResource TextPrimaryBrush}"/>
+                                        <TextBlock Text="{Binding Desc}"
+                                                   FontSize="11"
+                                                   Foreground="{StaticResource TextSecondaryBrush}"
+                                                   TextWrapping="Wrap"/>
+                                    </StackPanel>
+                                </Grid>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+
+                    <!-- 4. Backend / JSON array -->
+                    <Border Height="1" Background="{StaticResource BorderBrush}" Margin="0,16,0,16"/>
+                    <TextBlock Text="BACKEND INTEGRATION" FontSize="10" FontWeight="SemiBold"
+                               Foreground="#4A6FA5" Margin="0,0,0,8"/>
+
+                    <Border Background="#F1F5F9" CornerRadius="6" Padding="12,10">
+                        <StackPanel>
+                            <TextBlock FontSize="11" FontFamily="Consolas"
+                                       Foreground="#334155" TextWrapping="Wrap">
+                                <Run FontWeight="SemiBold">Name: </Run>
+                                <Run x:Name="BackendName"/>
+                            </TextBlock>
+                            <TextBlock FontSize="11" FontFamily="Consolas"
+                                       Foreground="#334155" TextWrapping="Wrap"
+                                       Margin="0,4,0,0">
+                                <Run FontWeight="SemiBold">Permissions: </Run>
+                                <Run x:Name="BackendPerms"/>
+                            </TextBlock>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Additional notes -->
+                    <StackPanel Margin="0,16,0,0"
+                                Visibility="{Binding SelectedRole.AdditionalNotes,
+                                             Converter={x:Static local:Converters.NullToCollapsed}}">
+                        <TextBlock Text="ADDITIONAL NOTES" FontSize="10" FontWeight="SemiBold"
+                                   Foreground="#4A6FA5" Margin="0,0,0,8"/>
+                        <TextBlock Text="{Binding SelectedRole.AdditionalNotes}"
+                                   FontSize="12" Foreground="{StaticResource TextSecondaryBrush}"
+                                   TextWrapping="Wrap"/>
+                    </StackPanel>
+
+                </StackPanel>
+
+                </Grid>
+            </ScrollViewer>
+
+        </Grid>
+    </Grid>
+</UserControl>

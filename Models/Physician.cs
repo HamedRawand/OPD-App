@@ -40,5 +40,5 @@ public class Physician
     [MaxLength(255)]
     public string? Address { get; set; }
 
-    public ICollection<Patient> Patients { get; set; } = [];
+    public ICollection<Visit> Visits { get; set; } = [];
 }

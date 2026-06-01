@@ -8,7 +8,7 @@ namespace OPDClinic.Views;
 
 public partial class ImportWizardView : UserControl
 {
-    private readonly MigrationService _migration = new(App.Db);
+    private readonly MigrationService _migration = new(App.DbFactory);
 
     public ImportWizardView()
     {

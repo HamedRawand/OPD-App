@@ -38,19 +38,29 @@
 
     <!-- Patient List -->
     <sys:String x:Key="PatList.Title">Patients</sys:String>
-    <sys:String x:Key="PatList.NewVisit">+ New Visit</sys:String>
-    <sys:String x:Key="PatList.Search">Search by name, diagnosis, number…</sys:String>
+    <sys:String x:Key="PatList.NewVisit">+ New Patient</sys:String>
+    <sys:String x:Key="PatList.ViewHistory">📋 History</sys:String>
+    <sys:String x:Key="PatList.Search">Search by name, ID, phone…</sys:String>
     <sys:String x:Key="PatList.AllPhysicians">All Physicians</sys:String>
     <sys:String x:Key="PatList.Clear">Clear</sys:String>
-    <sys:String x:Key="PatList.Col.Date">Date</sys:String>
-    <sys:String x:Key="PatList.Col.Shamsi">Shamsi</sys:String>
+    <sys:String x:Key="PatList.Col.PatientCode">Patient ID</sys:String>
     <sys:String x:Key="PatList.Col.Name">Patient Name</sys:String>
-    <sys:String x:Key="PatList.Col.Age">Age</sys:String>
     <sys:String x:Key="PatList.Col.Sex">Sex</sys:String>
-    <sys:String x:Key="PatList.Col.No">No.</sys:String>
-    <sys:String x:Key="PatList.Col.BP">BP</sys:String>
-    <sys:String x:Key="PatList.Col.Physician">Physician</sys:String>
-    <sys:String x:Key="PatList.Col.Diagnosis">Diagnosis</sys:String>
+    <sys:String x:Key="PatList.Col.Phone">Phone</sys:String>
+    <sys:String x:Key="PatList.Col.Visits">Visits</sys:String>
+    <sys:String x:Key="PatList.Col.LastVisit">Last Visit</sys:String>
+    <sys:String x:Key="PatList.Col.Physician">Last Physician</sys:String>
+    <sys:String x:Key="PatList.Col.Diagnosis">Last Diagnosis</sys:String>
+
+    <!-- Patient Detail (visit history) -->
+    <sys:String x:Key="PatDetail.NewVisit">+ New Visit</sys:String>
+    <sys:String x:Key="PatDetail.VisitHistory">Visit History</sys:String>
+    <sys:String x:Key="PatDetail.Visits">visits</sys:String>
+    <sys:String x:Key="PatDetail.Col.Date">Date</sys:String>
+    <sys:String x:Key="PatDetail.Col.Shamsi">Shamsi Date</sys:String>
+    <sys:String x:Key="PatDetail.Col.Physician">Physician</sys:String>
+    <sys:String x:Key="PatDetail.Col.Age">Age</sys:String>
+    <sys:String x:Key="PatDetail.Col.Diagnosis">Diagnosis</sys:String>
 
     <!-- Patient Edit -->
     <sys:String x:Key="PatEdit.Tab.Visit">Visit Info</sys:String>
@@ -65,6 +75,8 @@
     <sys:String x:Key="PatEdit.ShamsiDate">Shamsi Date</sys:String>
     <sys:String x:Key="PatEdit.ShamsiHint">(auto-syncs with OPD date)</sys:String>
     <sys:String x:Key="PatEdit.PatientNo">Patient Number</sys:String>
+    <sys:String x:Key="PatEdit.PhoneNumber">Phone Number</sys:String>
+    <sys:String x:Key="PatEdit.PatientCode">Patient ID</sys:String>
     <sys:String x:Key="PatEdit.PatientName">Patient Name *</sys:String>
     <sys:String x:Key="PatEdit.Age">Age</sys:String>
     <sys:String x:Key="PatEdit.Sex">Sex</sys:String>
@@ -266,5 +278,7 @@
     <sys:String x:Key="Common.Cancel">Cancel</sys:String>
     <sys:String x:Key="Common.Add">Add</sys:String>
     <sys:String x:Key="Common.Refresh">↻ Refresh</sys:String>
+    <sys:String x:Key="Common.Open">Open</sys:String>
+    <sys:String x:Key="Common.Repeat">↻ Repeat</sys:String>
 
 </ResourceDictionary>

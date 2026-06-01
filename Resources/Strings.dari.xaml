@@ -39,18 +39,28 @@
     <!-- Patient List -->
     <sys:String x:Key="PatList.Title">بیماران</sys:String>
     <sys:String x:Key="PatList.NewVisit">+ مریض جدید</sys:String>
-    <sys:String x:Key="PatList.Search">جستجو بر اساس نام، تشخیص، شماره...</sys:String>
+    <sys:String x:Key="PatList.ViewHistory">📋 سابقه</sys:String>
+    <sys:String x:Key="PatList.Search">جستجو بر اساس نام، شناسه، شماره...</sys:String>
     <sys:String x:Key="PatList.AllPhysicians">همه داکتران</sys:String>
     <sys:String x:Key="PatList.Clear">پاک</sys:String>
-    <sys:String x:Key="PatList.Col.Date">تاریخ</sys:String>
-    <sys:String x:Key="PatList.Col.Shamsi">شمسی</sys:String>
+    <sys:String x:Key="PatList.Col.PatientCode">شناسه مریض</sys:String>
     <sys:String x:Key="PatList.Col.Name">نام مریض</sys:String>
-    <sys:String x:Key="PatList.Col.Age">سن</sys:String>
     <sys:String x:Key="PatList.Col.Sex">جنس</sys:String>
-    <sys:String x:Key="PatList.Col.No">شماره</sys:String>
-    <sys:String x:Key="PatList.Col.BP">فشار خون</sys:String>
-    <sys:String x:Key="PatList.Col.Physician">داکتر</sys:String>
-    <sys:String x:Key="PatList.Col.Diagnosis">تشخیص</sys:String>
+    <sys:String x:Key="PatList.Col.Phone">شماره موبایل</sys:String>
+    <sys:String x:Key="PatList.Col.Visits">مراجعات</sys:String>
+    <sys:String x:Key="PatList.Col.LastVisit">آخرین مراجعه</sys:String>
+    <sys:String x:Key="PatList.Col.Physician">آخرین داکتر</sys:String>
+    <sys:String x:Key="PatList.Col.Diagnosis">آخرین تشخیص</sys:String>
+
+    <!-- Patient Detail -->
+    <sys:String x:Key="PatDetail.NewVisit">+ مراجعه جدید</sys:String>
+    <sys:String x:Key="PatDetail.VisitHistory">سابقه مراجعات</sys:String>
+    <sys:String x:Key="PatDetail.Visits">مراجعه</sys:String>
+    <sys:String x:Key="PatDetail.Col.Date">تاریخ</sys:String>
+    <sys:String x:Key="PatDetail.Col.Shamsi">تاریخ شمسی</sys:String>
+    <sys:String x:Key="PatDetail.Col.Physician">داکتر</sys:String>
+    <sys:String x:Key="PatDetail.Col.Age">سن</sys:String>
+    <sys:String x:Key="PatDetail.Col.Diagnosis">تشخیص</sys:String>
 
     <!-- Patient Edit -->
     <sys:String x:Key="PatEdit.Tab.Visit">معلومات مراجعه</sys:String>
@@ -65,6 +75,8 @@
     <sys:String x:Key="PatEdit.ShamsiDate">تاریخ شمسی</sys:String>
     <sys:String x:Key="PatEdit.ShamsiHint">(همگام با تاریخ میلادی)</sys:String>
     <sys:String x:Key="PatEdit.PatientNo">نمبر مریض</sys:String>
+    <sys:String x:Key="PatEdit.PhoneNumber">شماره موبایل</sys:String>
+    <sys:String x:Key="PatEdit.PatientCode">شناسه مریض</sys:String>
     <sys:String x:Key="PatEdit.PatientName">نام مریض *</sys:String>
     <sys:String x:Key="PatEdit.Age">سن</sys:String>
     <sys:String x:Key="PatEdit.Sex">جنس</sys:String>
@@ -266,5 +278,7 @@
     <sys:String x:Key="Common.Cancel">لغو</sys:String>
     <sys:String x:Key="Common.Add">اضافه</sys:String>
     <sys:String x:Key="Common.Refresh">↻ تازه‌سازی</sys:String>
+    <sys:String x:Key="Common.Open">باز کردن</sys:String>
+    <sys:String x:Key="Common.Repeat">↻ تکرار</sys:String>
 
 </ResourceDictionary>

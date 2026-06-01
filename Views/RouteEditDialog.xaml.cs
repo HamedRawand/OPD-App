@@ -1,5 +1,6 @@
 using System.Windows;
 using System.Windows.Controls;
+using Microsoft.EntityFrameworkCore;
 using OPDClinic.Data;
 using OPDClinic.Helpers;
 using OPDClinic.Models;
@@ -8,13 +9,13 @@ namespace OPDClinic.Views;
 
 public partial class RouteEditDialog : Window
 {
-    private readonly AppDbContext _db;
+    private readonly IDbContextFactory<AppDbContext> _factory;
     private readonly RouteOfAdministration? _existing;
 
-    public RouteEditDialog(AppDbContext db, RouteOfAdministration? route = null)
+    public RouteEditDialog(IDbContextFactory<AppDbContext> factory, RouteOfAdministration? route = null)
     {
         InitializeComponent();
-        _db = db;
+        _factory  = factory;
         _existing = route;
 
         if (route is not null)
@@ -46,10 +47,15 @@ public partial class RouteEditDialog : Window
         item.Abbreviation = AbbreviationBox.Text.NullIfEmpty();
         item.Description  = DescriptionBox.Text.NullIfEmpty();
 
-        if (_existing is null)
-            _db.Routes.Add(item);
-
-        try { _db.SaveChanges(); }
+        try
+        {
+            using var db = _factory.CreateDbContext();
+            if (_existing is null)
+                db.Routes.Add(item);
+            else
+                db.Update(item);
+            db.SaveChanges();
+        }
         catch (Exception ex)
         {
             ShowError($"Could not save route:\n{ex.Message}");

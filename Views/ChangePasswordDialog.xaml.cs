@@ -1,4 +1,5 @@
 using System.Windows;
+using OPDClinic.Services;
 
 namespace OPDClinic.Views;
 
@@ -35,6 +36,7 @@ public partial class ChangePasswordDialog : Window
         if (!App.Auth.ChangePassword(current, newPwd))
         { ShowError("Current password is incorrect."); return; }
 
+        AuditService.Log("PasswordChangedSelf", "User", App.Auth.CurrentUser?.Id, App.Auth.CurrentUser?.Username);
         DialogResult = true;
     }
 

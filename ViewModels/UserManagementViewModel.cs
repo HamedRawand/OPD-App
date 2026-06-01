@@ -5,6 +5,7 @@ using System.Windows.Data;
 using System.Windows.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Microsoft.EntityFrameworkCore;
 using OPDClinic.Models;
 using OPDClinic.Services;
 
@@ -46,8 +47,9 @@ public partial class UserManagementViewModel : ObservableObject
     [RelayCommand]
     public void LoadUsers()
     {
+        using var db = App.DbFactory.CreateDbContext();
         _allUsers.Clear();
-        _allUsers.AddRange(App.Db.Users.OrderBy(u => u.Username).ToList());
+        _allUsers.AddRange(db.Users.Include(u => u.CustomRole).OrderBy(u => u.Username).ToList());
 
         Users.Clear();
         foreach (var u in _allUsers) Users.Add(u);
@@ -86,11 +88,17 @@ public partial class UserManagementViewModel : ObservableObject
 
         if (result != MessageBoxResult.Yes) return;
 
-        user.IsActive = !user.IsActive;
-        try { App.Db.SaveChanges(); }
+        var newValue = !user.IsActive;
+        user.IsActive = newValue;
+        try
+        {
+            using var db = App.DbFactory.CreateDbContext();
+            var dbUser = db.Users.Find(user.Id);
+            if (dbUser != null) { dbUser.IsActive = newValue; db.SaveChanges(); }
+        }
         catch (Exception ex)
         {
-            user.IsActive = !user.IsActive; // revert optimistic change
+            user.IsActive = !newValue; // revert optimistic change
             MessageBox.Show($"Could not update user:\n{ex.Message}",
                 "Update Failed", MessageBoxButton.OK, MessageBoxImage.Error);
             return;
@@ -104,7 +112,17 @@ public partial class UserManagementViewModel : ObservableObject
     {
         user.IsLocked = false;
         user.FailedLoginAttempts = 0;
-        try { App.Db.SaveChanges(); }
+        try
+        {
+            using var db = App.DbFactory.CreateDbContext();
+            var dbUser = db.Users.Find(user.Id);
+            if (dbUser != null)
+            {
+                dbUser.IsLocked = false;
+                dbUser.FailedLoginAttempts = 0;
+                db.SaveChanges();
+            }
+        }
         catch (Exception ex)
         {
             MessageBox.Show($"Could not unlock account:\n{ex.Message}",
@@ -123,17 +141,31 @@ public partial class UserManagementViewModel : ObservableObject
         var dlg = new Views.ResetPasswordDialog(user.Username);
         if (dlg.ShowDialog() != true) return;
 
-        user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(dlg.NewPassword);
-        user.MustChangePassword = true;
-        user.IsLocked = false;
-        user.FailedLoginAttempts = 0;
-        try { App.Db.SaveChanges(); }
+        var newHash = BCrypt.Net.BCrypt.HashPassword(dlg.NewPassword);
+        try
+        {
+            using var db = App.DbFactory.CreateDbContext();
+            var dbUser = db.Users.Find(user.Id);
+            if (dbUser != null)
+            {
+                dbUser.PasswordHash        = newHash;
+                dbUser.MustChangePassword  = true;
+                dbUser.IsLocked            = false;
+                dbUser.FailedLoginAttempts = 0;
+                db.SaveChanges();
+            }
+        }
         catch (Exception ex)
         {
             MessageBox.Show($"Could not reset password:\n{ex.Message}",
                 "Reset Failed", MessageBoxButton.OK, MessageBoxImage.Error);
             return;
         }
+        // Sync in-memory copy
+        user.PasswordHash        = newHash;
+        user.MustChangePassword  = true;
+        user.IsLocked            = false;
+        user.FailedLoginAttempts = 0;
         AuditService.Log("PasswordReset", "User", user.Id, user.Username);
 
         MessageBox.Show(
@@ -159,8 +191,12 @@ public partial class UserManagementViewModel : ObservableObject
 
         var username = user.Username;
         var userId   = user.Id;
-        App.Db.Users.Remove(user);
-        try { App.Db.SaveChanges(); }
+        try
+        {
+            using var db = App.DbFactory.CreateDbContext();
+            db.Remove(user);
+            db.SaveChanges();
+        }
         catch (Exception ex)
         {
             MessageBox.Show($"Could not delete user:\n{ex.Message}",

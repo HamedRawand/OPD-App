@@ -12,13 +12,13 @@ public partial class PhysicianView : UserControl
     public PhysicianView()
     {
         InitializeComponent();
-        ViewModel = new PhysicianViewModel(App.Db);
+        ViewModel = new PhysicianViewModel(App.DbFactory);
         DataContext = ViewModel;
     }
 
     private void AddPhysician_Click(object sender, RoutedEventArgs e)
     {
-        var dlg = new PhysicianEditDialog(App.Db) { Owner = Window.GetWindow(this) };
+        var dlg = new PhysicianEditDialog(App.DbFactory) { Owner = Window.GetWindow(this) };
         if (dlg.ShowDialog() == true)
             ViewModel.LoadPhysiciansCommand.Execute(null);
     }
@@ -27,7 +27,7 @@ public partial class PhysicianView : UserControl
     {
         if (sender is Button btn && btn.Tag is Physician physician)
         {
-            var dlg = new PhysicianEditDialog(App.Db, physician) { Owner = Window.GetWindow(this) };
+            var dlg = new PhysicianEditDialog(App.DbFactory, physician) { Owner = Window.GetWindow(this) };
             if (dlg.ShowDialog() == true)
                 ViewModel.LoadPhysiciansCommand.Execute(null);
         }

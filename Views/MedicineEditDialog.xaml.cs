@@ -1,5 +1,6 @@
 using System.Windows;
 using System.Windows.Controls;
+using Microsoft.EntityFrameworkCore;
 using OPDClinic.Data;
 using OPDClinic.Models;
 using OPDClinic.Services;
@@ -8,15 +9,17 @@ namespace OPDClinic.Views;
 
 public partial class MedicineEditDialog : Window
 {
-    private readonly AppDbContext _db;
+    private readonly IDbContextFactory<AppDbContext> _factory;
     private readonly MedicineList? _existing;
     private List<MedicineForm> _allForms = [];
 
-    public MedicineEditDialog(AppDbContext db, MedicineList? medicine = null)
+    public MedicineEditDialog(IDbContextFactory<AppDbContext> factory, MedicineList? medicine = null)
     {
         InitializeComponent();
-        _db = db;
+        _factory  = factory;
         _existing = medicine;
+
+        using var db = factory.CreateDbContext();
 
         var categories = db.MedicineForms
             .Select(f => f.Category)
@@ -84,12 +87,14 @@ public partial class MedicineEditDialog : Window
         medicine.Note         = NoteBox.Text.Trim();
 
         bool isNew = _existing is null;
-        if (isNew)
-            _db.MedicineLists.Add(medicine);
-
         try
         {
-            _db.SaveChanges();
+            using var db = _factory.CreateDbContext();
+            if (isNew)
+                db.MedicineLists.Add(medicine);
+            else
+                db.Update(medicine);
+            db.SaveChanges();
             AuditService.Log(
                 isNew ? "MedicineCreated" : "MedicineUpdated",
                 "Medicine", medicine.Id, medicine.MedicineName);

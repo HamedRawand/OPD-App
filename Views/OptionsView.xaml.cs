@@ -14,7 +14,7 @@ public partial class OptionsView : UserControl
     public OptionsView()
     {
         InitializeComponent();
-        ViewModel = new OptionsViewModel(App.Db);
+        ViewModel = new OptionsViewModel(App.DbFactory);
         DataContext = ViewModel;
     }
 
@@ -22,7 +22,7 @@ public partial class OptionsView : UserControl
 
     private void AddRoute_Click(object sender, RoutedEventArgs e)
     {
-        var dlg = new RouteEditDialog(App.Db, null) { Owner = Owner };
+        var dlg = new RouteEditDialog(App.DbFactory, null) { Owner = Owner };
         if (dlg.ShowDialog() == true)
             ViewModel.LoadRoutesCommand.Execute(null);
     }
@@ -31,7 +31,7 @@ public partial class OptionsView : UserControl
     {
         if ((sender as FrameworkElement)?.Tag is RouteOfAdministration item)
         {
-            var dlg = new RouteEditDialog(App.Db, item) { Owner = Owner };
+            var dlg = new RouteEditDialog(App.DbFactory, item) { Owner = Owner };
             if (dlg.ShowDialog() == true)
                 ViewModel.LoadRoutesCommand.Execute(null);
         }
@@ -41,7 +41,7 @@ public partial class OptionsView : UserControl
 
     private void AddMedicineCategory_Click(object sender, RoutedEventArgs e)
     {
-        var dlg = new MedicineCategoryEditDialog(App.Db, null) { Owner = Owner };
+        var dlg = new MedicineCategoryEditDialog(App.DbFactory, null) { Owner = Owner };
         if (dlg.ShowDialog() == true)
             ViewModel.LoadMedicineCategoriesCommand.Execute(null);
     }
@@ -50,7 +50,7 @@ public partial class OptionsView : UserControl
     {
         if ((sender as FrameworkElement)?.Tag is MedicineForm item)
         {
-            var dlg = new MedicineCategoryEditDialog(App.Db, item) { Owner = Owner };
+            var dlg = new MedicineCategoryEditDialog(App.DbFactory, item) { Owner = Owner };
             if (dlg.ShowDialog() == true)
                 ViewModel.LoadMedicineCategoriesCommand.Execute(null);
         }
@@ -60,7 +60,7 @@ public partial class OptionsView : UserControl
 
     private void AddDosage_Click(object sender, RoutedEventArgs e)
     {
-        var dlg = new DosageEditDialog(App.Db, null) { Owner = Owner };
+        var dlg = new DosageEditDialog(App.DbFactory, null) { Owner = Owner };
         if (dlg.ShowDialog() == true)
             ViewModel.LoadDosagesCommand.Execute(null);
     }
@@ -69,7 +69,7 @@ public partial class OptionsView : UserControl
     {
         if ((sender as FrameworkElement)?.Tag is Dosage item)
         {
-            var dlg = new DosageEditDialog(App.Db, item) { Owner = Owner };
+            var dlg = new DosageEditDialog(App.DbFactory, item) { Owner = Owner };
             if (dlg.ShowDialog() == true)
                 ViewModel.LoadDosagesCommand.Execute(null);
         }
@@ -79,7 +79,7 @@ public partial class OptionsView : UserControl
 
     private void AddMedicineNote_Click(object sender, RoutedEventArgs e)
     {
-        var dlg = new MedicineNoteEditDialog(App.Db, null) { Owner = Owner };
+        var dlg = new MedicineNoteEditDialog(App.DbFactory, null) { Owner = Owner };
         if (dlg.ShowDialog() == true)
             ViewModel.LoadMedicineNotesCommand.Execute(null);
     }
@@ -88,7 +88,7 @@ public partial class OptionsView : UserControl
     {
         if ((sender as FrameworkElement)?.Tag is MedicineNote item)
         {
-            var dlg = new MedicineNoteEditDialog(App.Db, item) { Owner = Owner };
+            var dlg = new MedicineNoteEditDialog(App.DbFactory, item) { Owner = Owner };
             if (dlg.ShowDialog() == true)
                 ViewModel.LoadMedicineNotesCommand.Execute(null);
         }
@@ -98,7 +98,7 @@ public partial class OptionsView : UserControl
 
     private void AddPrescriptionNote_Click(object sender, RoutedEventArgs e)
     {
-        var dlg = new PrescriptionNoteEditDialog(App.Db, null) { Owner = Owner };
+        var dlg = new PrescriptionNoteEditDialog(App.DbFactory, null) { Owner = Owner };
         if (dlg.ShowDialog() == true)
             ViewModel.LoadPrescriptionNotesCommand.Execute(null);
     }
@@ -107,7 +107,7 @@ public partial class OptionsView : UserControl
     {
         if ((sender as FrameworkElement)?.Tag is PrescriptionNote item)
         {
-            var dlg = new PrescriptionNoteEditDialog(App.Db, item) { Owner = Owner };
+            var dlg = new PrescriptionNoteEditDialog(App.DbFactory, item) { Owner = Owner };
             if (dlg.ShowDialog() == true)
                 ViewModel.LoadPrescriptionNotesCommand.Execute(null);
         }
@@ -117,7 +117,7 @@ public partial class OptionsView : UserControl
 
     private void AddLabTest_Click(object sender, RoutedEventArgs e)
     {
-        var dlg = new LabTestEditDialog(App.Db, null) { Owner = Owner };
+        var dlg = new LabTestEditDialog(App.DbFactory, null) { Owner = Owner };
         if (dlg.ShowDialog() == true)
             ViewModel.LoadLabTestsCommand.Execute(null);
     }
@@ -126,7 +126,7 @@ public partial class OptionsView : UserControl
     {
         if ((sender as FrameworkElement)?.Tag is LabTest item)
         {
-            var dlg = new LabTestEditDialog(App.Db, item) { Owner = Owner };
+            var dlg = new LabTestEditDialog(App.DbFactory, item) { Owner = Owner };
             if (dlg.ShowDialog() == true)
                 ViewModel.LoadLabTestsCommand.Execute(null);
         }

@@ -1,5 +1,6 @@
 using System.Windows;
 using System.Windows.Controls;
+using Microsoft.EntityFrameworkCore;
 using OPDClinic.Data;
 using OPDClinic.Models;
 
@@ -7,13 +8,13 @@ namespace OPDClinic.Views;
 
 public partial class PrescriptionNoteEditDialog : Window
 {
-    private readonly AppDbContext _db;
+    private readonly IDbContextFactory<AppDbContext> _factory;
     private readonly PrescriptionNote? _existing;
 
-    public PrescriptionNoteEditDialog(AppDbContext db, PrescriptionNote? note = null)
+    public PrescriptionNoteEditDialog(IDbContextFactory<AppDbContext> factory, PrescriptionNote? note = null)
     {
         InitializeComponent();
-        _db = db;
+        _factory  = factory;
         _existing = note;
 
         if (note is not null)
@@ -39,10 +40,15 @@ public partial class PrescriptionNoteEditDialog : Window
         var item = _existing ?? new PrescriptionNote();
         item.Notes = notes;
 
-        if (_existing is null)
-            _db.PrescriptionNotes.Add(item);
-
-        try { _db.SaveChanges(); }
+        try
+        {
+            using var db = _factory.CreateDbContext();
+            if (_existing is null)
+                db.PrescriptionNotes.Add(item);
+            else
+                db.Update(item);
+            db.SaveChanges();
+        }
         catch (Exception ex)
         {
             ShowError($"Could not save prescription note:\n{ex.Message}");

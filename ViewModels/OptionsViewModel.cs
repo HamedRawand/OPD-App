@@ -2,6 +2,7 @@ using System.Collections.ObjectModel;
 using System.Windows;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Microsoft.EntityFrameworkCore;
 using OPDClinic.Data;
 using OPDClinic.Models;
 
@@ -9,7 +10,7 @@ namespace OPDClinic.ViewModels;
 
 public partial class OptionsViewModel : ObservableObject
 {
-    private readonly AppDbContext _db;
+    private readonly IDbContextFactory<AppDbContext> _factory;
 
     // ── Displayed collections ─────────────────────────────────────────────────
     [ObservableProperty] private ObservableCollection<RouteOfAdministration> _routes             = [];
@@ -23,9 +24,9 @@ public partial class OptionsViewModel : ObservableObject
     /// in Dosage and Medicine Categories edit dialogs.</summary>
     [ObservableProperty] private List<string> _routeCategories = [];
 
-    public OptionsViewModel(AppDbContext db)
+    public OptionsViewModel(IDbContextFactory<AppDbContext> factory)
     {
-        _db = db;
+        _factory = factory;
         LoadAll();
     }
 
@@ -54,8 +55,9 @@ public partial class OptionsViewModel : ObservableObject
     [RelayCommand]
     public void LoadRoutes()
     {
+        using var db = _factory.CreateDbContext();
         Routes = new ObservableCollection<RouteOfAdministration>(
-            _db.Routes.OrderBy(r => r.Category).ThenBy(r => r.RouteName).ToList());
+            db.Routes.OrderBy(r => r.Category).ThenBy(r => r.RouteName).ToList());
         RefreshRouteCategories();
     }
 
@@ -68,8 +70,9 @@ public partial class OptionsViewModel : ObservableObject
 
         try
         {
-            _db.Routes.Remove(item);
-            _db.SaveChanges();
+            using var db = _factory.CreateDbContext();
+            db.Remove(item);
+            db.SaveChanges();
         }
         catch (Exception ex)
         {
@@ -86,8 +89,9 @@ public partial class OptionsViewModel : ObservableObject
     [RelayCommand]
     public void LoadDosages()
     {
+        using var db = _factory.CreateDbContext();
         Dosages = new ObservableCollection<Dosage>(
-            _db.Dosages.OrderBy(d => d.Category).ThenBy(d => d.DosageText).ToList());
+            db.Dosages.OrderBy(d => d.Category).ThenBy(d => d.DosageText).ToList());
     }
 
     [RelayCommand]
@@ -99,8 +103,9 @@ public partial class OptionsViewModel : ObservableObject
 
         try
         {
-            _db.Dosages.Remove(item);
-            _db.SaveChanges();
+            using var db = _factory.CreateDbContext();
+            db.Remove(item);
+            db.SaveChanges();
         }
         catch (Exception ex)
         {
@@ -116,8 +121,9 @@ public partial class OptionsViewModel : ObservableObject
     [RelayCommand]
     public void LoadMedicineCategories()
     {
+        using var db = _factory.CreateDbContext();
         MedicineCategories = new ObservableCollection<MedicineForm>(
-            _db.MedicineForms.OrderBy(f => f.Category).ThenBy(f => f.FormName).ToList());
+            db.MedicineForms.OrderBy(f => f.Category).ThenBy(f => f.FormName).ToList());
     }
 
     [RelayCommand]
@@ -129,8 +135,9 @@ public partial class OptionsViewModel : ObservableObject
 
         try
         {
-            _db.MedicineForms.Remove(item);
-            _db.SaveChanges();
+            using var db = _factory.CreateDbContext();
+            db.Remove(item);
+            db.SaveChanges();
         }
         catch (Exception ex)
         {
@@ -146,8 +153,9 @@ public partial class OptionsViewModel : ObservableObject
     [RelayCommand]
     public void LoadMedicineNotes()
     {
+        using var db = _factory.CreateDbContext();
         MedicineNotes = new ObservableCollection<MedicineNote>(
-            _db.MedicineNotes.OrderBy(n => n.Notes).ToList());
+            db.MedicineNotes.OrderBy(n => n.Notes).ToList());
     }
 
     [RelayCommand]
@@ -159,8 +167,9 @@ public partial class OptionsViewModel : ObservableObject
 
         try
         {
-            _db.MedicineNotes.Remove(item);
-            _db.SaveChanges();
+            using var db = _factory.CreateDbContext();
+            db.Remove(item);
+            db.SaveChanges();
         }
         catch (Exception ex)
         {
@@ -176,8 +185,9 @@ public partial class OptionsViewModel : ObservableObject
     [RelayCommand]
     public void LoadPrescriptionNotes()
     {
+        using var db = _factory.CreateDbContext();
         PrescriptionNotes = new ObservableCollection<PrescriptionNote>(
-            _db.PrescriptionNotes.OrderBy(n => n.Notes).ToList());
+            db.PrescriptionNotes.OrderBy(n => n.Notes).ToList());
     }
 
     [RelayCommand]
@@ -189,8 +199,9 @@ public partial class OptionsViewModel : ObservableObject
 
         try
         {
-            _db.PrescriptionNotes.Remove(item);
-            _db.SaveChanges();
+            using var db = _factory.CreateDbContext();
+            db.Remove(item);
+            db.SaveChanges();
         }
         catch (Exception ex)
         {
@@ -206,8 +217,9 @@ public partial class OptionsViewModel : ObservableObject
     [RelayCommand]
     public void LoadLabTests()
     {
+        using var db = _factory.CreateDbContext();
         LabTests = new ObservableCollection<LabTest>(
-            _db.LabTests.OrderBy(t => t.Category).ThenBy(t => t.TestName).ToList());
+            db.LabTests.OrderBy(t => t.Category).ThenBy(t => t.TestName).ToList());
     }
 
     [RelayCommand]
@@ -219,8 +231,9 @@ public partial class OptionsViewModel : ObservableObject
 
         try
         {
-            _db.LabTests.Remove(item);
-            _db.SaveChanges();
+            using var db = _factory.CreateDbContext();
+            db.Remove(item);
+            db.SaveChanges();
         }
         catch (Exception ex)
         {

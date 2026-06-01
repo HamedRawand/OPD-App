@@ -1,9 +1,10 @@
+using Microsoft.EntityFrameworkCore;
 using OPDClinic.Data;
 using OPDClinic.Models;
 
 namespace OPDClinic.Services;
 
-public class AuthService(AppDbContext db)
+public class AuthService(IDbContextFactory<AppDbContext> factory)
 {
     private const int MaxFailedAttempts = 5;
 
@@ -11,8 +12,13 @@ public class AuthService(AppDbContext db)
     public bool IsLoggedIn => CurrentUser != null;
     public int AttemptsRemaining { get; private set; } = MaxFailedAttempts;
 
+    /// <summary>Non-null when the logged-in user has a CustomRole — used by Can() for O(1) checks.</summary>
+    private HashSet<Permission>? _customPermissions;
+
     public LoginResult Login(string username, string password)
     {
+        using var db = factory.CreateDbContext();
+
         var user = db.Users.FirstOrDefault(u =>
             u.Username.ToLower() == username.ToLower() && u.IsActive);
 
@@ -36,7 +42,19 @@ public class AuthService(AppDbContext db)
         user.LastLogin = DateTime.UtcNow;
         db.SaveChanges();
 
-        CurrentUser = user;
+        CurrentUser = user; // detached from context — kept in memory for the session
+
+        // Cache custom role permissions for O(1) Can() checks during the session
+        _customPermissions = null;
+        if (user.CustomRoleId.HasValue)
+        {
+            var customRole = db.CustomRoles
+                .FirstOrDefault(r => r.Id == user.CustomRoleId.Value);
+            _customPermissions = customRole?.GetPermissions();
+
+            // Keep CustomRole reference on CurrentUser for display
+            user.CustomRole = customRole;
+        }
 
         if (user.MustChangePassword)
             return LoginResult.MustChangePassword;
@@ -52,9 +70,20 @@ public class AuthService(AppDbContext db)
         if (!BCrypt.Net.BCrypt.Verify(currentPassword, CurrentUser.PasswordHash))
             return false;
 
-        CurrentUser.PasswordHash = BCrypt.Net.BCrypt.HashPassword(newPassword);
-        CurrentUser.MustChangePassword = false;
+        var newHash = BCrypt.Net.BCrypt.HashPassword(newPassword);
+
+        using var db = factory.CreateDbContext();
+        var dbUser = db.Users.Find(CurrentUser.Id);
+        if (dbUser is null) return false;
+
+        dbUser.PasswordHash      = newHash;
+        dbUser.MustChangePassword = false;
         db.SaveChanges();
+
+        // Sync in-memory copy
+        CurrentUser.PasswordHash      = newHash;
+        CurrentUser.MustChangePassword = false;
+
         return true;
     }
 
@@ -64,10 +93,27 @@ public class AuthService(AppDbContext db)
         return BCrypt.Net.BCrypt.Verify(password, CurrentUser.PasswordHash);
     }
 
-    public void Logout() => CurrentUser = null;
+    public void Logout()
+    {
+        CurrentUser = null;
+        _customPermissions = null;
+    }
 
-    public bool Can(Permission permission) =>
-        CurrentUser is not null && RolePermissions.Check(CurrentUser.Role, permission);
+    public bool Can(Permission permission)
+    {
+        if (CurrentUser is null) return false;
+        // Custom role overrides built-in permission map
+        if (_customPermissions is not null)
+            return _customPermissions.Contains(permission);
+        return RolePermissions.Check(CurrentUser.Role, permission);
+    }
+
+    /// <summary>Display name for the current user's role — custom role name or enum name.</summary>
+    public string CurrentRoleDisplayName =>
+        CurrentUser is null ? "" :
+        _customPermissions is not null && CurrentUser.CustomRole is not null
+            ? CurrentUser.CustomRole.Name
+            : CurrentUser.Role.ToString();
 }
 
 public enum LoginResult
@@ -81,7 +127,10 @@ public enum LoginResult
 public enum Permission
 {
     ViewPatients,
-    CreateEditPatient,
+    /// <summary>Register a new patient and add new visits (date, basic info, physician).</summary>
+    RegisterPatient,
+    /// <summary>Enter and edit clinical data for an existing visit (vitals, findings, diagnosis). Also guards visit deletion.</summary>
+    EnterClinicalData,
     WritePrescription,
     PrintPdf,
     ManagePhysicians,
@@ -96,7 +145,8 @@ public static class RolePermissions
     {
         [UserRole.Admin] = [
             Permission.ViewPatients,
-            Permission.CreateEditPatient,
+            Permission.RegisterPatient,
+            Permission.EnterClinicalData,
             Permission.WritePrescription,
             Permission.PrintPdf,
             Permission.ManagePhysicians,
@@ -106,13 +156,14 @@ public static class RolePermissions
         ],
         [UserRole.Doctor] = [
             Permission.ViewPatients,
-            Permission.CreateEditPatient,
+            Permission.RegisterPatient,
+            Permission.EnterClinicalData,
             Permission.WritePrescription,
             Permission.PrintPdf
         ],
         [UserRole.Receptionist] = [
             Permission.ViewPatients,
-            Permission.CreateEditPatient,
+            Permission.RegisterPatient,   // Can register patients but not edit clinical assessments
             Permission.PrintPdf,
             Permission.ViewAllPhysicianPatients
         ]

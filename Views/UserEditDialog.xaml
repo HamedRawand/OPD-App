@@ -34,6 +34,20 @@
                   Style="{StaticResource FormComboBox}"
                   Margin="0,0,0,12"/>
 
+        <!-- Link to Physician (visible only when Role = Doctor) -->
+        <Border x:Name="PhysicianLinkSection" Visibility="Collapsed" Margin="0,0,0,12">
+            <StackPanel>
+                <TextBlock Text="Linked Physician" Style="{StaticResource FormLabel}"/>
+                <ComboBox x:Name="PhysicianBox"
+                          Style="{StaticResource FormComboBox}"
+                          DisplayMemberPath="NameEng"/>
+                <TextBlock Text="Link this doctor account to their physician profile for patient filtering."
+                           FontSize="11" FontStyle="Italic"
+                           Foreground="{StaticResource TextSecondaryBrush}"
+                           TextWrapping="Wrap" Margin="0,4,0,0"/>
+            </StackPanel>
+        </Border>
+
         <!-- Password section -->
         <Border x:Name="PasswordSection" Margin="0,0,0,0">
             <StackPanel>

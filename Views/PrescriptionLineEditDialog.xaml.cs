@@ -1,5 +1,6 @@
 using System.Windows;
 using System.Windows.Controls;
+using Microsoft.EntityFrameworkCore;
 using OPDClinic.Data;
 using OPDClinic.Models;
 
@@ -12,12 +13,13 @@ public partial class PrescriptionLineEditDialog : Window
     private readonly List<Dosage>       _allDosages;
     private readonly List<MedicineNote> _allNotes;
 
-    public PrescriptionLineEditDialog(AppDbContext db, MedicineUsage line)
+    public PrescriptionLineEditDialog(IDbContextFactory<AppDbContext> factory, MedicineUsage line)
     {
         InitializeComponent();
         _line = line;
 
-        // Load catalog data fresh from DB
+        // Load catalog data fresh from DB using a short-lived context
+        using var db = factory.CreateDbContext();
         _allMedicines = db.MedicineLists.OrderBy(m => m.MedicineName).ToList();
         _allDosages   = db.Dosages.ToList();
         _allNotes     = db.MedicineNotes.ToList();

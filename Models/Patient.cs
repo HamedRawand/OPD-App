@@ -3,57 +3,30 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace OPDClinic.Models;
 
+/// <summary>
+/// Demographic record for a patient — one row per person, persists across visits.
+/// Clinical data for each encounter lives in <see cref="Visit"/>.
+/// </summary>
 public class Patient
 {
     public int Id { get; set; }
 
-    public int? PhysicianId { get; set; }
-    public Physician? Physician { get; set; }
-
-    public DateTime? OpdDate { get; set; }
-
-    [MaxLength(50)]
-    public string? HijriDate { get; set; }
+    /// <summary>Auto-generated unique identifier, e.g. "P-00042". Set after first save.</summary>
+    [MaxLength(20)]
+    public string? PatientCode { get; set; }
 
     [MaxLength(255)]
     public string? PatientName { get; set; }
 
-    public int? Age { get; set; }
-
     [MaxLength(50)]
     public string? Sex { get; set; }
 
+    /// <summary>Patient phone number. DB column kept as PatientNumber for backward compatibility.</summary>
+    [Column("PatientNumber")]
     [MaxLength(50)]
-    public string? PatientNumber { get; set; }
+    public string? PhoneNumber { get; set; }
 
-    [MaxLength(50)]
-    public string? BP { get; set; }
+    public DateTime? CreatedAt { get; set; }
 
-    [MaxLength(50)]
-    public string? HR { get; set; }
-
-    [MaxLength(50)]
-    public string? PR { get; set; }
-
-    [MaxLength(50)]
-    public string? RR { get; set; }
-
-    [MaxLength(50)]
-    public string? BT { get; set; }
-
-    [MaxLength(50)]
-    public string? BW { get; set; }
-
-    public string? ClinicalFindings { get; set; }
-
-    public string? Diagnosis { get; set; }
-
-    public string? Note { get; set; }
-
-    /// <summary>Text of the selected prescription footer note — stored directly so it prints correctly even if the preset is later deleted.</summary>
-    public string? FooterNote { get; set; }
-
-    public DateTime? LastUpdated { get; set; }
-
-    public ICollection<MedicineUsage> Medicines { get; set; } = [];
+    public ICollection<Visit> Visits { get; set; } = [];
 }

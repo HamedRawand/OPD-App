@@ -1,8 +1,10 @@
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Microsoft.EntityFrameworkCore;
 using OPDClinic.Data;
 using OPDClinic.Models;
+using OPDClinic.Services;
 
 namespace OPDClinic.ViewModels;
 
@@ -22,9 +24,13 @@ public class LabTestGroup(string category, IEnumerable<SelectableLabTest> tests)
 
 public partial class PrescriptionViewModel : ObservableObject
 {
-    private readonly AppDbContext _db;
+    private readonly IDbContextFactory<AppDbContext> _factory;
     private bool _suppressMedicineFilter;
     private bool _suppressFormFilter;
+
+    // ── Role-based permission ──
+    /// <summary>True for Admin and Doctor; false for Receptionist. Drives UI visibility.</summary>
+    public bool CanWritePrescription { get; } = App.Auth.Can(Permission.WritePrescription);
 
     // ── Catalog data (read-only lists) ──
     public List<MedicineList>      AllMedicines      { get; }
@@ -55,9 +61,12 @@ public partial class PrescriptionViewModel : ObservableObject
     [ObservableProperty] private PrescriptionNote? _selectedPrescriptionNote;
     [ObservableProperty] private string?           _addError;
 
-    public PrescriptionViewModel(AppDbContext db)
+    public PrescriptionViewModel(IDbContextFactory<AppDbContext> factory)
     {
-        _db = db;
+        _factory = factory;
+
+        // Load catalog data using a short-lived context
+        using var db = factory.CreateDbContext();
 
         AllMedicines      = db.MedicineLists.OrderBy(m => m.MedicineName).ToList();
         AllDosages        = db.Dosages.ToList();
@@ -224,17 +233,21 @@ public partial class PrescriptionViewModel : ObservableObject
     }
 
     // ── Load / Save ──────────────────────────────────────────────────────────
-    public void LoadExistingPrescription(int patientId)
+
+    /// <summary>Loads medicines and lab tests for an existing visit.</summary>
+    public void LoadExistingPrescription(int visitId)
     {
-        var lines = _db.MedicineUsages
-            .Where(m => m.PatientId == patientId)
+        using var db = _factory.CreateDbContext();
+
+        var lines = db.MedicineUsages
+            .Where(m => m.VisitId == visitId)
             .OrderBy(m => m.LineNumber)
             .ToList();
 
         foreach (var l in lines) Lines.Add(l);
 
-        var orderedTestIds = _db.PatientLabTests
-            .Where(pt => pt.PatientId == patientId)
+        var orderedTestIds = db.PatientLabTests
+            .Where(pt => pt.VisitId == visitId)
             .Select(pt => pt.LabTestId)
             .ToHashSet();
 
@@ -242,37 +255,35 @@ public partial class PrescriptionViewModel : ObservableObject
             foreach (var test in group.Tests)
                 if (orderedTestIds.Contains(test.Test.Id))
                     test.IsSelected = true;
-
-        // Load saved footer note — match by text so preset deletions don't break old records
-        var patient = _db.Patients.Find(patientId);
-        if (!string.IsNullOrEmpty(patient?.FooterNote))
-            SelectedPrescriptionNote = PrescriptionNotes
-                .FirstOrDefault(n => n.Notes == patient.FooterNote);
     }
 
-    public void SaveToDb(int patientId)
+    /// <summary>
+    /// Saves (replaces) all prescription lines and lab orders for a visit.
+    /// Must be called within the caller's transaction — uses the provided <paramref name="db"/> context.
+    /// </summary>
+    public void SaveToDb(int visitId, AppDbContext db)
     {
         // Remove existing lines + lab orders
-        var existingLines = _db.MedicineUsages.Where(m => m.PatientId == patientId).ToList();
-        _db.MedicineUsages.RemoveRange(existingLines);
+        var existingLines = db.MedicineUsages.Where(m => m.VisitId == visitId).ToList();
+        db.MedicineUsages.RemoveRange(existingLines);
 
-        var existingLabs = _db.PatientLabTests.Where(l => l.PatientId == patientId).ToList();
-        _db.PatientLabTests.RemoveRange(existingLabs);
+        var existingLabs = db.PatientLabTests.Where(l => l.VisitId == visitId).ToList();
+        db.PatientLabTests.RemoveRange(existingLabs);
 
         // Save medicine lines — new objects (avoid EF identity-resolution bug)
         for (int i = 0; i < Lines.Count; i++)
         {
             var line = Lines[i];
-            _db.MedicineUsages.Add(new MedicineUsage
+            db.MedicineUsages.Add(new MedicineUsage
             {
-                PatientId    = patientId,
+                VisitId      = visitId,
                 LineNumber   = i + 1,
                 Prescription = line.Prescription,
                 Type         = line.Type,
                 Strength     = line.Strength,
                 Qty          = line.Qty,
                 Usage        = line.Usage,
-                RouteName    = line.RouteName,   // kept for backward-compat with imported data
+                RouteName    = line.RouteName,
                 Note         = line.Note,
             });
         }
@@ -280,13 +291,13 @@ public partial class PrescriptionViewModel : ObservableObject
         // Save selected lab tests
         foreach (var group in LabTestGroups)
             foreach (var test in group.Tests.Where(t => t.IsSelected))
-                _db.PatientLabTests.Add(new PatientLabTest
+                db.PatientLabTests.Add(new PatientLabTest
                 {
-                    PatientId = patientId,
+                    VisitId   = visitId,
                     LabTestId = test.Test.Id
                 });
 
-        _db.SaveChanges();
+        db.SaveChanges();
     }
 
     // ── Computed ─────────────────────────────────────────────────────────────

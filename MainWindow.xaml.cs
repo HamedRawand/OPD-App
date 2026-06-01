@@ -17,6 +17,7 @@ public partial class MainWindow : Window
     private PhysicianView?            _physicianView;
     private CatalogView?              _catalogView;
     private UserManagementView?       _userMgmtView;
+    private CustomRolesView?          _customRolesView;
     private ImportWizardView?         _importView;
     private BackupView?               _backupView;
     private OptionsView?              _optionsView;
@@ -34,21 +35,57 @@ public partial class MainWindow : Window
 
         var user = App.Auth.CurrentUser!;
         UserNameText.Text = user.FullName;
-        UserRoleText.Text = user.Role.ToString();
+        UserRoleText.Text = App.Auth.CurrentRoleDisplayName;
 
         var v = Assembly.GetExecutingAssembly().GetName().Version;
         AppVersionText.Text = v is null ? "" : $"v{v.Major}.{v.Minor}.{v.Build}";
 
-        if (user.Role == UserRole.Admin)
+        // Each nav item shown only when the user holds the required permission.
+        // This ensures custom role users see exactly what they are permitted to access.
+        if (App.Auth.Can(Permission.ViewPatients))
+            NavPatientsBtn.Visibility = Visibility.Visible;
+
+        if (App.Auth.Can(Permission.ManagePhysicians))
+            NavPhysiciansBtn.Visibility = Visibility.Visible;
+
+        if (App.Auth.Can(Permission.ManageMedicineCatalog))
+            NavMedicinesBtn.Visibility = Visibility.Visible;
+
+        // ADMINISTRATION section: Users, Custom Roles, Import, Backup, Options, Print Settings
+        if (App.Auth.Can(Permission.ManageUsers))
             AdminNav.Visibility = Visibility.Visible;
 
         _dashboardView   = new DashboardView();
         _patientListView = new PatientListView();
 
-        // Dashboard is the default landing page
-        ContentArea.Content = _dashboardView;
-        _dashboardView.Reload();
-        SetActiveNav(NavDashboardBtn);
+        // Landing page: Dashboard if user can view patients; otherwise first permitted section
+        if (App.Auth.Can(Permission.ViewPatients))
+        {
+            ContentArea.Content = _dashboardView;
+            _dashboardView.Reload();
+            SetActiveNav(NavDashboardBtn);
+        }
+        else if (App.Auth.Can(Permission.ManageMedicineCatalog))
+        {
+            _catalogView = new CatalogView();
+            ContentArea.Content = _catalogView;
+            _catalogView.ViewModel.LoadMedicinesCommand.Execute(null);
+            SetActiveNav(NavMedicinesBtn);
+        }
+        else if (App.Auth.Can(Permission.ManagePhysicians))
+        {
+            _physicianView = new PhysicianView();
+            ContentArea.Content = _physicianView;
+            _physicianView.ViewModel.LoadPhysiciansCommand.Execute(null);
+            SetActiveNav(NavPhysiciansBtn);
+        }
+        else
+        {
+            // Fallback — show dashboard (edge case: no recognized permissions)
+            ContentArea.Content = _dashboardView;
+            _dashboardView.Reload();
+            SetActiveNav(NavDashboardBtn);
+        }
 
         // Language change listener
         LanguageService.LanguageChanged += OnLanguageChanged;
@@ -132,7 +169,7 @@ public partial class MainWindow : Window
 
     private void OnLanguageChanged()
     {
-        UserRoleText.Text = App.Auth.CurrentUser!.Role.ToString();
+        UserRoleText.Text = App.Auth.CurrentRoleDisplayName;
     }
 
     private void LangToggle_Click(object sender, RoutedEventArgs e)
@@ -184,6 +221,16 @@ public partial class MainWindow : Window
         _userMgmtView ??= new UserManagementView();
         ContentArea.Content = _userMgmtView;
         _userMgmtView.ViewModel.LoadUsersCommand.Execute(null);
+    }
+
+    private void NavCustomRoles_Click(object sender, RoutedEventArgs e)
+    {
+        SetActiveNav((Button)sender);
+        _customRolesView ??= new CustomRolesView();
+        ContentArea.Content = _customRolesView;
+        // Refresh the list whenever the user navigates back to this view
+        if (_customRolesView.DataContext is ViewModels.CustomRolesViewModel vm)
+            vm.LoadRolesCommand.Execute(null);
     }
 
     private void NavImport_Click(object sender, RoutedEventArgs e)

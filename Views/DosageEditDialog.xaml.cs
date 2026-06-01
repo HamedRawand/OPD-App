@@ -1,5 +1,6 @@
 using System.Windows;
 using System.Windows.Controls;
+using Microsoft.EntityFrameworkCore;
 using OPDClinic.Data;
 using OPDClinic.Helpers;
 using OPDClinic.Models;
@@ -8,16 +9,17 @@ namespace OPDClinic.Views;
 
 public partial class DosageEditDialog : Window
 {
-    private readonly AppDbContext _db;
+    private readonly IDbContextFactory<AppDbContext> _factory;
     private readonly Dosage? _existing;
 
-    public DosageEditDialog(AppDbContext db, Dosage? dosage = null)
+    public DosageEditDialog(IDbContextFactory<AppDbContext> factory, Dosage? dosage = null)
     {
         InitializeComponent();
-        _db = db;
+        _factory  = factory;
         _existing = dosage;
 
         // Populate category dropdown from distinct Route categories
+        using var db = factory.CreateDbContext();
         var categories = db.Routes
             .Select(r => r.Category)
             .Where(c => c != null)
@@ -53,10 +55,15 @@ public partial class DosageEditDialog : Window
         item.Type       = TypeBox.Text.NullIfEmpty();
         item.DosageText = text;
 
-        if (_existing is null)
-            _db.Dosages.Add(item);
-
-        try { _db.SaveChanges(); }
+        try
+        {
+            using var db = _factory.CreateDbContext();
+            if (_existing is null)
+                db.Dosages.Add(item);
+            else
+                db.Update(item);
+            db.SaveChanges();
+        }
         catch (Exception ex)
         {
             ShowError($"Could not save dosage:\n{ex.Message}");

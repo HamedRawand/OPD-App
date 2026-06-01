@@ -1,11 +1,11 @@
-; ============================================================
+﻿; ============================================================
 ;  Rx Writer — Inno Setup 6 installer script
 ;  Target: Windows 10/11 x64
 ;  Build : dotnet publish -c Release -r win-x64 --self-contained true
 ; ============================================================
 
 #define AppName        "Rx Writer"
-#define AppVersion     "1.0.8"
+#define AppVersion "2.0.0"
 #define AppPublisher   "Rx Writer"
 #define AppExeName     "OPDClinic.exe"
 #define SourceDir      "publish\OPDClinic"
@@ -64,7 +64,7 @@ Name: "{group}\Uninstall {#AppName}"; Filename: "{uninstallexe}"
 
 [Run]
 ; Optionally launch the app after install
-Filename: "{app}\{#AppExeName}"; Description: "Launch {#AppName}"; Flags: nowait postinstall skipifsilent
+Filename: "{app}\{#AppExeName}"; Description: "Launch {#AppName}"; Flags: nowait postinstall
 
 [UninstallDelete]
 ; Remove any log files the app writes next to itself

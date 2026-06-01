@@ -3,84 +3,90 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="clr-namespace:OPDClinic">
 
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVis"/>
+    </UserControl.Resources>
+
     <ScrollViewer VerticalScrollBarVisibility="Auto">
         <StackPanel Margin="4,8,4,16">
 
-            <!-- ══ Add Medicine ══════════════════════════════════════════════ -->
-            <TextBlock Text="{DynamicResource Rx.Section.Add}"
-                       Style="{StaticResource SectionHeader}" Margin="0,0,0,8"/>
+            <!-- ══ Add Medicine (hidden for Receptionists) ══════════════════ -->
+            <StackPanel Visibility="{Binding CanWritePrescription, Converter={StaticResource BoolToVis}}">
+                <TextBlock Text="{DynamicResource Rx.Section.Add}"
+                           Style="{StaticResource SectionHeader}" Margin="0,0,0,8"/>
 
-            <Border Style="{StaticResource Card}" Margin="0,0,0,4">
-                <StackPanel>
+                <Border Style="{StaticResource Card}" Margin="0,0,0,4">
+                    <StackPanel>
 
-                    <!-- Row 1: Form (parent selector — full width) -->
-                    <StackPanel Margin="0,0,0,10">
-                        <TextBlock Text="{DynamicResource Rx.Form}" Style="{StaticResource FormLabel}"/>
-                        <ComboBox ItemsSource="{Binding MedicineForms}"
-                                  DisplayMemberPath="FormName"
-                                  SelectedItem="{Binding SelectedMedicineForm}"
-                                  Style="{StaticResource FormComboBox}"/>
-                    </StackPanel>
-
-                    <!-- Row 2: Medicine Name (filtered) + Strength + Qty -->
-                    <Grid Margin="0,0,0,10">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="2*"/>
-                            <ColumnDefinition Width="12"/>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="12"/>
-                            <ColumnDefinition Width="100"/>
-                        </Grid.ColumnDefinitions>
-                        <StackPanel Grid.Column="0">
-                            <TextBlock Text="{DynamicResource Rx.Medicine}" Style="{StaticResource FormLabel}"/>
-                            <ComboBox IsEditable="True" StaysOpenOnEdit="True"
-                                      IsTextSearchEnabled="False"
-                                      ItemsSource="{Binding FilteredMedicines}"
-                                      SelectedItem="{Binding SelectedMedicine}"
-                                      DisplayMemberPath="MedicineName"
-                                      Text="{Binding CurrentMedicineName, UpdateSourceTrigger=PropertyChanged}"
+                        <!-- Row 1: Form (parent selector — full width) -->
+                        <StackPanel Margin="0,0,0,10">
+                            <TextBlock Text="{DynamicResource Rx.Form}" Style="{StaticResource FormLabel}"/>
+                            <ComboBox ItemsSource="{Binding MedicineForms}"
+                                      DisplayMemberPath="FormName"
+                                      SelectedItem="{Binding SelectedMedicineForm}"
                                       Style="{StaticResource FormComboBox}"/>
                         </StackPanel>
-                        <StackPanel Grid.Column="2">
-                            <TextBlock Text="{DynamicResource Rx.Strength}" Style="{StaticResource FormLabel}"/>
-                            <TextBox Text="{Binding CurrentStrength, UpdateSourceTrigger=PropertyChanged}"
-                                     Style="{StaticResource FormTextBox}" FlowDirection="LeftToRight"/>
+
+                        <!-- Row 2: Medicine Name (filtered) + Strength + Qty -->
+                        <Grid Margin="0,0,0,10">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="2*"/>
+                                <ColumnDefinition Width="12"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="12"/>
+                                <ColumnDefinition Width="100"/>
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Grid.Column="0">
+                                <TextBlock Text="{DynamicResource Rx.Medicine}" Style="{StaticResource FormLabel}"/>
+                                <ComboBox IsEditable="True" StaysOpenOnEdit="True"
+                                          IsTextSearchEnabled="False"
+                                          ItemsSource="{Binding FilteredMedicines}"
+                                          SelectedItem="{Binding SelectedMedicine}"
+                                          DisplayMemberPath="MedicineName"
+                                          Text="{Binding CurrentMedicineName, UpdateSourceTrigger=PropertyChanged}"
+                                          Style="{StaticResource FormComboBox}"/>
+                            </StackPanel>
+                            <StackPanel Grid.Column="2">
+                                <TextBlock Text="{DynamicResource Rx.Strength}" Style="{StaticResource FormLabel}"/>
+                                <TextBox Text="{Binding CurrentStrength, UpdateSourceTrigger=PropertyChanged}"
+                                         Style="{StaticResource FormTextBox}" FlowDirection="LeftToRight"/>
+                            </StackPanel>
+                            <StackPanel Grid.Column="4">
+                                <TextBlock Text="{DynamicResource Rx.Qty}" Style="{StaticResource FormLabel}"/>
+                                <TextBox Text="{Binding CurrentQty, UpdateSourceTrigger=PropertyChanged, TargetNullValue=''}"
+                                         Style="{StaticResource FormTextBox}" FlowDirection="LeftToRight"/>
+                            </StackPanel>
+                        </Grid>
+
+                        <!-- Row 3: Dosage (filtered by Form Category — full width) -->
+                        <StackPanel Margin="0,0,0,10">
+                            <TextBlock Text="{DynamicResource Rx.Dosage}" Style="{StaticResource FormLabel}"/>
+                            <ComboBox ItemsSource="{Binding FilteredDosages}"
+                                      SelectedItem="{Binding SelectedDosage}"
+                                      DisplayMemberPath="DosageText"
+                                      Style="{StaticResource FormComboBox}"/>
                         </StackPanel>
-                        <StackPanel Grid.Column="4">
-                            <TextBlock Text="{DynamicResource Rx.Qty}" Style="{StaticResource FormLabel}"/>
-                            <TextBox Text="{Binding CurrentQty, UpdateSourceTrigger=PropertyChanged, TargetNullValue=''}"
-                                     Style="{StaticResource FormTextBox}" FlowDirection="LeftToRight"/>
+
+                        <!-- Row 4: Note (filtered by Form Category — full width) -->
+                        <StackPanel Margin="0,0,0,10">
+                            <TextBlock Text="{DynamicResource Rx.Note}" Style="{StaticResource FormLabel}"/>
+                            <ComboBox ItemsSource="{Binding FilteredMedicineNotes}"
+                                      SelectedItem="{Binding SelectedMedicineNote}"
+                                      DisplayMemberPath="Notes"
+                                      Style="{StaticResource FormComboBox}"/>
                         </StackPanel>
-                    </Grid>
 
-                    <!-- Row 3: Dosage (filtered by Form Category — full width) -->
-                    <StackPanel Margin="0,0,0,10">
-                        <TextBlock Text="{DynamicResource Rx.Dosage}" Style="{StaticResource FormLabel}"/>
-                        <ComboBox ItemsSource="{Binding FilteredDosages}"
-                                  SelectedItem="{Binding SelectedDosage}"
-                                  DisplayMemberPath="DosageText"
-                                  Style="{StaticResource FormComboBox}"/>
+                        <TextBlock Text="{Binding AddError}" Foreground="{StaticResource DangerBrush}"
+                                   FontSize="12" Margin="0,0,0,6"
+                                   Visibility="{Binding AddError, Converter={x:Static local:Converters.NullToCollapsed}}"/>
+
+                        <Button Content="{DynamicResource Rx.Btn.Add}"
+                                Style="{StaticResource PrimaryButton}"
+                                Command="{Binding AddLineCommand}"
+                                HorizontalAlignment="Right"/>
                     </StackPanel>
-
-                    <!-- Row 4: Note (filtered by Form Category — full width) -->
-                    <StackPanel Margin="0,0,0,10">
-                        <TextBlock Text="{DynamicResource Rx.Note}" Style="{StaticResource FormLabel}"/>
-                        <ComboBox ItemsSource="{Binding FilteredMedicineNotes}"
-                                  SelectedItem="{Binding SelectedMedicineNote}"
-                                  DisplayMemberPath="Notes"
-                                  Style="{StaticResource FormComboBox}"/>
-                    </StackPanel>
-
-                    <TextBlock Text="{Binding AddError}" Foreground="{StaticResource DangerBrush}"
-                               FontSize="12" Margin="0,0,0,6"
-                               Visibility="{Binding AddError, Converter={x:Static local:Converters.NullToCollapsed}}"/>
-
-                    <Button Content="{DynamicResource Rx.Btn.Add}"
-                            Style="{StaticResource PrimaryButton}"
-                            Command="{Binding AddLineCommand}"
-                            HorizontalAlignment="Right"/>
-                </StackPanel>
-            </Border>
+                </Border>
+            </StackPanel>
 
             <!-- ══ Prescription Lines ════════════════════════════════════════ -->
             <TextBlock Text="{DynamicResource Rx.Section.Lines}"
@@ -123,24 +129,30 @@
                                 </Style>
                             </DataGridTextColumn.ElementStyle>
                         </DataGridTextColumn>
-                        <!-- Edit button -->
+                        <!-- Edit button — hidden for Receptionists -->
                         <DataGridTemplateColumn Header="" Width="40" CanUserResize="False">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
                                     <Button Content="✏"
                                             Style="{StaticResource ActionButton}"
-                                            Tag="{Binding}" Click="EditLine_Click"/>
+                                            Tag="{Binding}" Click="EditLine_Click"
+                                            Visibility="{Binding DataContext.CanWritePrescription,
+                                                         RelativeSource={RelativeSource AncestorType=UserControl},
+                                                         Converter={StaticResource BoolToVis}}"/>
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>
                         </DataGridTemplateColumn>
-                        <!-- Delete button -->
+                        <!-- Delete button — hidden for Receptionists -->
                         <DataGridTemplateColumn Header="" Width="40" CanUserResize="False">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
                                     <Button Content="✕"
                                             Style="{StaticResource ActionButton}"
                                             Foreground="{StaticResource DangerBrush}"
-                                            Tag="{Binding}" Click="DeleteLine_Click"/>
+                                            Tag="{Binding}" Click="DeleteLine_Click"
+                                            Visibility="{Binding DataContext.CanWritePrescription,
+                                                         RelativeSource={RelativeSource AncestorType=UserControl},
+                                                         Converter={StaticResource BoolToVis}}"/>
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>
                         </DataGridTemplateColumn>
@@ -183,7 +195,9 @@
                                         <ItemsControl.ItemTemplate>
                                             <DataTemplate>
                                                 <StackPanel Orientation="Horizontal" Margin="0,0,20,6">
-                                                    <CheckBox IsChecked="{Binding IsSelected}" VerticalAlignment="Center"/>
+                                                    <CheckBox IsChecked="{Binding IsSelected}" VerticalAlignment="Center"
+                                                              IsEnabled="{Binding DataContext.CanWritePrescription,
+                                                                          RelativeSource={RelativeSource AncestorType=UserControl}}"/>
                                                     <StackPanel Margin="6,0,0,0">
                                                         <TextBlock Text="{Binding Test.TestName}"
                                                                    FontSize="12" FontWeight="SemiBold"/>
@@ -293,13 +307,15 @@
                                   ItemsSource="{Binding PrescriptionNotes}"
                                   SelectedItem="{Binding SelectedPrescriptionNote}"
                                   DisplayMemberPath="Notes"
-                                  Style="{StaticResource FormComboBox}"/>
+                                  Style="{StaticResource FormComboBox}"
+                                  IsEnabled="{Binding CanWritePrescription}"/>
                         <Button Grid.Column="1"
                                 Content="{DynamicResource Common.Clear}"
                                 Style="{StaticResource SecondaryButton}"
                                 Command="{Binding ClearPrescriptionNoteCommand}"
                                 Visibility="{Binding SelectedPrescriptionNote,
                                              Converter={x:Static local:Converters.NullToCollapsed}}"
+                                IsEnabled="{Binding CanWritePrescription}"
                                 Padding="14,8" FontSize="12"
                                 Margin="8,0,0,0"/>
                     </Grid>

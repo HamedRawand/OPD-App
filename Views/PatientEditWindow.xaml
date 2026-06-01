@@ -11,6 +11,12 @@
         Background="{StaticResource ContentBgBrush}"
         FlowDirection="{DynamicResource App.FlowDirection}">
 
+    <!-- Ctrl+S = Save,  Ctrl+P = Save & Print -->
+    <Window.CommandBindings>
+        <CommandBinding Command="ApplicationCommands.Save"  Executed="SaveCommand_Executed"/>
+        <CommandBinding Command="ApplicationCommands.Print" Executed="PrintCommand_Executed"/>
+    </Window.CommandBindings>
+
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -76,17 +82,33 @@
                                 </StackPanel>
 
                                 <StackPanel Grid.Row="2" Grid.Column="2">
-                                    <TextBlock Text="{DynamicResource PatEdit.PatientNo}"
+                                    <TextBlock Text="{DynamicResource PatEdit.PhoneNumber}"
                                                Style="{StaticResource FormLabel}"/>
-                                    <TextBox Text="{Binding PatientNumber, UpdateSourceTrigger=PropertyChanged}"
+                                    <TextBox Text="{Binding PhoneNumber, UpdateSourceTrigger=PropertyChanged}"
                                              Style="{StaticResource FormTextBox}"
                                              FlowDirection="LeftToRight"/>
                                 </StackPanel>
                             </Grid>
                         </Border>
 
-                        <TextBlock Text="{DynamicResource PatEdit.Section.Patient}"
-                                   Style="{StaticResource SectionHeader}"/>
+                        <!-- Patient ID badge — shown when PatientCode is set (i.e. existing or just-saved patient) -->
+                        <DockPanel Margin="0,4,0,0">
+                            <TextBlock DockPanel.Dock="Left"
+                                       Text="{DynamicResource PatEdit.Section.Patient}"
+                                       Style="{StaticResource SectionHeader}" Margin="0"/>
+                            <Border DockPanel.Dock="Left" Margin="10,0,0,0"
+                                    Background="#EFF6FF" CornerRadius="4"
+                                    Padding="8,2" VerticalAlignment="Center"
+                                    Visibility="{Binding PatientCode, Converter={x:Static local:Converters.NullToCollapsed}}">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="ID: " FontSize="11" FontWeight="SemiBold"
+                                               Foreground="#1565C0"/>
+                                    <TextBlock Text="{Binding PatientCode}" FontSize="11"
+                                               FontWeight="Bold" Foreground="#1565C0"
+                                               FlowDirection="LeftToRight"/>
+                                </StackPanel>
+                            </Border>
+                        </DockPanel>
 
                         <Border Style="{StaticResource Card}" Margin="0,0,0,12">
                             <Grid>
@@ -205,10 +227,12 @@
                 <Button DockPanel.Dock="Right"
                         Content="{DynamicResource PatEdit.Btn.Save}"
                         Style="{StaticResource PrimaryButton}"
+                        ToolTip="Save visit  (Ctrl+S)"
                         Command="{Binding SaveCommand}" MinWidth="140"/>
                 <Button DockPanel.Dock="Right"
                         Content="{DynamicResource PatEdit.Btn.SavePrint}"
                         Style="{StaticResource SecondaryButton}"
+                        ToolTip="Save and open prescription PDF  (Ctrl+P)"
                         Click="SaveAndPrint_Click"
                         Margin="0,0,10,0" MinWidth="150"/>
                 <Button DockPanel.Dock="Right"

@@ -7,13 +7,34 @@ using CommunityToolkit.Mvvm.Input;
 using Microsoft.EntityFrameworkCore;
 using OPDClinic.Data;
 using OPDClinic.Models;
+using OPDClinic.Services;
 
 namespace OPDClinic.ViewModels;
 
+/// <summary>One row in the patient list — aggregates data across all visits for a patient.</summary>
+public class PatientListRow
+{
+    public required Patient  Patient           { get; init; }
+    public          int      VisitCount        { get; init; }
+    public          DateTime? LastVisitDate    { get; init; }
+    public          string?  LastDiagnosis     { get; init; }
+    public          string?  LastPhysicianName { get; init; }
+
+    // Shortcut properties used by XAML column bindings
+    public string? PatientCode    => Patient.PatientCode;
+    public string? PatientName    => Patient.PatientName;
+    public string? Sex            => Patient.Sex;
+    public string? PhoneNumber    => Patient.PhoneNumber;
+    public string  LastVisitText  => LastVisitDate?.ToString("yyyy-MM-dd") ?? "—";
+    public string  VisitCountText => VisitCount > 0
+        ? $"{VisitCount} visit{(VisitCount == 1 ? "" : "s")}"
+        : "No visits";
+}
+
 public partial class PatientListViewModel : ObservableObject
 {
-    private readonly AppDbContext _db;
-    private ObservableCollection<Patient> _allPatients = [];
+    private readonly IDbContextFactory<AppDbContext> _factory;
+    private ObservableCollection<PatientListRow> _allRows = [];
     private ICollectionView? _patientsView;
     private const int MaxPatients = 500;
 
@@ -23,7 +44,7 @@ public partial class PatientListViewModel : ObservableObject
         Interval = TimeSpan.FromMilliseconds(300)
     };
 
-    [ObservableProperty] private string _searchText = "";
+    [ObservableProperty] private string    _searchText = "";
     [ObservableProperty] private Physician? _selectedPhysician;
     [ObservableProperty] private DateTime? _filterDate;
     [ObservableProperty] private ICollectionView? _patients;
@@ -32,9 +53,16 @@ public partial class PatientListViewModel : ObservableObject
     [ObservableProperty] private string _truncationNotice = "";
     [ObservableProperty] private bool   _isLoading;
 
-    public PatientListViewModel(AppDbContext db)
+    /// <summary>
+    /// False for Doctors (auto-filtered to own patients — no point showing the picker).
+    /// True for Admin and Receptionist.
+    /// </summary>
+    public bool ShowPhysicianFilter { get; } =
+        App.Auth.Can(Permission.ViewAllPhysicianPatients);
+
+    public PatientListViewModel(IDbContextFactory<AppDbContext> factory)
     {
-        _db = db;
+        _factory = factory;
         _searchDebounce.Tick += (_, _) =>
         {
             _searchDebounce.Stop();
@@ -47,8 +75,8 @@ public partial class PatientListViewModel : ObservableObject
 
     private void LoadPhysicians()
     {
-        // Project to avoid loading SymbolImage BLOB — only need Id + NameEng for the filter ComboBox
-        var stubs = _db.Physicians
+        using var db = _factory.CreateDbContext();
+        var stubs = db.Physicians
             .OrderBy(p => p.NameEng)
             .Select(p => new { p.Id, p.NameEng })
             .ToList()
@@ -63,42 +91,60 @@ public partial class PatientListViewModel : ObservableObject
         IsLoading = true;
         try
         {
-            // Yield to let the UI render the loading indicator before blocking on DB
             await Task.Yield();
 
-            var totalInDb = _db.Patients.Count();
+            var currentUser = App.Auth.CurrentUser!;
+            int? doctorPhysicianId = (!App.Auth.Can(Permission.ViewAllPhysicianPatients)
+                                      && currentUser.PhysicianId.HasValue)
+                                     ? currentUser.PhysicianId
+                                     : null;
 
-            // Load patients without .Include(Physician) to avoid pulling the SymbolImage BLOB
-            // for every row.  Physician stubs (Id + NameEng only) are attached manually below.
-            var patients = _db.Patients
-                .OrderByDescending(p => p.OpdDate)
+            using var db = _factory.CreateDbContext();
+
+            // Base patient query — doctors only see their own patients
+            var patientQuery = db.Patients.AsQueryable();
+            if (doctorPhysicianId.HasValue)
+                patientQuery = patientQuery
+                    .Where(p => p.Visits.Any(v => v.PhysicianId == doctorPhysicianId.Value));
+
+            var totalInDb = patientQuery.Count();
+
+            // Project aggregate data: visit count, last visit date, last diagnosis, last physician
+            var projected = patientQuery
+                .Select(p => new
+                {
+                    Patient           = p,
+                    VisitCount        = p.Visits.Count,
+                    LastVisitDate     = p.Visits.Max(v => (DateTime?)v.OpdDate),
+                    LastDiagnosis     = p.Visits
+                        .OrderByDescending(v => v.OpdDate)
+                        .Select(v => v.Diagnosis)
+                        .FirstOrDefault(),
+                    LastPhysicianName = p.Visits
+                        .OrderByDescending(v => v.OpdDate)
+                        .Select(v => v.Physician != null ? v.Physician.NameEng : null)
+                        .FirstOrDefault()
+                })
+                .OrderByDescending(r => r.LastVisitDate)
                 .Take(MaxPatients)
                 .AsNoTracking()
                 .ToList();
-
-            // Build a lightweight physician lookup — name only, no BLOB
-            var physicianLookup = _db.Physicians
-                .Select(p => new { p.Id, p.NameEng })
-                .ToDictionary(x => x.Id, x => x.NameEng);
-
-            foreach (var p in patients)
-            {
-                // Normalise to canonical Dari ("مذکر"/"مؤنث"), handles old English + ComboBoxItem prefix
-                p.Sex = NormalizeSex(p.Sex);
-
-                if (p.PhysicianId.HasValue &&
-                    physicianLookup.TryGetValue(p.PhysicianId.Value, out var name))
-                {
-                    p.Physician = new Physician { Id = p.PhysicianId.Value, NameEng = name };
-                }
-            }
 
             TruncationNotice = totalInDb > MaxPatients
                 ? $"Showing first {MaxPatients} of {totalInDb} records — use filters to narrow down."
                 : "";
 
-            _allPatients = new ObservableCollection<Patient>(patients);
-            _patientsView = CollectionViewSource.GetDefaultView(_allPatients);
+            var rows = projected.Select(r => new PatientListRow
+            {
+                Patient           = r.Patient,
+                VisitCount        = r.VisitCount,
+                LastVisitDate     = r.LastVisitDate,
+                LastDiagnosis     = r.LastDiagnosis,
+                LastPhysicianName = r.LastPhysicianName
+            }).ToList();
+
+            _allRows      = new ObservableCollection<PatientListRow>(rows);
+            _patientsView = CollectionViewSource.GetDefaultView(_allRows);
             _patientsView.Filter = ApplyFilter;
             Patients = _patientsView;
             RefreshCount();
@@ -114,22 +160,24 @@ public partial class PatientListViewModel : ObservableObject
 
     private bool ApplyFilter(object obj)
     {
-        if (obj is not Patient p) return false;
+        if (obj is not PatientListRow row) return false;
 
         if (!string.IsNullOrWhiteSpace(SearchText))
         {
             var s = SearchText.ToLower();
-            bool match = p.PatientName?.ToLower().Contains(s) == true
-                      || p.PatientNumber?.ToLower().Contains(s) == true
-                      || p.Diagnosis?.ToLower().Contains(s) == true;
+            bool match = row.PatientName?.ToLower().Contains(s)   == true
+                      || row.PhoneNumber?.ToLower().Contains(s)   == true
+                      || row.PatientCode?.ToLower().Contains(s)   == true
+                      || row.LastDiagnosis?.ToLower().Contains(s) == true;
             if (!match) return false;
         }
 
-        if (SelectedPhysician is not null && p.PhysicianId != SelectedPhysician.Id)
+        if (SelectedPhysician is not null &&
+            row.LastPhysicianName != SelectedPhysician.NameEng)
             return false;
 
-        if (FilterDate.HasValue && p.OpdDate.HasValue &&
-            p.OpdDate.Value.Date != FilterDate.Value.Date)
+        if (FilterDate.HasValue &&
+            (!row.LastVisitDate.HasValue || row.LastVisitDate.Value.Date != FilterDate.Value.Date))
             return false;
 
         return true;
@@ -141,32 +189,14 @@ public partial class PatientListViewModel : ObservableObject
         _searchDebounce.Stop();
         _searchDebounce.Start();
     }
-    // Discrete selection changes — refresh immediately
     partial void OnSelectedPhysicianChanged(Physician? value) { _patientsView?.Refresh(); RefreshCount(); }
     partial void OnFilterDateChanged(DateTime? value)         { _patientsView?.Refresh(); RefreshCount(); }
 
     [RelayCommand]
     private void ClearFilters()
     {
-        SearchText = "";
-        SelectedPhysician = null;
-        FilterDate = null;
-    }
-
-    /// <summary>Normalises the Sex field to canonical Dari values ("مذکر" / "مؤنث").
-    /// Handles: legacy English ("Male"/"Female"), old WPF ComboBoxItem prefix, and
-    /// already-correct Dari values.</summary>
-    private static string NormalizeSex(string? value)
-    {
-        if (string.IsNullOrWhiteSpace(value)) return "مذکر";
-        const string prefix = "System.Windows.Controls.ComboBoxItem: ";
-        var clean = value.StartsWith(prefix, StringComparison.Ordinal)
-            ? value[prefix.Length..] : value;
-        return clean switch
-        {
-            "Male"   or "مذکر" => "مذکر",
-            "Female" or "مؤنث" => "مؤنث",
-            _                   => "مذکر"
-        };
+        SearchText         = "";
+        SelectedPhysician  = null;
+        FilterDate         = null;
     }
 }

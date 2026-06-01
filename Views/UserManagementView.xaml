@@ -59,7 +59,7 @@
                                     Binding="{Binding FullName}"/>
 
                 <DataGridTextColumn Header="{DynamicResource Users.Col.Role}" Width="120"
-                                    Binding="{Binding Role}"/>
+                                    Binding="{Binding RoleDisplayName}"/>
 
                 <DataGridTemplateColumn Header="{DynamicResource Users.Col.Status}" Width="100">
                     <DataGridTemplateColumn.CellTemplate>

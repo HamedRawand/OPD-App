@@ -2,6 +2,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using OPDClinic.ViewModels;
+using OPDClinic.Services;
 
 namespace OPDClinic.Views;
 
@@ -28,7 +29,7 @@ public partial class DashboardView : UserControl
     private void BindStats()
     {
         TotalPatientsText.Text   = ViewModel.TotalPatients.ToString("N0");
-        TodayPatientsText.Text   = ViewModel.TodayPatients.ToString("N0");
+        TodayPatientsText.Text   = ViewModel.TodayVisits.ToString("N0");
         TotalMedicinesText.Text  = ViewModel.TotalMedicines.ToString("N0");
         TotalPhysiciansText.Text = ViewModel.TotalPhysicians.ToString("N0");
 
@@ -77,9 +78,9 @@ public partial class DashboardView : UserControl
 
     private void NewVisit_Click(object sender, RoutedEventArgs e)
     {
-        if (!App.Auth.Can(Services.Permission.CreateEditPatient)) return;
+        if (!App.Auth.Can(Services.Permission.RegisterPatient)) return;
 
-        var vm  = new PatientEditViewModel(App.Db);
+        var vm  = new PatientEditViewModel(App.DbFactory);
         var win = new PatientEditWindow(vm) { Owner = Window.GetWindow(this) };
         if (win.ShowDialog() == true)
             Reload();   // refresh today's count
@@ -89,5 +90,18 @@ public partial class DashboardView : UserControl
     {
         ViewModel.CreateBackup();
         BindStats();
+    }
+
+    private void OpenPatient_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is not Button btn || btn.Tag is not RecentVisitRow row) return;
+
+        using var db = App.DbFactory.CreateDbContext();
+        var patient = db.Patients.Find(row.PatientId);
+        if (patient is null) return;
+
+        var win = new PatientDetailWindow(patient) { Owner = Window.GetWindow(this) };
+        win.ShowDialog();
+        Reload();   // refresh stats in case a visit was added
     }
 }

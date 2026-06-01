@@ -5,38 +5,103 @@ using OPDClinic.Services;
 
 namespace OPDClinic.Views;
 
+/// <summary>Unified role item that can represent either a built-in UserRole or a CustomRole.</summary>
+internal sealed class RoleItem
+{
+    public string    DisplayName  { get; init; } = "";
+    public UserRole  BuiltinRole  { get; init; }
+    public int?      CustomRoleId { get; init; }
+    public bool      IsCustom     => CustomRoleId.HasValue;
+    public override  string ToString() => DisplayName;
+}
+
 public partial class UserEditDialog : Window
 {
     private readonly User? _existing;
-    private readonly bool _isEdit;
+    private readonly bool  _isEdit;
+    private List<Physician> _physicians = [];
+    private List<RoleItem>  _roleItems  = [];
 
     public UserEditDialog(User? existing)
     {
         InitializeComponent();
         _existing = existing;
-        _isEdit = existing != null;
+        _isEdit   = existing != null;
 
-        RoleBox.ItemsSource = Enum.GetValues<UserRole>();
+        using var db = App.DbFactory.CreateDbContext();
 
+        // ── Physicians ───────────────────────────────────────────────────────
+        _physicians = db.Physicians
+            .OrderBy(p => p.NameEng)
+            .Select(p => new Physician { Id = p.Id, NameEng = p.NameEng })
+            .ToList();
+        PhysicianBox.ItemsSource = _physicians;
+
+        // ── Role items: built-in + custom ────────────────────────────────────
+        _roleItems = BuildRoleItems(db);
+        RoleBox.ItemsSource       = _roleItems;
+        RoleBox.DisplayMemberPath = "DisplayName";
+        RoleBox.SelectionChanged += RoleBox_SelectionChanged;
+
+        // ── Pre-fill fields ──────────────────────────────────────────────────
         if (_isEdit)
         {
             TitleText.SetResourceReference(TextBlock.TextProperty, "UserEdit.Header.Edit");
-            UsernameBox.Text = existing!.Username;
-            FullNameBox.Text = existing.FullName;
-            RoleBox.SelectedItem = existing.Role;
-            IsActiveBox.IsChecked = existing.IsActive;
-            MustChangePwdBox.IsChecked = existing.MustChangePassword;
-            PasswordNote.Visibility = Visibility.Visible;
+            UsernameBox.Text            = existing!.Username;
+            FullNameBox.Text            = existing.FullName;
+            IsActiveBox.IsChecked       = existing.IsActive;
+            MustChangePwdBox.IsChecked  = existing.MustChangePassword;
+            PasswordNote.Visibility     = Visibility.Visible;
             PasswordLabel.SetResourceReference(TextBlock.TextProperty, "UserEdit.NewPassword");
             ConfirmLabel.SetResourceReference(TextBlock.TextProperty, "UserEdit.ConfirmNewPassword");
+
+            // Select the correct role item
+            RoleItem? toSelect = existing.CustomRoleId.HasValue
+                ? _roleItems.FirstOrDefault(r => r.CustomRoleId == existing.CustomRoleId.Value)
+                : _roleItems.FirstOrDefault(r => !r.IsCustom && r.BuiltinRole == existing.Role);
+            RoleBox.SelectedItem = toSelect ?? _roleItems.FirstOrDefault();
+
+            // Pre-select linked physician if editing a Doctor
+            if (existing.PhysicianId.HasValue)
+                PhysicianBox.SelectedItem = _physicians.FirstOrDefault(p => p.Id == existing.PhysicianId.Value);
         }
         else
         {
             TitleText.SetResourceReference(TextBlock.TextProperty, "UserEdit.Header.Add");
             PasswordLabel.SetResourceReference(TextBlock.TextProperty, "UserEdit.Password");
             ConfirmLabel.SetResourceReference(TextBlock.TextProperty, "UserEdit.ConfirmPassword");
-            RoleBox.SelectedItem = UserRole.Receptionist;
+            RoleBox.SelectedItem = _roleItems.FirstOrDefault(r => !r.IsCustom && r.BuiltinRole == UserRole.Receptionist);
         }
+    }
+
+    // ── Helpers ──────────────────────────────────────────────────────────────
+
+    private static List<RoleItem> BuildRoleItems(OPDClinic.Data.AppDbContext db)
+    {
+        var items = new List<RoleItem>
+        {
+            new() { DisplayName = "Admin",        BuiltinRole = UserRole.Admin },
+            new() { DisplayName = "Doctor",       BuiltinRole = UserRole.Doctor },
+            new() { DisplayName = "Receptionist", BuiltinRole = UserRole.Receptionist }
+        };
+
+        var customs = db.CustomRoles.OrderBy(r => r.Name).ToList();
+        foreach (var cr in customs)
+            items.Add(new RoleItem { DisplayName = cr.Name, BuiltinRole = UserRole.Receptionist, CustomRoleId = cr.Id });
+
+        return items;
+    }
+
+    // ── Events ───────────────────────────────────────────────────────────────
+
+    private void RoleBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        // Show physician link only for the built-in Doctor role
+        var selected = RoleBox.SelectedItem as RoleItem;
+        PhysicianLinkSection.Visibility =
+            selected is { IsCustom: false, BuiltinRole: UserRole.Doctor }
+                ? Visibility.Visible
+                : Visibility.Collapsed;
     }
 
     private void Save_Click(object sender, RoutedEventArgs e)
@@ -45,9 +110,9 @@ public partial class UserEditDialog : Window
 
         var username = UsernameBox.Text.Trim();
         var fullName = FullNameBox.Text.Trim();
-        var role = (UserRole?)RoleBox.SelectedItem;
+        var roleItem = RoleBox.SelectedItem as RoleItem;
         var password = PasswordBox.Password;
-        var confirm = ConfirmBox.Password;
+        var confirm  = ConfirmBox.Password;
 
         if (string.IsNullOrEmpty(username))
         { ShowError("Username is required."); return; }
@@ -55,10 +120,9 @@ public partial class UserEditDialog : Window
         if (string.IsNullOrEmpty(fullName))
         { ShowError("Full name is required."); return; }
 
-        if (role is null)
+        if (roleItem is null)
         { ShowError("Please select a role."); return; }
 
-        // Validate password for new user
         if (!_isEdit && string.IsNullOrEmpty(password))
         { ShowError("Password is required for new users."); return; }
 
@@ -66,54 +130,72 @@ public partial class UserEditDialog : Window
         {
             if (password.Length < 8)
             { ShowError("Password must be at least 8 characters."); return; }
-
             if (password != confirm)
             { ShowError("Passwords do not match."); return; }
         }
 
-        // Check username uniqueness
-        var excludeId = _existing?.Id ?? 0;
-        var duplicate = App.Db.Users.FirstOrDefault(u =>
-            u.Username.ToLower() == username.ToLower() &&
-            u.Id != excludeId);
-        if (duplicate != null)
-        { ShowError($"Username '{username}' is already taken."); return; }
-
-        if (_isEdit)
-        {
-            _existing!.Username = username;
-            _existing.FullName = fullName;
-            _existing.Role = role.Value;
-            _existing.IsActive = IsActiveBox.IsChecked == true;
-            _existing.MustChangePassword = MustChangePwdBox.IsChecked == true;
-
-            if (!string.IsNullOrEmpty(password))
-            {
-                _existing.PasswordHash = BCrypt.Net.BCrypt.HashPassword(password);
-                _existing.IsLocked = false;
-                _existing.FailedLoginAttempts = 0;
-            }
-        }
-        else
-        {
-            App.Db.Users.Add(new User
-            {
-                Username = username,
-                FullName = fullName,
-                Role = role.Value,
-                IsActive = IsActiveBox.IsChecked == true,
-                MustChangePassword = MustChangePwdBox.IsChecked == true,
-                PasswordHash = BCrypt.Net.BCrypt.HashPassword(password),
-                CreatedAt = DateTime.UtcNow
-            });
-        }
+        var resolvedRole      = roleItem.BuiltinRole;
+        var customRoleId      = roleItem.CustomRoleId;
+        var linkedPhysicianId = (roleItem is { IsCustom: false, BuiltinRole: UserRole.Doctor })
+            ? (PhysicianBox.SelectedItem as Physician)?.Id
+            : null;
 
         try
         {
-            App.Db.SaveChanges();
-            AuditService.Log(
-                _isEdit ? "UserUpdated" : "UserCreated",
-                "User", null, username);
+            using var db = App.DbFactory.CreateDbContext();
+
+            // Username uniqueness
+            var excludeId = _existing?.Id ?? 0;
+            if (db.Users.Any(u => u.Username.ToLower() == username.ToLower() && u.Id != excludeId))
+            { ShowError($"Username '{username}' is already taken."); return; }
+
+            if (_isEdit)
+            {
+                var dbUser = db.Users.Find(_existing!.Id)
+                    ?? throw new InvalidOperationException("User not found.");
+
+                dbUser.Username           = username;
+                dbUser.FullName           = fullName;
+                dbUser.Role               = resolvedRole;
+                dbUser.CustomRoleId       = customRoleId;
+                dbUser.PhysicianId        = linkedPhysicianId;
+                dbUser.IsActive           = IsActiveBox.IsChecked == true;
+                dbUser.MustChangePassword = MustChangePwdBox.IsChecked == true;
+
+                if (!string.IsNullOrEmpty(password))
+                {
+                    dbUser.PasswordHash        = BCrypt.Net.BCrypt.HashPassword(password);
+                    dbUser.IsLocked            = false;
+                    dbUser.FailedLoginAttempts = 0;
+                }
+
+                // Sync in-memory copy (reflected in parent list)
+                _existing!.Username          = username;
+                _existing.FullName           = fullName;
+                _existing.Role               = resolvedRole;
+                _existing.CustomRoleId       = customRoleId;
+                _existing.PhysicianId        = linkedPhysicianId;
+                _existing.IsActive           = IsActiveBox.IsChecked == true;
+                _existing.MustChangePassword = MustChangePwdBox.IsChecked == true;
+            }
+            else
+            {
+                db.Users.Add(new User
+                {
+                    Username           = username,
+                    FullName           = fullName,
+                    Role               = resolvedRole,
+                    CustomRoleId       = customRoleId,
+                    PhysicianId        = linkedPhysicianId,
+                    IsActive           = IsActiveBox.IsChecked == true,
+                    MustChangePassword = MustChangePwdBox.IsChecked == true,
+                    PasswordHash       = BCrypt.Net.BCrypt.HashPassword(password),
+                    CreatedAt          = DateTime.UtcNow
+                });
+            }
+
+            db.SaveChanges();
+            AuditService.Log(_isEdit ? "UserUpdated" : "UserCreated", "User", null, username);
         }
         catch (Exception ex)
         {
@@ -125,7 +207,7 @@ public partial class UserEditDialog : Window
 
     private void ShowError(string msg)
     {
-        ErrorText.Text = msg;
+        ErrorText.Text       = msg;
         ErrorText.Visibility = Visibility.Visible;
     }
 }

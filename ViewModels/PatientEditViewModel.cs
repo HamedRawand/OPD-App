@@ -1,6 +1,7 @@
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Microsoft.EntityFrameworkCore;
 using OPDClinic.Data;
 using OPDClinic.Models;
 using OPDClinic.Services;
@@ -10,29 +11,39 @@ namespace OPDClinic.ViewModels;
 
 public partial class PatientEditViewModel : ObservableObject
 {
-    private readonly AppDbContext _db;
+    private readonly IDbContextFactory<AppDbContext> _factory;
     private Patient? _existingPatient;
-    private bool _updatingDate;
+    private Visit?   _existingVisit;
+    private bool     _updatingDate;
 
-    [ObservableProperty] private string _windowTitle = "New Patient Visit";
-    [ObservableProperty] private bool _isSaved;
+    [ObservableProperty] private string _windowTitle = "New Patient";
+    [ObservableProperty] private bool   _isSaved;
     [ObservableProperty] private string? _errorMessage;
+
+    /// <summary>Set after a successful save — used by callers to open the detail view.</summary>
     public int SavedPatientId { get; private set; }
+    public int SavedVisitId   { get; private set; }
 
     [ObservableProperty] private ObservableCollection<Physician> _physicians = [];
     [ObservableProperty] private Physician? _selectedPhysician;
 
+    // ── Visit fields ──────────────────────────────────────────────────────────
     [ObservableProperty] private DateTime _opdDate = DateTime.Today;
-    [ObservableProperty] private string _shamsiDate = "";
+    [ObservableProperty] private string   _shamsiDate = "";
 
-    [ObservableProperty] private string _patientName = "";
-    [ObservableProperty] private int? _age;
-    [ObservableProperty] private string _sex = "مذکر";
-    [ObservableProperty] private string _patientNumber = "";
+    // ── Patient (demographic) fields ──────────────────────────────────────────
+    [ObservableProperty] private string  _patientName = "";
+    [ObservableProperty] private int?    _age;
+    [ObservableProperty] private string  _sex = "مذکر";
+    /// <summary>Auto-generated patient ID (e.g. "P-00042"). Read-only — displayed but never edited.</summary>
+    [ObservableProperty] private string  _patientCode = "";
+    /// <summary>Patient phone number.</summary>
+    [ObservableProperty] private string  _phoneNumber = "";
 
     /// <summary>Drives the Sex ComboBox — Dari values stored directly in the DB.</summary>
     public string[] SexOptions { get; } = ["مذکر", "مؤنث"];
 
+    // ── Vital signs (visit fields) ────────────────────────────────────────────
     private string _bp = ""; public string BP { get => _bp; set => SetProperty(ref _bp, value); }
     private string _hr = ""; public string HR { get => _hr; set => SetProperty(ref _hr, value); }
     private string _pr = ""; public string PR { get => _pr; set => SetProperty(ref _pr, value); }
@@ -41,18 +52,39 @@ public partial class PatientEditViewModel : ObservableObject
     private string _bw = ""; public string BW { get => _bw; set => SetProperty(ref _bw, value); }
 
     [ObservableProperty] private string _clinicalFindings = "";
-    [ObservableProperty] private string _diagnosis = "";
+    [ObservableProperty] private string _diagnosis        = "";
 
     public PrescriptionViewModel Prescription { get; }
 
-    public PatientEditViewModel(AppDbContext db, Patient? patient = null)
-    {
-        _db = db;
-        Prescription = new PrescriptionViewModel(db);
+    /// <summary>
+    /// Use this overload when creating a brand-new patient (and their first visit).
+    /// </summary>
+    public PatientEditViewModel(IDbContextFactory<AppDbContext> factory)
+        : this(factory, null, null) { }
 
-        // Project to stubs — avoids loading SymbolImage BLOBs for every physician
-        // just to populate the ComboBox in the patient form.
-        var stubs = db.Physicians
+    /// <summary>
+    /// Use this overload when adding a new visit to an existing patient.
+    /// </summary>
+    public PatientEditViewModel(IDbContextFactory<AppDbContext> factory, Patient patient)
+        : this(factory, patient, null) { }
+
+    /// <summary>
+    /// Core constructor.
+    /// <para><paramref name="patient"/> = null  → brand-new patient + new visit.</para>
+    /// <para><paramref name="visit"/> = null     → new visit for an existing patient.</para>
+    /// <para>Both provided                       → edit that specific visit.</para>
+    /// </summary>
+    public PatientEditViewModel(IDbContextFactory<AppDbContext> factory, Patient? patient, Visit? visit)
+    {
+        _factory         = factory;
+        _existingPatient = patient;
+        _existingVisit   = visit;
+
+        Prescription = new PrescriptionViewModel(factory);
+
+        // Load physician stubs using a short-lived context
+        using var initDb = factory.CreateDbContext();
+        var stubs = initDb.Physicians
             .OrderBy(p => p.NameEng)
             .Select(p => new { p.Id, p.NameEng })
             .ToList()
@@ -62,39 +94,78 @@ public partial class PatientEditViewModel : ObservableObject
 
         if (patient is not null)
         {
-            _existingPatient = patient;
-            WindowTitle = $"{patient.PatientName} — Edit Visit";
             LoadFromPatient(patient);
-            Prescription.LoadExistingPrescription(patient.Id);
+
+            if (visit is not null)
+            {
+                WindowTitle = $"{patient.PatientName} — Edit Visit ({visit.OpdDate?.ToString("yyyy-MM-dd") ?? "—"})";
+                LoadFromVisit(visit);
+                Prescription.LoadExistingPrescription(visit.Id);
+                // Load footer note saved on this visit
+                if (!string.IsNullOrEmpty(visit.FooterNote))
+                    Prescription.SelectedPrescriptionNote =
+                        Prescription.PrescriptionNotes
+                            .FirstOrDefault(n => n.Notes == visit.FooterNote);
+            }
+            else
+            {
+                WindowTitle  = $"{patient.PatientName} — New Visit";
+                ShamsiDate   = HijriService.ToShamsi(DateTime.Today);
+            }
         }
         else
         {
-            ShamsiDate = HijriService.ToShamsi(DateTime.Today);
+            WindowTitle = "New Patient";
+            ShamsiDate  = HijriService.ToShamsi(DateTime.Today);
         }
+    }
+
+    /// <summary>
+    /// Pre-fills this new-visit form with data copied from a previous visit.
+    /// Sets today's date, copies physician / diagnosis / findings / prescription lines / lab tests.
+    /// Vitals are intentionally left blank (they must be taken fresh at each visit).
+    /// Call after the default constructor (patient, null) has already run.
+    /// </summary>
+    public void RepeatFromVisit(Visit sourceVisit)
+    {
+        SelectedPhysician    = Physicians.FirstOrDefault(ph => ph.Id == sourceVisit.PhysicianId);
+        Diagnosis            = sourceVisit.Diagnosis        ?? "";
+        ClinicalFindings     = sourceVisit.ClinicalFindings ?? "";
+
+        Prescription.LoadExistingPrescription(sourceVisit.Id);
+
+        if (!string.IsNullOrEmpty(sourceVisit.FooterNote))
+            Prescription.SelectedPrescriptionNote =
+                Prescription.PrescriptionNotes
+                    .FirstOrDefault(n => n.Notes == sourceVisit.FooterNote);
     }
 
     private void LoadFromPatient(Patient p)
     {
-        SelectedPhysician  = Physicians.FirstOrDefault(ph => ph.Id == p.PhysicianId);
-        OpdDate            = p.OpdDate ?? DateTime.Today;
-        ShamsiDate         = p.HijriDate ?? HijriService.ToShamsi(OpdDate);
-        PatientName        = p.PatientName ?? "";
-        Age                = p.Age;
-        Sex                = NormalizeSex(p.Sex);
-        PatientNumber      = p.PatientNumber ?? "";
-        BP                 = p.BP ?? "";
-        HR                 = p.HR ?? "";
-        PR                 = p.PR ?? "";
-        RR                 = p.RR ?? "";
-        BT                 = p.BT ?? "";
-        BW                 = p.BW ?? "";
-        ClinicalFindings   = p.ClinicalFindings ?? "";
-        Diagnosis          = p.Diagnosis ?? "";
+        PatientCode = p.PatientCode ?? "";
+        PatientName = p.PatientName ?? "";
+        Age         = null;               // Age is per-visit; will be overwritten by LoadFromVisit
+        Sex         = NormalizeSex(p.Sex);
+        PhoneNumber = p.PhoneNumber ?? "";
     }
 
-    /// <summary>Normalises the Sex field to canonical Dari values ("مذکر" / "مؤنث").
-    /// Handles: legacy English ("Male"/"Female"), old WPF ComboBoxItem prefix, and
-    /// already-correct Dari values.</summary>
+    private void LoadFromVisit(Visit v)
+    {
+        SelectedPhysician = Physicians.FirstOrDefault(ph => ph.Id == v.PhysicianId);
+        OpdDate           = v.OpdDate ?? DateTime.Today;
+        ShamsiDate        = v.HijriDate ?? HijriService.ToShamsi(OpdDate);
+        Age               = v.Age;
+        BP                = v.BP ?? "";
+        HR                = v.HR ?? "";
+        PR                = v.PR ?? "";
+        RR                = v.RR ?? "";
+        BT                = v.BT ?? "";
+        BW                = v.BW ?? "";
+        ClinicalFindings  = v.ClinicalFindings ?? "";
+        Diagnosis         = v.Diagnosis ?? "";
+    }
+
+    /// <summary>Normalises the Sex field to canonical Dari values ("مذکر" / "مؤنث").</summary>
     private static string NormalizeSex(string? value)
     {
         if (string.IsNullOrWhiteSpace(value)) return "مذکر";
@@ -140,52 +211,76 @@ public partial class PatientEditViewModel : ObservableObject
             return;
         }
 
-        var isNew = _existingPatient is null;
+        var isNewPatient = _existingPatient is null;
+        var isNewVisit   = _existingVisit   is null;
 
-        // For existing patients the list loads with AsNoTracking(), so _existingPatient is
-        // NOT tracked by EF.  SaveChanges() only saves tracked entities, which means using
-        // _existingPatient directly would silently discard every edit.
-        // Find() first checks the EF identity map (free hit if LoadExistingPrescription
-        // already loaded it), otherwise executes a single-row SELECT and begins tracking.
-        // Either way we get the tracked entity and EF detects every property change on it.
-        Patient patient;
-        if (isNew)
-        {
-            patient = new Patient();
-        }
-        else
-        {
-            patient = _db.Patients.Find(_existingPatient!.Id)
-                      ?? throw new InvalidOperationException(
-                             $"Patient record (Id={_existingPatient.Id}) was not found in the database.");
-        }
-
-        patient.PhysicianId      = SelectedPhysician?.Id;
-        patient.OpdDate          = OpdDate;
-        patient.HijriDate        = ShamsiDate;
-        patient.PatientName      = PatientName.Trim();
-        patient.Age              = Age;
-        patient.Sex              = Sex;
-        patient.PatientNumber    = PatientNumber.Trim();
-        patient.BP               = BP.Trim();
-        patient.HR               = HR.Trim();
-        patient.PR               = PR.Trim();
-        patient.RR               = RR.Trim();
-        patient.BT               = BT.Trim();
-        patient.BW               = BW.Trim();
-        patient.ClinicalFindings = ClinicalFindings.Trim();
-        patient.Diagnosis        = Diagnosis.Trim();
-        patient.FooterNote       = Prescription.SelectedPrescriptionNote?.Notes;
-        patient.LastUpdated      = DateTime.UtcNow;
-
-        using var tx = _db.Database.BeginTransaction();
+        using var db = _factory.CreateDbContext();
+        using var tx = db.Database.BeginTransaction();
         try
         {
-            if (isNew) _db.Patients.Add(patient);
-            _db.SaveChanges();
+            // ── 1. Patient (demographics) ─────────────────────────────────────
+            Patient patient;
+            if (isNewPatient)
+            {
+                patient = new Patient { CreatedAt = DateTime.UtcNow };
+                db.Patients.Add(patient);
+            }
+            else
+            {
+                patient = db.Patients.Find(_existingPatient!.Id)
+                          ?? throw new InvalidOperationException(
+                                 $"Patient record (Id={_existingPatient.Id}) was not found.");
+            }
 
+            patient.PatientName = PatientName.Trim();
+            patient.Sex         = Sex;
+            patient.PhoneNumber = PhoneNumber.Trim();
+            db.SaveChanges();
+
+            // Auto-generate PatientCode for new patients
+            if (isNewPatient && patient.PatientCode is null)
+            {
+                patient.PatientCode = $"P-{patient.Id:D5}";
+                PatientCode = patient.PatientCode;
+                db.SaveChanges();
+            }
+
+            // ── 2. Visit (clinical data) ──────────────────────────────────────
+            Visit visit;
+            if (isNewVisit)
+            {
+                visit = new Visit { PatientId = patient.Id };
+                db.Visits.Add(visit);
+            }
+            else
+            {
+                visit = db.Visits.Find(_existingVisit!.Id)
+                        ?? throw new InvalidOperationException(
+                               $"Visit record (Id={_existingVisit.Id}) was not found.");
+            }
+
+            visit.PhysicianId      = SelectedPhysician?.Id;
+            visit.OpdDate          = OpdDate;
+            visit.HijriDate        = ShamsiDate;
+            visit.Age              = Age;
+            visit.BP               = BP.Trim();
+            visit.HR               = HR.Trim();
+            visit.PR               = PR.Trim();
+            visit.RR               = RR.Trim();
+            visit.BT               = BT.Trim();
+            visit.BW               = BW.Trim();
+            visit.ClinicalFindings = ClinicalFindings.Trim();
+            visit.Diagnosis        = Diagnosis.Trim();
+            if (App.Auth.Can(Permission.WritePrescription))
+                visit.FooterNote = Prescription.SelectedPrescriptionNote?.Notes;
+            visit.LastUpdated = DateTime.UtcNow;
+            db.SaveChanges();
+
+            // ── 3. Prescription lines + lab tests ─────────────────────────────
             SavedPatientId = patient.Id;
-            Prescription.SaveToDb(patient.Id);
+            SavedVisitId   = visit.Id;
+            if (App.Auth.Can(Permission.WritePrescription))
+                Prescription.SaveToDb(visit.Id, db);
 
             tx.Commit();
         }
@@ -196,13 +291,12 @@ public partial class PatientEditViewModel : ObservableObject
             return;
         }
 
-        AuditService.Log(
-            isNew ? "PatientCreated" : "PatientUpdated",
-            "Patient", patient.Id,
-            patient.PatientName);
-        Log.Information("{Action} — Id:{Id} Name:{Name}",
-            isNew ? "PatientCreated" : "PatientUpdated",
-            patient.Id, patient.PatientName);
+        var action = isNewPatient ? "PatientCreated"
+                   : isNewVisit   ? "VisitAdded"
+                                  : "VisitUpdated";
+        AuditService.Log(action, "Patient", SavedPatientId, PatientName);
+        Log.Information("{Action} — PatientId:{Pid} VisitId:{Vid} Name:{Name}",
+            action, SavedPatientId, SavedVisitId, PatientName);
 
         IsSaved = true;
     }

@@ -1,5 +1,6 @@
 using System.Windows;
 using System.Windows.Controls;
+using Microsoft.EntityFrameworkCore;
 using OPDClinic.Data;
 using OPDClinic.Helpers;
 using OPDClinic.Models;
@@ -8,16 +9,17 @@ namespace OPDClinic.Views;
 
 public partial class MedicineCategoryEditDialog : Window
 {
-    private readonly AppDbContext _db;
+    private readonly IDbContextFactory<AppDbContext> _factory;
     private readonly MedicineForm? _existing;
 
-    public MedicineCategoryEditDialog(AppDbContext db, MedicineForm? form = null)
+    public MedicineCategoryEditDialog(IDbContextFactory<AppDbContext> factory, MedicineForm? form = null)
     {
         InitializeComponent();
-        _db = db;
+        _factory  = factory;
         _existing = form;
 
         // Populate category dropdown from distinct Route categories
+        using var db = factory.CreateDbContext();
         var categories = db.Routes
             .Select(r => r.Category)
             .Where(c => c != null)
@@ -55,10 +57,15 @@ public partial class MedicineCategoryEditDialog : Window
         item.Abbreviation = AbbreviationBox.Text.NullIfEmpty();
         item.Note         = NoteBox.Text.NullIfEmpty();
 
-        if (_existing is null)
-            _db.MedicineForms.Add(item);
-
-        try { _db.SaveChanges(); }
+        try
+        {
+            using var db = _factory.CreateDbContext();
+            if (_existing is null)
+                db.MedicineForms.Add(item);
+            else
+                db.Update(item);
+            db.SaveChanges();
+        }
         catch (Exception ex)
         {
             ShowError($"Could not save medicine form:\n{ex.Message}");

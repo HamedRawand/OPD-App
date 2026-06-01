@@ -1,4 +1,5 @@
 using System.Windows;
+using Microsoft.EntityFrameworkCore;
 using OPDClinic.Data;
 using OPDClinic.Helpers;
 using OPDClinic.Models;
@@ -7,18 +8,18 @@ namespace OPDClinic.Views;
 
 public partial class LabTestEditDialog : Window
 {
-    private readonly AppDbContext _db;
-    private readonly LabTest?     _existing;
+    private readonly IDbContextFactory<AppDbContext> _factory;
+    private readonly LabTest? _existing;
 
-    public LabTestEditDialog(AppDbContext db, LabTest? labTest = null)
+    public LabTestEditDialog(IDbContextFactory<AppDbContext> factory, LabTest? labTest = null)
     {
         InitializeComponent();
-        _db       = db;
+        _factory  = factory;
         _existing = labTest;
 
         if (labTest is not null)
         {
-            HeaderTitle.Text   = "Edit Lab Test";
+            HeaderTitle.Text     = "Edit Lab Test";
             CategoryBox.Text     = labTest.Category     ?? "";
             TestNameBox.Text     = labTest.TestName     ?? "";
             AbbreviationBox.Text = labTest.Abbreviation ?? "";
@@ -47,10 +48,15 @@ public partial class LabTestEditDialog : Window
         item.Specimen     = SpecimenBox.Text.NullIfEmpty();
         item.Description  = DescriptionBox.Text.NullIfEmpty();
 
-        if (_existing is null)
-            _db.LabTests.Add(item);
-
-        try { _db.SaveChanges(); }
+        try
+        {
+            using var db = _factory.CreateDbContext();
+            if (_existing is null)
+                db.LabTests.Add(item);
+            else
+                db.Update(item);
+            db.SaveChanges();
+        }
         catch (Exception ex)
         {
             ShowError($"Could not save lab test:\n{ex.Message}");

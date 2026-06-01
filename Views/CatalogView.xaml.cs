@@ -12,13 +12,13 @@ public partial class CatalogView : UserControl
     public CatalogView()
     {
         InitializeComponent();
-        ViewModel = new CatalogViewModel(App.Db);
+        ViewModel = new CatalogViewModel(App.DbFactory);
         DataContext = ViewModel;
     }
 
     private void AddMedicine_Click(object sender, RoutedEventArgs e)
     {
-        var dlg = new MedicineEditDialog(App.Db) { Owner = Window.GetWindow(this) };
+        var dlg = new MedicineEditDialog(App.DbFactory) { Owner = Window.GetWindow(this) };
         if (dlg.ShowDialog() == true)
             ViewModel.LoadMedicinesCommand.Execute(null);
     }
@@ -27,7 +27,7 @@ public partial class CatalogView : UserControl
     {
         if (sender is Button btn && btn.Tag is MedicineList medicine)
         {
-            var dlg = new MedicineEditDialog(App.Db, medicine) { Owner = Window.GetWindow(this) };
+            var dlg = new MedicineEditDialog(App.DbFactory, medicine) { Owner = Window.GetWindow(this) };
             if (dlg.ShowDialog() == true)
                 ViewModel.LoadMedicinesCommand.Execute(null);
         }

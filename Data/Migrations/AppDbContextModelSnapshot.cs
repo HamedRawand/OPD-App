@@ -51,6 +51,37 @@ namespace OPDClinic.Data.Migrations
                     b.ToTable("AuditLogs");
                 });
 
+            modelBuilder.Entity("OPDClinic.Models.CustomRole", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("AdditionalNotes")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("PermissionsJson")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("CustomRoles");
+                });
+
             modelBuilder.Entity("OPDClinic.Models.Dosage", b =>
                 {
                     b.Property<int>("Id")
@@ -195,9 +226,6 @@ namespace OPDClinic.Data.Migrations
                     b.Property<string>("Note")
                         .HasColumnType("TEXT");
 
-                    b.Property<int>("PatientId")
-                        .HasColumnType("INTEGER");
-
                     b.Property<string>("Prescription")
                         .HasMaxLength(255)
                         .HasColumnType("TEXT");
@@ -220,9 +248,12 @@ namespace OPDClinic.Data.Migrations
                     b.Property<string>("Usage")
                         .HasColumnType("TEXT");
 
+                    b.Property<int>("VisitId")
+                        .HasColumnType("INTEGER");
+
                     b.HasKey("Id");
 
-                    b.HasIndex("PatientId");
+                    b.HasIndex("VisitId");
 
                     b.ToTable("MedicineUsages");
                 });
@@ -233,65 +264,21 @@ namespace OPDClinic.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<int?>("Age")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("BP")
-                        .HasMaxLength(50)
+                    b.Property<DateTime?>("CreatedAt")
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("BT")
-                        .HasMaxLength(50)
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("BW")
-                        .HasMaxLength(50)
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("ClinicalFindings")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Diagnosis")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("FooterNote")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("HR")
-                        .HasMaxLength(50)
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("HijriDate")
-                        .HasMaxLength(50)
-                        .HasColumnType("TEXT");
-
-                    b.Property<DateTime?>("LastUpdated")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Note")
-                        .HasColumnType("TEXT");
-
-                    b.Property<DateTime?>("OpdDate")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("PR")
-                        .HasMaxLength(50)
+                    b.Property<string>("PatientCode")
+                        .HasMaxLength(20)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("PatientName")
                         .HasMaxLength(255)
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("PatientNumber")
+                    b.Property<string>("PhoneNumber")
                         .HasMaxLength(50)
-                        .HasColumnType("TEXT");
-
-                    b.Property<int?>("PhysicianId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("RR")
-                        .HasMaxLength(50)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("TEXT")
+                        .HasColumnName("PatientNumber");
 
                     b.Property<string>("Sex")
                         .HasMaxLength(50)
@@ -299,7 +286,9 @@ namespace OPDClinic.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("PhysicianId");
+                    b.HasIndex("PatientCode")
+                        .IsUnique()
+                        .HasFilter("\"PatientCode\" IS NOT NULL");
 
                     b.ToTable("Patients");
                 });
@@ -313,14 +302,14 @@ namespace OPDClinic.Data.Migrations
                     b.Property<int>("LabTestId")
                         .HasColumnType("INTEGER");
 
-                    b.Property<int>("PatientId")
+                    b.Property<int>("VisitId")
                         .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
 
                     b.HasIndex("LabTestId");
 
-                    b.HasIndex("PatientId");
+                    b.HasIndex("VisitId");
 
                     b.ToTable("PatientLabTests");
                 });
@@ -428,6 +417,9 @@ namespace OPDClinic.Data.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("TEXT");
 
+                    b.Property<int?>("CustomRoleId")
+                        .HasColumnType("INTEGER");
+
                     b.Property<int>("FailedLoginAttempts")
                         .HasColumnType("INTEGER");
 
@@ -452,6 +444,9 @@ namespace OPDClinic.Data.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
+                    b.Property<int?>("PhysicianId")
+                        .HasColumnType("INTEGER");
+
                     b.Property<int>("Role")
                         .HasColumnType("INTEGER");
 
@@ -462,31 +457,95 @@ namespace OPDClinic.Data.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("CustomRoleId");
+
+                    b.HasIndex("PhysicianId");
+
                     b.HasIndex("Username")
                         .IsUnique();
 
                     b.ToTable("Users");
                 });
 
+            modelBuilder.Entity("OPDClinic.Models.Visit", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int?>("Age")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("BP")
+                        .HasMaxLength(50)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("BT")
+                        .HasMaxLength(50)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("BW")
+                        .HasMaxLength(50)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ClinicalFindings")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Diagnosis")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("FooterNote")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("HR")
+                        .HasMaxLength(50)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("HijriDate")
+                        .HasMaxLength(50)
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("LastUpdated")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Note")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("OpdDate")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("PR")
+                        .HasMaxLength(50)
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("PatientId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int?>("PhysicianId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("RR")
+                        .HasMaxLength(50)
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PatientId");
+
+                    b.HasIndex("PhysicianId");
+
+                    b.ToTable("Visits");
+                });
+
             modelBuilder.Entity("OPDClinic.Models.MedicineUsage", b =>
                 {
-                    b.HasOne("OPDClinic.Models.Patient", "Patient")
+                    b.HasOne("OPDClinic.Models.Visit", "Visit")
                         .WithMany("Medicines")
-                        .HasForeignKey("PatientId")
+                        .HasForeignKey("VisitId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Patient");
-                });
-
-            modelBuilder.Entity("OPDClinic.Models.Patient", b =>
-                {
-                    b.HasOne("OPDClinic.Models.Physician", "Physician")
-                        .WithMany("Patients")
-                        .HasForeignKey("PhysicianId")
-                        .OnDelete(DeleteBehavior.SetNull);
-
-                    b.Navigation("Physician");
+                    b.Navigation("Visit");
                 });
 
             modelBuilder.Entity("OPDClinic.Models.PatientLabTest", b =>
@@ -497,25 +556,67 @@ namespace OPDClinic.Data.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("OPDClinic.Models.Patient", "Patient")
-                        .WithMany()
-                        .HasForeignKey("PatientId")
+                    b.HasOne("OPDClinic.Models.Visit", "Visit")
+                        .WithMany("LabTests")
+                        .HasForeignKey("VisitId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("LabTest");
 
+                    b.Navigation("Visit");
+                });
+
+            modelBuilder.Entity("OPDClinic.Models.User", b =>
+                {
+                    b.HasOne("OPDClinic.Models.CustomRole", "CustomRole")
+                        .WithMany()
+                        .HasForeignKey("CustomRoleId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("OPDClinic.Models.Physician", "Physician")
+                        .WithMany()
+                        .HasForeignKey("PhysicianId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("CustomRole");
+
+                    b.Navigation("Physician");
+                });
+
+            modelBuilder.Entity("OPDClinic.Models.Visit", b =>
+                {
+                    b.HasOne("OPDClinic.Models.Patient", "Patient")
+                        .WithMany("Visits")
+                        .HasForeignKey("PatientId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("OPDClinic.Models.Physician", "Physician")
+                        .WithMany("Visits")
+                        .HasForeignKey("PhysicianId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
                     b.Navigation("Patient");
+
+                    b.Navigation("Physician");
                 });
 
             modelBuilder.Entity("OPDClinic.Models.Patient", b =>
                 {
-                    b.Navigation("Medicines");
+                    b.Navigation("Visits");
                 });
 
             modelBuilder.Entity("OPDClinic.Models.Physician", b =>
                 {
-                    b.Navigation("Patients");
+                    b.Navigation("Visits");
+                });
+
+            modelBuilder.Entity("OPDClinic.Models.Visit", b =>
+                {
+                    b.Navigation("LabTests");
+
+                    b.Navigation("Medicines");
                 });
 #pragma warning restore 612, 618
         }

@@ -2,6 +2,7 @@ using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media.Imaging;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Win32;
 using OPDClinic.Data;
 using OPDClinic.Models;
@@ -11,14 +12,14 @@ namespace OPDClinic.Views;
 
 public partial class PhysicianEditDialog : Window
 {
-    private readonly AppDbContext _db;
+    private readonly IDbContextFactory<AppDbContext> _factory;
     private readonly Physician? _existing;
     private byte[]? _symbolBytes;
 
-    public PhysicianEditDialog(AppDbContext db, Physician? physician = null)
+    public PhysicianEditDialog(IDbContextFactory<AppDbContext> factory, Physician? physician = null)
     {
         InitializeComponent();
-        _db = db;
+        _factory  = factory;
         _existing = physician;
 
         HeaderTitle.SetResourceReference(TextBlock.TextProperty, "PhysEdit.Header.Add");
@@ -127,12 +128,14 @@ public partial class PhysicianEditDialog : Window
         physician.SymbolImage              = _symbolBytes;
 
         bool isNew = _existing is null;
-        if (isNew)
-            _db.Physicians.Add(physician);
-
         try
         {
-            _db.SaveChanges();
+            using var db = _factory.CreateDbContext();
+            if (isNew)
+                db.Physicians.Add(physician);
+            else
+                db.Update(physician);
+            db.SaveChanges();
             AuditService.Log(
                 isNew ? "PhysicianCreated" : "PhysicianUpdated",
                 "Physician", physician.Id, physician.NameEng);

@@ -266,6 +266,17 @@
                             <DataGridTextColumn Header="{DynamicResource PatList.Col.Diagnosis}"
                                                 Binding="{Binding Diagnosis}"
                                                 Width="2*"/>
+                            <DataGridTemplateColumn Header="" Width="60" CanUserResize="False">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Button Content="{DynamicResource Common.Open}"
+                                                Style="{StaticResource ActionButton}"
+                                                ToolTip="Open patient record"
+                                                Tag="{Binding}"
+                                                Click="OpenPatient_Click"/>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
                         </DataGrid.Columns>
                     </DataGrid>
 
