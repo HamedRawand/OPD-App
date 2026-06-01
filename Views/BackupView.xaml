@@ -131,6 +131,62 @@
                     </StackPanel>
                 </Border>
 
+                <!-- ═══ MERGE / IMPORT FROM ANOTHER CLINIC ═══ -->
+                <Border Style="{StaticResource Card}" Margin="0,0,0,24" Padding="24,20">
+                    <StackPanel>
+                        <TextBlock Text="Merge from Another Clinic" FontSize="15" FontWeight="Bold"
+                                   Foreground="{StaticResource TextPrimaryBrush}" Margin="0,0,0,4"/>
+                        <TextBlock FontSize="12" TextWrapping="Wrap" Margin="0,0,0,16"
+                                   Foreground="{StaticResource TextSecondaryBrush}">
+                            Import all patients, visits, and reference data from a backup file into
+                            this master database. Imported records are tagged with the clinic name
+                            you enter below. Run this once per branch backup — you can merge as many
+                            clinics as needed.
+                        </TextBlock>
+
+                        <!-- Backup file row -->
+                        <TextBlock Text="Backup file" Style="{StaticResource FormLabel}"/>
+                        <DockPanel Margin="0,4,0,12">
+                            <Button DockPanel.Dock="Right" Content="Browse…"
+                                    Style="{StaticResource SecondaryButton}"
+                                    Padding="14,7" Margin="10,0,0,0"
+                                    Click="MergeBrowse_Click"/>
+                            <TextBox x:Name="MergeFileBox"
+                                     Style="{StaticResource FormTextBox}"
+                                     IsReadOnly="True"/>
+                        </DockPanel>
+
+                        <!-- Clinic name row -->
+                        <TextBlock Text="Source clinic name  (e.g. Branch A, Downtown Clinic)"
+                                   Style="{StaticResource FormLabel}"/>
+                        <TextBox x:Name="MergeClinicNameBox"
+                                 Style="{StaticResource FormTextBox}"
+                                 Margin="0,4,0,12"
+                                 MaxLength="100"/>
+
+                        <!-- Password row — shown only for .rxb encrypted backups -->
+                        <StackPanel x:Name="MergePasswordPanel" Visibility="Collapsed" Margin="0,0,0,12">
+                            <TextBlock Text="Backup password" Style="{StaticResource FormLabel}"/>
+                            <PasswordBox x:Name="MergePasswordBox"
+                                         Height="36" FontSize="13" Padding="10,0"/>
+                            <TextBlock Text="🔒 This backup is encrypted. Enter the password used when it was created."
+                                       FontSize="11" Foreground="#1565C0" Margin="0,4,0,0"/>
+                        </StackPanel>
+
+                        <Button x:Name="MergeBtn"
+                                Content="↔ Merge &amp; Import"
+                                Style="{StaticResource PrimaryButton}"
+                                Padding="24,9" FontSize="13"
+                                HorizontalAlignment="Left"
+                                IsEnabled="False"
+                                Click="Merge_Click"/>
+
+                        <TextBlock x:Name="MergeStatusText" FontSize="12"
+                                   Margin="0,12,0,0" TextWrapping="Wrap"
+                                   Visibility="Collapsed"/>
+                    </StackPanel>
+                </Border>
+
                 <!-- ═══ EXISTING BACKUPS ═══ -->
                 <Border Style="{StaticResource Card}" Padding="24,20">
                     <StackPanel>

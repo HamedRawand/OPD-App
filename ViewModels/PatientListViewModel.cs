@@ -29,6 +29,10 @@ public class PatientListRow
     public string  VisitCountText => VisitCount > 0
         ? $"{VisitCount} visit{(VisitCount == 1 ? "" : "s")}"
         : "No visits";
+
+    /// <summary>Non-null only for patients imported via backup merge.</summary>
+    public string? SourceClinic   => Patient.SourceClinic;
+    public bool    IsImported     => !string.IsNullOrEmpty(Patient.SourceClinic);
 }
 
 public partial class PatientListViewModel : ObservableObject

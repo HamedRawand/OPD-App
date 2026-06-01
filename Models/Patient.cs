@@ -28,5 +28,12 @@ public class Patient
 
     public DateTime? CreatedAt { get; set; }
 
+    /// <summary>
+    /// Set when this patient was imported via a backup merge.
+    /// Null for patients entered directly in this database.
+    /// </summary>
+    [MaxLength(100)]
+    public string? SourceClinic { get; set; }
+
     public ICollection<Visit> Visits { get; set; } = [];
 }

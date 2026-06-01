@@ -102,6 +102,26 @@ public class BackupService
         File.WriteAllBytes(rxbPath, ms.ToArray());
     }
 
+    // ── Extract to temp (used by MergeService) ────────────────────────────────
+
+    /// <summary>
+    /// Extracts or decrypts a backup file into a temporary SQLite file.
+    /// The caller is responsible for deleting the returned path when done.
+    /// </summary>
+    public static string ExtractToTempFile(string backupPath, string? password = null)
+    {
+        var ext = Path.GetExtension(backupPath).ToLowerInvariant();
+        var dbBytes = ext == ".rxb"
+            ? DecryptRxb(backupPath,
+                password ?? throw new InvalidOperationException(
+                    "This backup is encrypted. Please enter the backup password."))
+            : ExtractZip(backupPath);
+
+        var tempPath = Path.GetTempFileName();
+        File.WriteAllBytes(tempPath, dbBytes);
+        return tempPath;
+    }
+
     // ── Restore ───────────────────────────────────────────────────────────────
 
     /// <summary>
