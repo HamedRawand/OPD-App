@@ -32,6 +32,7 @@ public partial class DashboardView : UserControl
         TodayPatientsText.Text   = ViewModel.TodayVisits.ToString("N0");
         TotalMedicinesText.Text  = ViewModel.TotalMedicines.ToString("N0");
         TotalPhysiciansText.Text = ViewModel.TotalPhysicians.ToString("N0");
+        TotalVisitsText.Text     = ViewModel.TotalVisits.ToString("N0");
 
         TodayGregorianText.Text  = ViewModel.TodayDateText;
         TodayShamsiLabel.Text    = ViewModel.TodayShamsiText;

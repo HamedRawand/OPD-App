@@ -71,9 +71,9 @@
     <sys:String x:Key="PatEdit.Section.Clinical">Clinical Findings</sys:String>
     <sys:String x:Key="PatEdit.Section.Diagnosis">Diagnosis</sys:String>
     <sys:String x:Key="PatEdit.Physician">Physician</sys:String>
-    <sys:String x:Key="PatEdit.OpdDate">OPD Date</sys:String>
+    <sys:String x:Key="PatEdit.OpdDate">Gregorian Date</sys:String>
     <sys:String x:Key="PatEdit.ShamsiDate">Shamsi Date</sys:String>
-    <sys:String x:Key="PatEdit.ShamsiHint">(auto-syncs with OPD date)</sys:String>
+    <sys:String x:Key="PatEdit.ShamsiHint">(auto-syncs with Gregorian date)</sys:String>
     <sys:String x:Key="PatEdit.PatientNo">Patient Number</sys:String>
     <sys:String x:Key="PatEdit.PhoneNumber">Phone Number</sys:String>
     <sys:String x:Key="PatEdit.PatientCode">Patient ID</sys:String>
@@ -113,6 +113,7 @@
     <sys:String x:Key="RxLine.Edit.Title">Edit Prescription Line</sys:String>
     <sys:String x:Key="RxLine.Edit.Header">Edit Medicine</sys:String>
     <sys:String x:Key="Options.NoteEdit.Category">Category</sys:String>
+    <sys:String x:Key="Options.NoteEdit.Type">Type</sys:String>
     <sys:String x:Key="Rx.Empty">No medicines added yet. Use the form above to add prescription lines.</sys:String>
     <sys:String x:Key="Rx.Section.LabTests">Lab Tests</sys:String>
     <sys:String x:Key="Rx.SelectedTests">Selected Tests</sys:String>
@@ -252,6 +253,7 @@
 
     <!-- Dashboard -->
     <sys:String x:Key="Dashboard.Title">Dashboard</sys:String>
+    <sys:String x:Key="Dashboard.TotalVisits">Total Visits</sys:String>
     <sys:String x:Key="Dashboard.Subtitle">Welcome — here's a quick overview of your clinic today.</sys:String>
     <sys:String x:Key="Dashboard.TotalPatients">Total Patients</sys:String>
     <sys:String x:Key="Dashboard.AllTime">all time</sys:String>

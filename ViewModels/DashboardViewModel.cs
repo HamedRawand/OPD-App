@@ -14,6 +14,7 @@ public partial class DashboardViewModel : ObservableObject
     [ObservableProperty] private int    _todayVisits;
     [ObservableProperty] private int    _totalMedicines;
     [ObservableProperty] private int    _totalPhysicians;
+    [ObservableProperty] private int    _totalVisits;
 
     // ── Info cards ────────────────────────────────────────────────────────────
     [ObservableProperty] private string _lastBackupText    = "–";
@@ -59,7 +60,8 @@ public partial class DashboardViewModel : ObservableObject
         TotalMedicines  = db.MedicineLists.Count();
         TotalPhysicians = db.Physicians.Count();
 
-        // Today's visits
+        // All visits + today's visits
+        TotalVisits = visitQuery.Count();
         var todayEnd = today.AddDays(1);
         TodayVisits = visitQuery.Count(v => v.OpdDate >= today && v.OpdDate < todayEnd);
 
@@ -92,11 +94,26 @@ public partial class DashboardViewModel : ObservableObject
         }
         catch { DatabaseSizeText = "–"; }
 
-        // ── Recent visits (last 10 with a date) ───────────────────────────────
-        var rows = visitQuery
+        // ── Recent visits — one row per patient (latest visit), ordered by most recent ──
+        // Step 1: group by patient, get visit count and latest date, take top 10
+        var patientGroups = visitQuery
             .Where(v => v.OpdDate.HasValue)
-            .OrderByDescending(v => v.OpdDate)
+            .GroupBy(v => v.PatientId)
+            .Select(g => new
+            {
+                PatientId  = g.Key,
+                VisitCount = g.Count(),
+                LatestDate = g.Max(v => v.OpdDate)
+            })
+            .OrderByDescending(g => g.LatestDate)
             .Take(10)
+            .ToList();
+
+        // Step 2: load full visit details for those patients (latest visit per patient)
+        var patientIds = patientGroups.Select(g => g.PatientId).ToList();
+        var latestVisitDetails = visitQuery
+            .Where(v => patientIds.Contains(v.PatientId) && v.OpdDate.HasValue)
+            .OrderByDescending(v => v.OpdDate)
             .Select(v => new
             {
                 v.PatientId,
@@ -106,16 +123,23 @@ public partial class DashboardViewModel : ObservableObject
                 v.HijriDate,
                 v.Diagnosis
             })
-            .ToList();
+            .ToList()
+            .GroupBy(v => v.PatientId)
+            .ToDictionary(g => g.Key, g => g.First());
 
         RecentVisits = new ObservableCollection<RecentVisitRow>(
-            rows.Select(r => new RecentVisitRow(
-                r.PatientId,
-                r.PatientName ?? "–",
-                r.PhysName    ?? "–",
-                r.OpdDate.HasValue ? r.OpdDate.Value.ToString("yyyy-MM-dd") : "",
-                r.HijriDate   ?? "",
-                r.Diagnosis   ?? "")));
+            patientGroups.Select(g =>
+            {
+                latestVisitDetails.TryGetValue(g.PatientId, out var d);
+                return new RecentVisitRow(
+                    g.PatientId,
+                    d?.PatientName ?? "–",
+                    d?.PhysName    ?? "–",
+                    g.LatestDate.HasValue ? g.LatestDate.Value.ToString("yyyy-MM-dd") : "",
+                    d?.HijriDate   ?? "",
+                    d?.Diagnosis   ?? "",
+                    g.VisitCount);
+            }));
     }
 
     [RelayCommand]
@@ -143,4 +167,5 @@ public record RecentVisitRow(
     string Physician,
     string VisitDate,
     string ShamsiDate,
-    string Diagnosis);
+    string Diagnosis,
+    int    VisitCount);

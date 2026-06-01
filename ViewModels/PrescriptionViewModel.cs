@@ -173,8 +173,9 @@ public partial class PrescriptionViewModel : ObservableObject
         FilteredMedicineNotes = form is null
             ? new ObservableCollection<MedicineNote>(AllMedicineNotes)
             : new ObservableCollection<MedicineNote>(
-                AllMedicineNotes.Where(n => n.Category == form.Category
-                                       || string.IsNullOrEmpty(n.Category)));
+                AllMedicineNotes.Where(n =>
+                    (string.IsNullOrEmpty(n.Category) || n.Category == form.Category) &&
+                    (string.IsNullOrEmpty(n.Type)     || n.Type     == form.FormName)));
     }
 
     // ── Add / Remove lines ───────────────────────────────────────────────────

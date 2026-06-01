@@ -16,6 +16,8 @@
         <SolidColorBrush x:Key="Accent.Green.Bg"  Color="#F0FDF4"/>
         <SolidColorBrush x:Key="Accent.Orange.Bg" Color="#FFF7ED"/>
         <SolidColorBrush x:Key="Accent.Purple.Bg" Color="#F5F3FF"/>
+        <SolidColorBrush x:Key="Accent.Teal"      Color="#0F766E"/>
+        <SolidColorBrush x:Key="Accent.Teal.Bg"   Color="#F0FDFA"/>
 
         <!-- Shared stat-card number style -->
         <Style x:Key="StatNumber" TargetType="TextBlock">
@@ -67,7 +69,7 @@
             </Border>
 
             <!-- ── Row 1 — Stat cards ────────────────────────────────────── -->
-            <UniformGrid Columns="4" Margin="0,0,0,16">
+            <UniformGrid Columns="5" Margin="0,0,0,16">
 
                 <!-- Total Patients -->
                 <Border Style="{StaticResource Card}" Margin="0,0,10,0"
@@ -142,7 +144,7 @@
                 </Border>
 
                 <!-- Physicians -->
-                <Border Style="{StaticResource Card}" Margin="0"
+                <Border Style="{StaticResource Card}" Margin="0,0,10,0"
                         Background="{StaticResource Accent.Purple.Bg}"
                         BorderBrush="#DDD6FE" BorderThickness="1">
                     <Grid>
@@ -160,6 +162,30 @@
                         <TextBlock Text="&#xE77B;" FontFamily="Segoe MDL2 Assets"
                                    FontSize="40" Opacity="0.15"
                                    Foreground="{StaticResource Accent.Purple}"
+                                   HorizontalAlignment="Right" VerticalAlignment="Center"
+                                   Margin="0,0,4,0" FlowDirection="LeftToRight"/>
+                    </Grid>
+                </Border>
+
+                <!-- Total Visits -->
+                <Border Style="{StaticResource Card}" Margin="0"
+                        Background="{StaticResource Accent.Teal.Bg}"
+                        BorderBrush="#99F6E4" BorderThickness="1">
+                    <Grid>
+                        <StackPanel>
+                            <TextBlock Text="{DynamicResource Dashboard.TotalVisits}"
+                                       Style="{StaticResource StatLabel}"
+                                       Foreground="{StaticResource Accent.Teal}"/>
+                            <TextBlock x:Name="TotalVisitsText"
+                                       Style="{StaticResource StatNumber}"
+                                       Foreground="{StaticResource Accent.Teal}"/>
+                            <TextBlock Text="{DynamicResource Dashboard.AllTime}"
+                                       FontSize="11"
+                                       Foreground="{StaticResource TextSecondaryBrush}"/>
+                        </StackPanel>
+                        <TextBlock Text="&#xE7C3;" FontFamily="Segoe MDL2 Assets"
+                                   FontSize="40" Opacity="0.15"
+                                   Foreground="{StaticResource Accent.Teal}"
                                    HorizontalAlignment="Right" VerticalAlignment="Center"
                                    Margin="0,0,4,0" FlowDirection="LeftToRight"/>
                     </Grid>
@@ -251,15 +277,18 @@
                               BorderThickness="0,1,0,0"
                               Margin="0,8,0,0">
                         <DataGrid.Columns>
-                            <DataGridTextColumn Header="{DynamicResource PatList.Col.Date}"
+                            <DataGridTextColumn Header="{DynamicResource PatDetail.Col.Date}"
                                                 Binding="{Binding VisitDate}"
                                                 Width="110"/>
-                            <DataGridTextColumn Header="{DynamicResource PatList.Col.Shamsi}"
+                            <DataGridTextColumn Header="{DynamicResource PatDetail.Col.Shamsi}"
                                                 Binding="{Binding ShamsiDate}"
                                                 Width="120"/>
                             <DataGridTextColumn Header="{DynamicResource PatList.Col.Name}"
                                                 Binding="{Binding PatientName}"
                                                 Width="*"/>
+                            <DataGridTextColumn Header="{DynamicResource PatList.Col.Visits}"
+                                                Binding="{Binding VisitCount}"
+                                                Width="60"/>
                             <DataGridTextColumn Header="{DynamicResource PatList.Col.Physician}"
                                                 Binding="{Binding Physician}"
                                                 Width="150"/>

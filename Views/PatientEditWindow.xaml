@@ -88,6 +88,8 @@
                                 <StackPanel Grid.Row="2" Grid.Column="2">
                                     <TextBlock Text="{DynamicResource PatEdit.PhoneNumber}"
                                                Style="{StaticResource FormLabel}"/>
+                                    <!-- Invisible spacer matches the Shamsi Date hint height so both TextBoxes align -->
+                                    <TextBlock FontSize="10" Margin="0,0,0,4" Visibility="Hidden"/>
                                     <TextBox Text="{Binding PhoneNumber, UpdateSourceTrigger=PropertyChanged}"
                                              Style="{StaticResource FormTextBox}"
                                              FlowDirection="LeftToRight"/>

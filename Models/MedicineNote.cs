@@ -10,4 +10,8 @@ public class MedicineNote
     /// <summary>Links to RouteOfAdministration.Category for context-sensitive filtering in the prescription form.</summary>
     [MaxLength(255)]
     public string? Category { get; set; }
+
+    /// <summary>Links to MedicineForm.FormName — filtered by Category in the edit dialog and prescription form.</summary>
+    [MaxLength(255)]
+    public string? Type { get; set; }
 }

@@ -71,7 +71,7 @@
     <sys:String x:Key="PatEdit.Section.Clinical">مشاهدات کلینیکی</sys:String>
     <sys:String x:Key="PatEdit.Section.Diagnosis">تشخیص</sys:String>
     <sys:String x:Key="PatEdit.Physician">داکتر</sys:String>
-    <sys:String x:Key="PatEdit.OpdDate">تاریخ OPD</sys:String>
+    <sys:String x:Key="PatEdit.OpdDate">تاریخ میلادی</sys:String>
     <sys:String x:Key="PatEdit.ShamsiDate">تاریخ شمسی</sys:String>
     <sys:String x:Key="PatEdit.ShamsiHint">(همگام با تاریخ میلادی)</sys:String>
     <sys:String x:Key="PatEdit.PatientNo">نمبر مریض</sys:String>
@@ -113,6 +113,7 @@
     <sys:String x:Key="RxLine.Edit.Title">ویرایش خط نسخه</sys:String>
     <sys:String x:Key="RxLine.Edit.Header">ویرایش ادویه</sys:String>
     <sys:String x:Key="Options.NoteEdit.Category">کتگوری</sys:String>
+    <sys:String x:Key="Options.NoteEdit.Type">نوع</sys:String>
     <sys:String x:Key="Rx.Empty">هیچ دارویی اضافه نشده است. از فورم بالا دوا اضافه کنید.</sys:String>
     <sys:String x:Key="Rx.Section.LabTests">آزمایشات</sys:String>
     <sys:String x:Key="Rx.SelectedTests">آزمایشات انتخاب شده</sys:String>
@@ -252,6 +253,7 @@
 
     <!-- Dashboard -->
     <sys:String x:Key="Dashboard.Title">داشبورد</sys:String>
+    <sys:String x:Key="Dashboard.TotalVisits">مجموع مراجعات</sys:String>
     <sys:String x:Key="Dashboard.Subtitle">خوش آمدید — مرور سریع کلینیک امروز.</sys:String>
     <sys:String x:Key="Dashboard.TotalPatients">مجموع مریضان</sys:String>
     <sys:String x:Key="Dashboard.AllTime">در کل</sys:String>
