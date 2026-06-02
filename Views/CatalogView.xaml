@@ -18,7 +18,7 @@
         <!-- Header -->
         <Border Grid.Row="0" Background="White" Padding="24,16"
                 BorderBrush="{StaticResource BorderBrush}" BorderThickness="0,0,0,1">
-            <DockPanel>
+            <DockPanel LastChildFill="False">
                 <TextBlock DockPanel.Dock="Left"
                            Text="{DynamicResource Catalog.Title}"
                            FontSize="20" FontWeight="Bold"

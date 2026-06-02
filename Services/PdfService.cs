@@ -70,6 +70,7 @@ public class PrescriptionDocument(PrescriptionData data) : IDocument
 
     // ── Section style shortcuts ────────────────────────────────────────────────
     private SectionStyle S_Hdr  => _s.Header;
+    private SectionStyle S_Tag  => _s.Tagline;
     private SectionStyle S_PBar => _s.PatientBar;
     private SectionStyle S_VS   => _s.VitalSigns;
     private SectionStyle S_CF   => _s.ClinicalFindings;
@@ -140,11 +141,16 @@ public class PrescriptionDocument(PrescriptionData data) : IDocument
                 {
                     // Clinic name (above physician name) — only if set
                     if (!string.IsNullOrWhiteSpace(ph?.ClinicNameEng))
-                        info.Item()
+                    {
+                        var cn = _s.ClinicName;
+                        var cnText = info.Item()
                             .Text(ph.ClinicNameEng)
-                            .FontFamily(_s.ClinicName.FontFamily)
-                            .FontSize(_s.ClinicName.FontSize).Bold()
-                            .FontColor(Clr(_s.ClinicName.FontColor));
+                            .FontFamily(cn.FontFamily)
+                            .FontSize(cn.FontSize)
+                            .FontColor(Clr(cn.FontColor));
+                        if (cn.Bold)   cnText.Bold();
+                        if (cn.Italic) cnText.Italic();
+                    }
 
                     info.Item()
                         .Text(ph?.NameEng ?? "Rx Writer")
@@ -186,11 +192,16 @@ public class PrescriptionDocument(PrescriptionData data) : IDocument
 
                     // Tagline below logo — only if set
                     if (!string.IsNullOrWhiteSpace(ph?.Tagline))
-                        logoCol.Item().PaddingTop(4).AlignCenter()
+                    {
+                        var tag = S_Tag;
+                        var tagText = logoCol.Item().PaddingTop(4).AlignCenter()
                                .Text(ph.Tagline)
-                               .FontFamily(hdr.FontFamily)
-                               .FontSize(Math.Max(fs - 9, 6))
-                               .Italic().FontColor(Gray);
+                               .FontFamily(tag.FontFamily)
+                               .FontSize(tag.FontSize)
+                               .FontColor(Clr(tag.FontColor));
+                        if (tag.Bold)   tagText.Bold();
+                        if (tag.Italic) tagText.Italic();
+                    }
                 });
 
                 // ── Right: Dari clinic info (RTL) ─────────────────────────
@@ -198,12 +209,19 @@ public class PrescriptionDocument(PrescriptionData data) : IDocument
                 {
                     // Dari clinic name (above physician Dari name) — only if set
                     if (!string.IsNullOrWhiteSpace(ph?.ClinicNameDari))
+                    {
+                        var cn = _s.ClinicName;
                         info.Item().Element(e =>
-                            e.AlignRight().ContentFromRightToLeft()
-                             .Text(ph.ClinicNameDari)
-                             .FontFamily(_s.ClinicName.FontFamily)
-                             .FontSize(_s.ClinicName.FontSize).Bold()
-                             .FontColor(Clr(_s.ClinicName.FontColor)));
+                        {
+                            var t = e.AlignRight().ContentFromRightToLeft()
+                                 .Text(ph.ClinicNameDari)
+                                 .FontFamily(cn.FontFamily)
+                                 .FontSize(cn.FontSize)
+                                 .FontColor(Clr(cn.FontColor));
+                            if (cn.Bold)   t.Bold();
+                            if (cn.Italic) t.Italic();
+                        });
+                    }
 
                     info.Item().Element(e =>
                         e.AlignRight().ContentFromRightToLeft()

@@ -10,6 +10,7 @@ public class ReportSettings
 
     // ── Per-section styles ─────────────────────────────────────────────────────
     public SectionStyle ClinicName       { get; set; } = SectionStyle.MakeClinicName();
+    public SectionStyle Tagline          { get; set; } = SectionStyle.MakeTagline();
     public SectionStyle Header           { get; set; } = SectionStyle.MakeHeader();
     public SectionStyle PatientBar       { get; set; } = SectionStyle.MakePatientBar();
     public SectionStyle VitalSigns       { get; set; } = SectionStyle.MakeBox();
@@ -26,6 +27,7 @@ public class SectionStyle
     public string FontFamily      { get; set; } = "Calibri";
     public float  FontSize        { get; set; } = 9f;
     public bool   Bold            { get; set; } = false;
+    public bool   Italic          { get; set; } = false;
     public string FontColor       { get; set; } = "#111111";
     public string BackgroundColor { get; set; } = "#FFFFFF";
     public float  Padding         { get; set; } = 7f;
@@ -42,10 +44,18 @@ public class SectionStyle
     // ── Default factories ──────────────────────────────────────────────────────
     public static SectionStyle MakeClinicName() => new()
     {
-        FontSize = 20f, Bold = true,
+        FontSize = 20f, Bold = true, Italic = false,
         FontColor = "#1565C0", BackgroundColor = "#FFFFFF",
         ShowBorder = false, Padding = 0f,
         TitleFontColor = "#1565C0", TitleBgColor = "#FFFFFF"
+    };
+
+    public static SectionStyle MakeTagline() => new()
+    {
+        FontSize = 9f, Bold = false, Italic = false,
+        FontColor = "#555555", BackgroundColor = "#FFFFFF",
+        ShowBorder = false, Padding = 0f,
+        TitleFontColor = "#555555", TitleBgColor = "#FFFFFF"
     };
 
     public static SectionStyle MakeHeader() => new()

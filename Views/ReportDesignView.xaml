@@ -81,6 +81,17 @@
                                VerticalAlignment="Center"/>
                 </Grid>
 
+                <!-- Italic -->
+                <Grid Style="{StaticResource SettingRow}">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="115"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="Italic" Style="{StaticResource SettingLabel}"/>
+                    <CheckBox  Grid.Column="1" IsChecked="{Binding Italic, Mode=TwoWay}"
+                               VerticalAlignment="Center"/>
+                </Grid>
+
                 <!-- Font Color -->
                 <Grid Style="{StaticResource ColorRow}">
                     <Grid.ColumnDefinitions>
@@ -338,6 +349,19 @@
                         </Expander.Header>
                         <Border Style="{StaticResource Card}" Margin="0,4,0,0" Padding="12">
                             <ContentControl DataContext="{Binding ClinicName}"
+                                            ContentTemplate="{StaticResource SectionTemplate}"
+                                            Content="{Binding}"/>
+                        </Border>
+                    </Expander>
+
+                    <!-- ── TAGLINE ────────────────────────────────── -->
+                    <Expander IsExpanded="False" Margin="0,6,0,0">
+                        <Expander.Header>
+                            <TextBlock Text="✍  Tagline / Motto  (printed below logo)"
+                                       FontSize="12" FontWeight="SemiBold"/>
+                        </Expander.Header>
+                        <Border Style="{StaticResource Card}" Margin="0,4,0,0" Padding="12">
+                            <ContentControl DataContext="{Binding Tagline}"
                                             ContentTemplate="{StaticResource SectionTemplate}"
                                             Content="{Binding}"/>
                         </Border>

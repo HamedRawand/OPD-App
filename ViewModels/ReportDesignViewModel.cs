@@ -30,6 +30,9 @@ public partial class SectionStyleVm : ObservableObject
     [ObservableProperty][NotifyPropertyChangedFor(nameof(FontWeightWpf))]
     private bool _bold;
 
+    [ObservableProperty][NotifyPropertyChangedFor(nameof(FontStyleWpf))]
+    private bool _italic;
+
     [ObservableProperty][NotifyPropertyChangedFor(nameof(FontColorBrush))]
     private string _fontColor = "#111111";
 
@@ -66,6 +69,7 @@ public partial class SectionStyleVm : ObservableObject
     public FontFamily FontFamilyWpf      => SafeFont(FontFamily);
     public double     FontSizeWpf        => Math.Clamp(FontSize, 6, 36);
     public FontWeight FontWeightWpf      => Bold ? FontWeights.Bold : FontWeights.Normal;
+    public FontStyle  FontStyleWpf       => Italic ? FontStyles.Italic : FontStyles.Normal;
     public FontWeight TitleFontWeightWpf => TitleBold ? FontWeights.Bold : FontWeights.Normal;
     public Brush      FontColorBrush     => SafeBrush(FontColor,     Colors.Black);
     public Brush      BgBrush            => SafeBrush(BackgroundColor, Colors.White);
@@ -85,6 +89,7 @@ public partial class SectionStyleVm : ObservableObject
         FontFamily      = s.FontFamily;
         FontSize        = s.FontSize;
         Bold            = s.Bold;
+        Italic          = s.Italic;
         FontColor       = s.FontColor;
         BackgroundColor = s.BackgroundColor;
         Padding         = s.Padding;
@@ -101,6 +106,7 @@ public partial class SectionStyleVm : ObservableObject
         FontFamily      = FontFamily,
         FontSize        = (float)FontSize,
         Bold            = Bold,
+        Italic          = Italic,
         FontColor       = FontColor,
         BackgroundColor = BackgroundColor,
         Padding         = (float)Padding,
@@ -152,6 +158,7 @@ public partial class ReportDesignViewModel : ObservableObject
 {
     // ── Section view-models ───────────────────────────────────────────────────
     public SectionStyleVm ClinicName       { get; } = new(SectionStyle.MakeClinicName);
+    public SectionStyleVm Tagline          { get; } = new(SectionStyle.MakeTagline);
     public SectionStyleVm Header           { get; } = new(SectionStyle.MakeHeader);
     public SectionStyleVm PatientBar       { get; } = new(SectionStyle.MakePatientBar);
     public SectionStyleVm VitalSigns       { get; } = new(SectionStyle.MakeBox);
@@ -177,6 +184,7 @@ public partial class ReportDesignViewModel : ObservableObject
         BlackAndWhiteMode = s.BlackAndWhiteMode;
         GlobalFontFamily  = s.GlobalFontFamily;
         ClinicName       .LoadFrom(s.ClinicName);
+        Tagline          .LoadFrom(s.Tagline);
         Header           .LoadFrom(s.Header);
         PatientBar       .LoadFrom(s.PatientBar);
         VitalSigns       .LoadFrom(s.VitalSigns);
@@ -202,6 +210,7 @@ public partial class ReportDesignViewModel : ObservableObject
         BlackAndWhiteMode = def.BlackAndWhiteMode;
         GlobalFontFamily  = def.GlobalFontFamily;
         ClinicName       .LoadFrom(def.ClinicName);
+        Tagline          .LoadFrom(def.Tagline);
         Header           .LoadFrom(def.Header);
         PatientBar       .LoadFrom(def.PatientBar);
         VitalSigns       .LoadFrom(def.VitalSigns);
@@ -238,6 +247,7 @@ public partial class ReportDesignViewModel : ObservableObject
         BlackAndWhiteMode = BlackAndWhiteMode,
         GlobalFontFamily  = GlobalFontFamily,
         ClinicName       = ClinicName.ToModel(),
+        Tagline          = Tagline.ToModel(),
         Header           = Header.ToModel(),
         PatientBar       = PatientBar.ToModel(),
         VitalSigns       = VitalSigns.ToModel(),
