@@ -25,6 +25,11 @@
                                Foreground="{StaticResource TextSecondaryBrush}"
                                FontSize="12" VerticalAlignment="Center"
                                Margin="0,0,16,0"/>
+                    <Button Content="📧 Email Settings"
+                            Style="{StaticResource SecondaryButton}"
+                            Click="SmtpSettings_Click"
+                            VerticalAlignment="Center"
+                            Margin="0,0,8,0"/>
                     <Button Content="{DynamicResource Users.Btn.Add}"
                             Style="{StaticResource PrimaryButton}"
                             Click="AddUser_Click"
@@ -62,8 +67,11 @@
                 <DataGridTextColumn Header="{DynamicResource Users.Col.Username}" Width="140"
                                     Binding="{Binding Username}"/>
 
-                <DataGridTextColumn Header="{DynamicResource Users.Col.FullName}" Width="180"
+                <DataGridTextColumn Header="{DynamicResource Users.Col.FullName}" Width="160"
                                     Binding="{Binding FullName}"/>
+
+                <DataGridTextColumn Header="Email" Width="190"
+                                    Binding="{Binding Email}"/>
 
                 <DataGridTextColumn Header="{DynamicResource Users.Col.Role}" Width="120"
                                     Binding="{Binding RoleDisplayName}"/>

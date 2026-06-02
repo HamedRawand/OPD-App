@@ -463,6 +463,10 @@ namespace OPDClinic.Data.Migrations
                     b.Property<int>("FailedLoginAttempts")
                         .HasColumnType("INTEGER");
 
+                    b.Property<string>("Email")
+                        .HasMaxLength(255)
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("FullName")
                         .IsRequired()
                         .HasMaxLength(200)

@@ -17,6 +17,9 @@ public class User
     [MaxLength(200)]
     public string FullName { get; set; } = "";
 
+    [MaxLength(255)]
+    public string? Email { get; set; }
+
     public UserRole Role { get; set; } = UserRole.Receptionist;
 
     public bool IsActive { get; set; } = true;

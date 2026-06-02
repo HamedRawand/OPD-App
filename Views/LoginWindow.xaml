@@ -38,9 +38,31 @@
             <Button Content="{DynamicResource Login.SignIn}"
                     Style="{StaticResource PrimaryButton}"
                     Height="40" FontSize="14" FontWeight="SemiBold"
-                    Margin="0,20,0,0"
+                    Margin="0,20,0,8"
                     IsDefault="True"
                     Click="SignIn_Click"/>
+
+            <!-- Forgot password link -->
+            <Button x:Name="ForgotPasswordBtn"
+                    Content="Forgot your password?"
+                    HorizontalAlignment="Center"
+                    Background="Transparent"
+                    BorderThickness="0"
+                    Foreground="{StaticResource PrimaryBrush}"
+                    FontSize="12"
+                    Cursor="Hand"
+                    Margin="0,4,0,0"
+                    Click="ForgotPassword_Click">
+                <Button.Template>
+                    <ControlTemplate TargetType="Button">
+                        <TextBlock Text="{TemplateBinding Content}"
+                                   Foreground="{TemplateBinding Foreground}"
+                                   FontSize="{TemplateBinding FontSize}"
+                                   TextDecorations="Underline"
+                                   HorizontalAlignment="Center"/>
+                    </ControlTemplate>
+                </Button.Template>
+            </Button>
         </StackPanel>
     </Grid>
 </Window>

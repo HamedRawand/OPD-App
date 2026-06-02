@@ -30,4 +30,10 @@ public partial class UserManagementView : UserControl
         if (dlg.ShowDialog() != true) return;
         ViewModel.LoadUsersCommand.Execute(null);
     }
+
+    private void SmtpSettings_Click(object sender, RoutedEventArgs e)
+    {
+        var dlg = new SmtpSettingsDialog { Owner = Window.GetWindow(this) };
+        dlg.ShowDialog();
+    }
 }

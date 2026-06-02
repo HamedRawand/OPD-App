@@ -52,6 +52,12 @@ public partial class LoginWindow : Window
         }
     }
 
+    private void ForgotPassword_Click(object sender, RoutedEventArgs e)
+    {
+        var dlg = new ForgotPasswordDialog { Owner = this };
+        dlg.ShowDialog();
+    }
+
     private void OpenMain()
     {
         var main = new MainWindow();

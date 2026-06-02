@@ -49,6 +49,7 @@ public partial class UserEditDialog : Window
             TitleText.SetResourceReference(TextBlock.TextProperty, "UserEdit.Header.Edit");
             UsernameBox.Text            = existing!.Username;
             FullNameBox.Text            = existing.FullName;
+            EmailBox.Text               = existing.Email ?? "info.rxwriter@gmail.com";
             IsActiveBox.IsChecked       = existing.IsActive;
             MustChangePwdBox.IsChecked  = existing.MustChangePassword;
             PasswordNote.Visibility     = Visibility.Visible;
@@ -71,6 +72,7 @@ public partial class UserEditDialog : Window
             PasswordLabel.SetResourceReference(TextBlock.TextProperty, "UserEdit.Password");
             ConfirmLabel.SetResourceReference(TextBlock.TextProperty, "UserEdit.ConfirmPassword");
             RoleBox.SelectedItem = _roleItems.FirstOrDefault(r => !r.IsCustom && r.BuiltinRole == UserRole.Receptionist);
+            EmailBox.Text = "info.rxwriter@gmail.com"; // default for new users
         }
     }
 
@@ -110,6 +112,7 @@ public partial class UserEditDialog : Window
 
         var username = UsernameBox.Text.Trim();
         var fullName = FullNameBox.Text.Trim();
+        var email    = EmailBox.Text.Trim();
         var roleItem = RoleBox.SelectedItem as RoleItem;
         var password = PasswordBox.Password;
         var confirm  = ConfirmBox.Password;
@@ -156,6 +159,7 @@ public partial class UserEditDialog : Window
 
                 dbUser.Username           = username;
                 dbUser.FullName           = fullName;
+                dbUser.Email              = string.IsNullOrWhiteSpace(email) ? null : email;
                 dbUser.Role               = resolvedRole;
                 dbUser.CustomRoleId       = customRoleId;
                 dbUser.PhysicianId        = linkedPhysicianId;
@@ -184,6 +188,7 @@ public partial class UserEditDialog : Window
                 {
                     Username           = username,
                     FullName           = fullName,
+                    Email              = string.IsNullOrWhiteSpace(email) ? null : email,
                     Role               = resolvedRole,
                     CustomRoleId       = customRoleId,
                     PhysicianId        = linkedPhysicianId,
