@@ -33,6 +33,9 @@ public partial class PhysicianEditDialog : Window
             NameDariBox.Text            = physician.NameDari ?? "";
             SpecialityDariBox.Text      = physician.SpecialityDari ?? "";
             OtherSpecialityDariBox.Text = physician.OtherSpecialityDari ?? "";
+            ClinicNameEngBox.Text       = physician.ClinicNameEng ?? "";
+            ClinicNameDariBox.Text      = physician.ClinicNameDari ?? "";
+            TaglineBox.Text             = physician.Tagline ?? "";
             ContactBox.Text             = physician.ContactNumber ?? "";
             WhatsAppBox.Text            = physician.WhatsAppNumber ?? "";
             ReceptionBox.Text           = physician.ReceptionContactNumber ?? "";
@@ -121,6 +124,9 @@ public partial class PhysicianEditDialog : Window
         physician.NameDari                 = NameDariBox.Text.Trim();
         physician.SpecialityDari           = SpecialityDariBox.Text.Trim();
         physician.OtherSpecialityDari      = OtherSpecialityDariBox.Text.Trim();
+        physician.ClinicNameEng            = string.IsNullOrWhiteSpace(ClinicNameEngBox.Text) ? null : ClinicNameEngBox.Text.Trim();
+        physician.ClinicNameDari           = string.IsNullOrWhiteSpace(ClinicNameDariBox.Text) ? null : ClinicNameDariBox.Text.Trim();
+        physician.Tagline                  = string.IsNullOrWhiteSpace(TaglineBox.Text) ? null : TaglineBox.Text.Trim();
         physician.ContactNumber            = ContactBox.Text.Trim();
         physician.WhatsAppNumber           = WhatsAppBox.Text.Trim();
         physician.ReceptionContactNumber   = ReceptionBox.Text.Trim();

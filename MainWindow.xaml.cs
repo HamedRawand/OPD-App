@@ -52,7 +52,10 @@ public partial class MainWindow : Window
         if (App.Auth.Can(Permission.ManageMedicineCatalog))
             NavMedicinesBtn.Visibility = Visibility.Visible;
 
-        // ADMINISTRATION section: Users, Custom Roles, Import, Backup, Options, Print Settings
+        if (App.Auth.Can(Permission.ManageMedicineCatalog) || App.Auth.Can(Permission.ManageUsers))
+            NavOptionsBtn.Visibility = Visibility.Visible;
+
+        // ADMINISTRATION section: Users, Custom Roles, Import, Backup, Print Settings
         if (App.Auth.Can(Permission.ManageUsers))
             AdminNav.Visibility = Visibility.Visible;
 

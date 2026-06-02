@@ -52,6 +52,11 @@ public class Visit
 
     public string? Note { get; set; }
 
+    /// <summary>Next visit date in Shamsi/Hijri format (user-entered text, e.g. "1404/5/20").
+    /// Printed on the prescription when not null.</summary>
+    [MaxLength(50)]
+    public string? NextVisitDate { get; set; }
+
     public DateTime? LastUpdated { get; set; }
 
     public ICollection<MedicineUsage> Medicines { get; set; } = [];

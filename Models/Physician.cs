@@ -24,6 +24,16 @@ public class Physician
     [MaxLength(255)]
     public string? OtherSpecialityDari { get; set; }
 
+    [MaxLength(255)]
+    public string? ClinicNameEng { get; set; }
+
+    [MaxLength(255)]
+    public string? ClinicNameDari { get; set; }
+
+    /// <summary>Short tagline / motto printed below the logo in the PDF header (optional).</summary>
+    [MaxLength(500)]
+    public string? Tagline { get; set; }
+
     /// <summary>Raw bytes of the physician's logo/stamp image (PNG, JPG, etc.)
     /// Stored as BLOB in SQLite. Used in the prescription PDF header.</summary>
     public byte[]? SymbolImage { get; set; }

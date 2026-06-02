@@ -330,6 +330,19 @@
             <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="14,8,14,20">
                 <StackPanel>
 
+                    <!-- ── CLINIC NAME ────────────────────────────── -->
+                    <Expander IsExpanded="False" Margin="0,6,0,0">
+                        <Expander.Header>
+                            <TextBlock Text="🏥  Clinic Name  (printed above physician name)"
+                                       FontSize="12" FontWeight="SemiBold"/>
+                        </Expander.Header>
+                        <Border Style="{StaticResource Card}" Margin="0,4,0,0" Padding="12">
+                            <ContentControl DataContext="{Binding ClinicName}"
+                                            ContentTemplate="{StaticResource SectionTemplate}"
+                                            Content="{Binding}"/>
+                        </Border>
+                    </Expander>
+
                     <!-- ── HEADER ──────────────────────────────────── -->
                     <Expander IsExpanded="True" Margin="0,6,0,0">
                         <Expander.Header>

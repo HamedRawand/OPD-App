@@ -12,21 +12,28 @@
         <!-- Header -->
         <Border Grid.Row="0" Background="White" Padding="24,16"
                 BorderBrush="{StaticResource BorderBrush}" BorderThickness="0,0,0,1">
-            <DockPanel>
+            <DockPanel LastChildFill="False">
                 <TextBlock DockPanel.Dock="Left"
                            Text="{DynamicResource Physician.Title}"
                            FontSize="20" FontWeight="Bold"
                            Foreground="{StaticResource TextPrimaryBrush}"
                            VerticalAlignment="Center"/>
-                <Button DockPanel.Dock="Right" Content="{DynamicResource Physician.Btn.Add}"
-                        Style="{StaticResource PrimaryButton}"
-                        Click="AddPhysician_Click"
-                        VerticalAlignment="Center"/>
-                <TextBlock DockPanel.Dock="Right"
-                           Text="{Binding PhysicianCount, StringFormat='{}{0} physician(s)'}"
-                           Foreground="{StaticResource TextSecondaryBrush}"
-                           FontSize="12" VerticalAlignment="Center"
-                           Margin="0,0,16,0"/>
+                <StackPanel DockPanel.Dock="Right" Orientation="Horizontal"
+                            VerticalAlignment="Center">
+                    <TextBlock Text="{Binding PhysicianCount, StringFormat='{}{0} physician(s)'}"
+                               Foreground="{StaticResource TextSecondaryBrush}"
+                               FontSize="12" VerticalAlignment="Center"
+                               Margin="0,0,16,0"/>
+                    <Button Content="{DynamicResource Common.Export}"
+                            Style="{StaticResource SecondaryButton}"
+                            Click="ExportPhysicians_Click"
+                            VerticalAlignment="Center"
+                            Margin="0,0,8,0"/>
+                    <Button Content="{DynamicResource Physician.Btn.Add}"
+                            Style="{StaticResource PrimaryButton}"
+                            Click="AddPhysician_Click"
+                            VerticalAlignment="Center"/>
+                </StackPanel>
             </DockPanel>
         </Border>
 

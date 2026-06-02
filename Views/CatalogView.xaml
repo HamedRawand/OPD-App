@@ -30,6 +30,10 @@
                                Foreground="{StaticResource TextSecondaryBrush}"
                                FontSize="12" Margin="0,0,16,0"
                                Text="{Binding TotalCount, StringFormat='{}{0} medicine(s)'}"/>
+                    <Button Content="{DynamicResource Common.Export}"
+                            Style="{StaticResource SecondaryButton}"
+                            Click="ExportMedicines_Click"
+                            Margin="0,0,8,0"/>
                     <Button Content="{DynamicResource Catalog.Btn.Add}"
                             Style="{StaticResource PrimaryButton}"
                             Click="AddMedicine_Click"/>

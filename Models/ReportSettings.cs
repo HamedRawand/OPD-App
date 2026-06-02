@@ -9,6 +9,7 @@ public class ReportSettings
     public string GlobalFontFamily  { get; set; } = "Calibri";
 
     // ── Per-section styles ─────────────────────────────────────────────────────
+    public SectionStyle ClinicName       { get; set; } = SectionStyle.MakeClinicName();
     public SectionStyle Header           { get; set; } = SectionStyle.MakeHeader();
     public SectionStyle PatientBar       { get; set; } = SectionStyle.MakePatientBar();
     public SectionStyle VitalSigns       { get; set; } = SectionStyle.MakeBox();
@@ -39,6 +40,14 @@ public class SectionStyle
     public SectionStyle Clone() => (SectionStyle)MemberwiseClone();
 
     // ── Default factories ──────────────────────────────────────────────────────
+    public static SectionStyle MakeClinicName() => new()
+    {
+        FontSize = 20f, Bold = true,
+        FontColor = "#1565C0", BackgroundColor = "#FFFFFF",
+        ShowBorder = false, Padding = 0f,
+        TitleFontColor = "#1565C0", TitleBgColor = "#FFFFFF"
+    };
+
     public static SectionStyle MakeHeader() => new()
     {
         FontSize = 17f, Bold = true,

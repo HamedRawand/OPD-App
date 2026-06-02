@@ -1,6 +1,7 @@
 using System.Windows;
 using System.Windows.Controls;
 using OPDClinic.Models;
+using OPDClinic.Services;
 using OPDClinic.ViewModels;
 
 namespace OPDClinic.Views;
@@ -31,5 +32,11 @@ public partial class CatalogView : UserControl
             if (dlg.ShowDialog() == true)
                 ViewModel.LoadMedicinesCommand.Execute(null);
         }
+    }
+
+    private void ExportMedicines_Click(object sender, RoutedEventArgs e)
+    {
+        var medicines = ViewModel.Medicines?.Cast<MedicineList>() ?? [];
+        ExportService.ExportMedicines(medicines);
     }
 }

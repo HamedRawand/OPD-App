@@ -57,6 +57,7 @@ public partial class PatientEditViewModel : ObservableObject
 
     [ObservableProperty] private string _clinicalFindings = "";
     [ObservableProperty] private string _diagnosis        = "";
+    [ObservableProperty] private string _nextVisitDate    = "";
 
     public PrescriptionViewModel Prescription { get; }
 
@@ -167,6 +168,7 @@ public partial class PatientEditViewModel : ObservableObject
         BW                = v.BW ?? "";
         ClinicalFindings  = v.ClinicalFindings ?? "";
         Diagnosis         = v.Diagnosis ?? "";
+        NextVisitDate     = v.NextVisitDate ?? "";
     }
 
     /// <summary>Normalises the Sex field to canonical Dari values ("مذکر" / "مؤنث").</summary>
@@ -282,6 +284,7 @@ public partial class PatientEditViewModel : ObservableObject
             }
             if (App.Auth.Can(Permission.WritePrescription))
                 visit.FooterNote = Prescription.SelectedPrescriptionNote?.Notes;
+            visit.NextVisitDate = string.IsNullOrWhiteSpace(NextVisitDate) ? null : NextVisitDate.Trim();
             visit.LastUpdated = DateTime.UtcNow;
             db.SaveChanges();
 

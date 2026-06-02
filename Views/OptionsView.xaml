@@ -37,6 +37,10 @@
                                 Style="{StaticResource SecondaryButton}"
                                 Click="AddRoute_Click"
                                 Padding="12,6"/>
+                        <Button Content="{DynamicResource Common.Export}"
+                                Style="{StaticResource SecondaryButton}"
+                                Click="ExportRoutes_Click"
+                                Padding="12,6" Margin="8,0,0,0"/>
                     </StackPanel>
 
                     <DataGrid Grid.Row="1"
@@ -94,6 +98,10 @@
                                 Style="{StaticResource SecondaryButton}"
                                 Click="AddMedicineCategory_Click"
                                 Padding="12,6"/>
+                        <Button Content="{DynamicResource Common.Export}"
+                                Style="{StaticResource SecondaryButton}"
+                                Click="ExportMedicineCategories_Click"
+                                Padding="12,6" Margin="8,0,0,0"/>
                     </StackPanel>
 
                     <DataGrid Grid.Row="1"
@@ -151,6 +159,10 @@
                                 Style="{StaticResource SecondaryButton}"
                                 Click="AddDosage_Click"
                                 Padding="12,6"/>
+                        <Button Content="{DynamicResource Common.Export}"
+                                Style="{StaticResource SecondaryButton}"
+                                Click="ExportDosages_Click"
+                                Padding="12,6" Margin="8,0,0,0"/>
                     </StackPanel>
 
                     <DataGrid Grid.Row="1"
@@ -206,6 +218,10 @@
                                 Style="{StaticResource SecondaryButton}"
                                 Click="AddMedicineNote_Click"
                                 Padding="12,6"/>
+                        <Button Content="{DynamicResource Common.Export}"
+                                Style="{StaticResource SecondaryButton}"
+                                Click="ExportMedicineNotes_Click"
+                                Padding="12,6" Margin="8,0,0,0"/>
                     </StackPanel>
 
                     <DataGrid Grid.Row="1"
@@ -257,6 +273,10 @@
                                 Style="{StaticResource SecondaryButton}"
                                 Click="AddPrescriptionNote_Click"
                                 Padding="12,6"/>
+                        <Button Content="{DynamicResource Common.Export}"
+                                Style="{StaticResource SecondaryButton}"
+                                Click="ExportPrescriptionNotes_Click"
+                                Padding="12,6" Margin="8,0,0,0"/>
                     </StackPanel>
 
                     <DataGrid Grid.Row="1"
@@ -308,6 +328,10 @@
                                 Style="{StaticResource SecondaryButton}"
                                 Click="AddLabTest_Click"
                                 Padding="12,6"/>
+                        <Button Content="{DynamicResource Common.Export}"
+                                Style="{StaticResource SecondaryButton}"
+                                Click="ExportLabTests_Click"
+                                Padding="12,6" Margin="8,0,0,0"/>
                     </StackPanel>
 
                     <DataGrid Grid.Row="1"

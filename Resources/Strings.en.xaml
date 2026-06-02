@@ -76,6 +76,7 @@
     <sys:String x:Key="PatEdit.ShamsiHint">(auto-syncs with Gregorian date)</sys:String>
     <sys:String x:Key="PatEdit.PatientNo">Patient Number</sys:String>
     <sys:String x:Key="PatEdit.PhoneNumber">Phone Number</sys:String>
+    <sys:String x:Key="PatEdit.NextVisitDate">Next Visit Date (Hijri)</sys:String>
     <sys:String x:Key="PatEdit.PatientCode">Patient ID</sys:String>
     <sys:String x:Key="PatEdit.PatientName">Patient Name *</sys:String>
     <sys:String x:Key="PatEdit.Age">Age</sys:String>
@@ -177,6 +178,10 @@
     <sys:String x:Key="PhysEdit.Header.Edit">Edit Physician</sys:String>
     <sys:String x:Key="PhysEdit.Section.English">English Information</sys:String>
     <sys:String x:Key="PhysEdit.Section.Dari">Dari Information</sys:String>
+    <sys:String x:Key="PhysEdit.Section.ClinicInfo">Clinic Information</sys:String>
+    <sys:String x:Key="PhysEdit.ClinicNameEng">Clinic Name (English)</sys:String>
+    <sys:String x:Key="PhysEdit.ClinicNameDari">Clinic Name (Dari)</sys:String>
+    <sys:String x:Key="PhysEdit.Tagline">Tagline / Motto (printed below logo)</sys:String>
     <sys:String x:Key="PhysEdit.Section.Contact">Contact Information</sys:String>
     <sys:String x:Key="PhysEdit.NameEng">Name (English) *</sys:String>
     <sys:String x:Key="PhysEdit.SpecialityEng">Speciality (English)</sys:String>
@@ -282,5 +287,6 @@
     <sys:String x:Key="Common.Refresh">↻ Refresh</sys:String>
     <sys:String x:Key="Common.Open">Open</sys:String>
     <sys:String x:Key="Common.Repeat">↻ Repeat</sys:String>
+    <sys:String x:Key="Common.Export">⬇ Export</sys:String>
 
 </ResourceDictionary>

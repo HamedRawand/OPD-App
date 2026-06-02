@@ -56,6 +56,8 @@
                                     <RowDefinition Height="Auto"/>
                                     <RowDefinition Height="12"/>
                                     <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="12"/>
+                                    <RowDefinition Height="Auto"/>
                                 </Grid.RowDefinitions>
 
                                 <StackPanel Grid.Row="0" Grid.Column="0">
@@ -93,6 +95,16 @@
                                     <TextBox Text="{Binding PhoneNumber, UpdateSourceTrigger=PropertyChanged}"
                                              Style="{StaticResource FormTextBox}"
                                              FlowDirection="LeftToRight"/>
+                                </StackPanel>
+
+                                <!-- Row 3: Next Visit Date (full width) -->
+                                <StackPanel Grid.Row="4" Grid.ColumnSpan="3">
+                                    <TextBlock Text="{DynamicResource PatEdit.NextVisitDate}"
+                                               Style="{StaticResource FormLabel}"/>
+                                    <TextBox Text="{Binding NextVisitDate, UpdateSourceTrigger=PropertyChanged}"
+                                             Style="{StaticResource FormTextBox}"
+                                             FlowDirection="LeftToRight"
+                                             ToolTip="Enter the next appointment date in Hijri format (e.g. 1404/5/20)"/>
                                 </StackPanel>
                             </Grid>
                         </Border>

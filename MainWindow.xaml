@@ -200,6 +200,21 @@
                         </StackPanel>
                     </Button>
 
+                    <!-- Options — visible when ManageMedicineCatalog or Admin -->
+                    <Button x:Name="NavOptionsBtn"
+                            Visibility="Collapsed"
+                            Style="{StaticResource NavButton}"
+                            Click="NavOptions_Click"
+                            ToolTip="Manage medicine categories, forms and notes">
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                            <TextBlock Text="&#xE713;" FontFamily="Segoe MDL2 Assets"
+                                       FontSize="15" Width="22" Margin="0,0,10,0"
+                                       VerticalAlignment="Center"/>
+                            <TextBlock Text="{DynamicResource Nav.Options}"
+                                       VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
+
                     <!-- ── ADMINISTRATION — visible only to Admin / ManageUsers ── -->
                     <StackPanel x:Name="AdminNav" Visibility="Collapsed">
                         <Border Height="1" Background="#2E4A6A" Margin="4,10,4,8"/>
@@ -251,18 +266,6 @@
                                            FontSize="15" Width="22" Margin="0,0,10,0"
                                            VerticalAlignment="Center"/>
                                 <TextBlock Text="{DynamicResource Nav.Backup}"
-                                           VerticalAlignment="Center"/>
-                            </StackPanel>
-                        </Button>
-
-                        <Button Style="{StaticResource NavButton}"
-                                Click="NavOptions_Click"
-                                ToolTip="Manage medicine categories, forms and notes">
-                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                                <TextBlock Text="&#xE713;" FontFamily="Segoe MDL2 Assets"
-                                           FontSize="15" Width="22" Margin="0,0,10,0"
-                                           VerticalAlignment="Center"/>
-                                <TextBlock Text="{DynamicResource Nav.Options}"
                                            VerticalAlignment="Center"/>
                             </StackPanel>
                         </Button>

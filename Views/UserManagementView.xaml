@@ -13,16 +13,23 @@
         <!-- Header -->
         <Border Grid.Row="0" Background="White" Padding="24,16"
                 BorderBrush="{StaticResource BorderBrush}" BorderThickness="0,0,0,1">
-            <DockPanel>
+            <DockPanel LastChildFill="False">
                 <TextBlock DockPanel.Dock="Left"
                            Text="{DynamicResource Users.Title}"
                            FontSize="20" FontWeight="Bold"
                            Foreground="{StaticResource TextPrimaryBrush}"
                            VerticalAlignment="Center"/>
-                <Button DockPanel.Dock="Right" Content="{DynamicResource Users.Btn.Add}"
-                        Style="{StaticResource PrimaryButton}"
-                        Click="AddUser_Click"
-                        VerticalAlignment="Center"/>
+                <StackPanel DockPanel.Dock="Right" Orientation="Horizontal"
+                            VerticalAlignment="Center">
+                    <TextBlock Text="{Binding UserCount, StringFormat='{}{0} user(s)'}"
+                               Foreground="{StaticResource TextSecondaryBrush}"
+                               FontSize="12" VerticalAlignment="Center"
+                               Margin="0,0,16,0"/>
+                    <Button Content="{DynamicResource Users.Btn.Add}"
+                            Style="{StaticResource PrimaryButton}"
+                            Click="AddUser_Click"
+                            VerticalAlignment="Center"/>
+                </StackPanel>
             </DockPanel>
         </Border>
 

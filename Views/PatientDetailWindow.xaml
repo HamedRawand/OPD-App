@@ -3,8 +3,8 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:local="clr-namespace:OPDClinic"
         Title="{Binding PatientHeader}"
-        Height="660" Width="860"
-        MinHeight="480" MinWidth="660"
+        Height="680" Width="860"
+        MinHeight="500" MinWidth="660"
         WindowStartupLocation="CenterOwner"
         ResizeMode="CanResize"
         Background="{StaticResource ContentBgBrush}"
@@ -16,12 +16,13 @@
 
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>  <!-- Header -->
+            <RowDefinition Height="Auto"/>  <!-- Summary stats bar -->
+            <RowDefinition Height="Auto"/>  <!-- Vitals chart panel (collapsible) -->
+            <RowDefinition Height="*"/>     <!-- Visit timeline -->
         </Grid.RowDefinitions>
 
-        <!-- Header bar -->
+        <!-- ── Row 0: Header bar ─────────────────────────────────────────────── -->
         <Border Grid.Row="0" Background="{StaticResource PrimaryBrush}" Padding="24,16">
             <DockPanel LastChildFill="False">
                 <StackPanel DockPanel.Dock="Left" Orientation="Vertical">
@@ -36,30 +37,77 @@
                                    Foreground="#B3E5FC" FontSize="13"/>
                     </StackPanel>
                 </StackPanel>
-                <Button DockPanel.Dock="Right"
-                        Content="{DynamicResource PatDetail.NewVisit}"
-                        Style="{StaticResource SecondaryButton}"
-                        Background="White" Foreground="{StaticResource PrimaryBrush}"
-                        ToolTip="New visit  (Ctrl+N)"
-                        Click="NewVisit_Click"
-                        VerticalAlignment="Center"/>
+                <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center">
+                    <Button Content="{DynamicResource Common.Export}"
+                            Style="{StaticResource SecondaryButton}"
+                            Background="White" Foreground="{StaticResource PrimaryBrush}"
+                            Click="ExportVisits_Click"
+                            Margin="0,0,8,0"/>
+                    <Button Content="{DynamicResource PatDetail.NewVisit}"
+                            Style="{StaticResource SecondaryButton}"
+                            Background="White" Foreground="{StaticResource PrimaryBrush}"
+                            ToolTip="New visit  (Ctrl+N)"
+                            Click="NewVisit_Click"/>
+                </StackPanel>
             </DockPanel>
         </Border>
 
-        <!-- Visit count hint -->
+        <!-- ── Row 1: Summary stats bar ─────────────────────────────────────── -->
         <Border Grid.Row="1" Background="#EEF2F7" Padding="24,8"
                 BorderBrush="{StaticResource BorderBrush}" BorderThickness="0,0,0,1">
-            <TextBlock FontSize="12" Foreground="{StaticResource TextSecondaryBrush}">
-                <Run Text="{DynamicResource PatDetail.VisitHistory}"/>
-                <Run Text=" · "/>
-                <Run Text="{Binding Visits.Count, Mode=OneWay}"/>
-                <Run Text=" "/>
-                <Run Text="{DynamicResource PatDetail.Visits}"/>
-            </TextBlock>
+            <DockPanel>
+                <!-- Vitals Trend toggle — only shown when chart data exists -->
+                <Button x:Name="ChartToggleBtn"
+                        DockPanel.Dock="Right"
+                        Content="▾ Vitals Trend"
+                        Style="{StaticResource ActionButton}"
+                        Click="ChartToggle_Click"
+                        VerticalAlignment="Center"
+                        Visibility="{Binding HasVitalsChart, Converter={StaticResource BoolToVisible}}"/>
+                <!-- Visit count + date summary -->
+                <TextBlock Text="{Binding SummaryText}"
+                           FontSize="12" Foreground="{StaticResource TextSecondaryBrush}"
+                           VerticalAlignment="Center"/>
+            </DockPanel>
         </Border>
 
-        <!-- Visit timeline -->
-        <Grid Grid.Row="2">
+        <!-- ── Row 2: Vitals Trend chart panel (collapsed by default) ────────── -->
+        <Border x:Name="ChartPanel" Grid.Row="2"
+                Background="#FAFBFC"
+                BorderBrush="{StaticResource BorderBrush}" BorderThickness="0,0,0,1"
+                Visibility="Collapsed">
+            <Grid Margin="24,12,24,12">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="130"/>  <!-- Chart canvas -->
+                    <RowDefinition Height="Auto"/> <!-- Legend -->
+                </Grid.RowDefinitions>
+
+                <!-- Canvas — drawn in code-behind -->
+                <Border Grid.Row="0" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1"
+                        CornerRadius="4" Background="White">
+                    <Canvas x:Name="VitalsCanvas"
+                            SizeChanged="VitalsCanvas_SizeChanged"
+                            ClipToBounds="True"/>
+                </Border>
+
+                <!-- Legend -->
+                <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,8,0,0">
+                    <Ellipse Width="10" Height="10" Margin="0,0,5,0" VerticalAlignment="Center">
+                        <Ellipse.Fill><SolidColorBrush Color="#1565C0"/></Ellipse.Fill>
+                    </Ellipse>
+                    <TextBlock Text="Body Weight (kg)" FontSize="11"
+                               Foreground="{StaticResource TextSecondaryBrush}" Margin="0,0,18,0"/>
+                    <Ellipse Width="10" Height="10" Margin="0,0,5,0" VerticalAlignment="Center">
+                        <Ellipse.Fill><SolidColorBrush Color="#C62828"/></Ellipse.Fill>
+                    </Ellipse>
+                    <TextBlock Text="Systolic BP (mmHg)" FontSize="11"
+                               Foreground="{StaticResource TextSecondaryBrush}"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- ── Row 3: Visit timeline ─────────────────────────────────────────── -->
+        <Grid Grid.Row="3">
 
             <!-- Timeline card list -->
             <ScrollViewer VerticalScrollBarVisibility="Auto"
@@ -67,18 +115,40 @@
                 <ItemsControl ItemsSource="{Binding Visits}">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
-                            <Border CornerRadius="8"
-                                    BorderBrush="{StaticResource BorderBrush}" BorderThickness="1"
-                                    Background="White" Margin="0,0,0,10">
-                                <Grid>
 
-                                    <!-- Left blue accent strip -->
-                                    <Border Width="5" HorizontalAlignment="Left"
-                                            CornerRadius="8,0,0,8"
-                                            Background="{StaticResource PrimaryBrush}"/>
+                            <!-- Outer row: timeline gutter (dot+line) + card -->
+                            <Grid Margin="0,0,0,10">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="30"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
 
-                                    <!-- Card body -->
-                                    <StackPanel Margin="17,12,12,12">
+                                <!-- ── Timeline connector ── -->
+                                <Grid Grid.Column="0">
+                                    <!-- Vertical connecting line -->
+                                    <Rectangle Width="2" HorizontalAlignment="Center"
+                                               VerticalAlignment="Stretch">
+                                        <Rectangle.Fill>
+                                            <SolidColorBrush Color="#1565C0" Opacity="0.25"/>
+                                        </Rectangle.Fill>
+                                    </Rectangle>
+                                    <!-- Circle dot (sits on top of the line) -->
+                                    <Ellipse Width="12" Height="12"
+                                             HorizontalAlignment="Center" VerticalAlignment="Top"
+                                             Margin="0,16,0,0"
+                                             Stroke="White" StrokeThickness="2">
+                                        <Ellipse.Fill>
+                                            <SolidColorBrush Color="#1565C0"/>
+                                        </Ellipse.Fill>
+                                    </Ellipse>
+                                </Grid>
+
+                                <!-- ── Visit card ── -->
+                                <Border Grid.Column="1"
+                                        CornerRadius="8"
+                                        BorderBrush="{StaticResource BorderBrush}" BorderThickness="1"
+                                        Background="White">
+                                    <StackPanel Margin="14,12,12,12">
 
                                         <!-- ── Header: date / physician  +  action buttons ── -->
                                         <DockPanel>
@@ -243,8 +313,9 @@
                                         </Border>
 
                                     </StackPanel>
-                                </Grid>
-                            </Border>
+                                </Border>
+
+                            </Grid>
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>

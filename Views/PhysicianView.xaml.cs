@@ -1,6 +1,7 @@
 using System.Windows;
 using System.Windows.Controls;
 using OPDClinic.Models;
+using OPDClinic.Services;
 using OPDClinic.ViewModels;
 
 namespace OPDClinic.Views;
@@ -32,4 +33,7 @@ public partial class PhysicianView : UserControl
                 ViewModel.LoadPhysiciansCommand.Execute(null);
         }
     }
+
+    private void ExportPhysicians_Click(object sender, RoutedEventArgs e)
+        => ExportService.ExportPhysicians(ViewModel.Physicians);
 }

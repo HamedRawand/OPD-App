@@ -138,6 +138,14 @@ public class PrescriptionDocument(PrescriptionData data) : IDocument
                 // ── Left: English clinic info ──────────────────────────────
                 row.RelativeItem().Column(info =>
                 {
+                    // Clinic name (above physician name) — only if set
+                    if (!string.IsNullOrWhiteSpace(ph?.ClinicNameEng))
+                        info.Item()
+                            .Text(ph.ClinicNameEng)
+                            .FontFamily(_s.ClinicName.FontFamily)
+                            .FontSize(_s.ClinicName.FontSize).Bold()
+                            .FontColor(Clr(_s.ClinicName.FontColor));
+
                     info.Item()
                         .Text(ph?.NameEng ?? "Rx Writer")
                         .FontFamily(hdr.FontFamily)
@@ -156,27 +164,47 @@ public class PrescriptionDocument(PrescriptionData data) : IDocument
                             .FontSize(Math.Max(fs - 8, 7)).FontColor(Gray);
                 });
 
-                // ── Centre: Logo / initials circle ────────────────────────
-                row.ConstantItem(94).AlignCenter().AlignMiddle().Element(av =>
+                // ── Centre: Logo / initials circle (+ optional tagline below) ─
+                row.ConstantItem(94).AlignCenter().AlignMiddle().Column(logoCol =>
                 {
-                    if (ph?.SymbolImage is { Length: > 0 } img)
+                    logoCol.Item().AlignCenter().Element(av =>
                     {
-                        av.Width(76).Height(76).Image(img).FitArea();
-                    }
-                    else
-                    {
-                        av.Width(66).Height(66)
-                          .Border(2).BorderColor(Clr(S_VS.BorderColor))
-                          .Background(Clr(S_VS.TitleBgColor))
-                          .AlignCenter().AlignMiddle()
-                          .Text(GetInitials(ph?.NameEng ?? "OPD"))
-                          .FontSize(22).Bold().FontColor(Accent);
-                    }
+                        if (ph?.SymbolImage is { Length: > 0 } img)
+                        {
+                            av.Width(76).Height(76).Image(img).FitArea();
+                        }
+                        else
+                        {
+                            av.Width(66).Height(66)
+                              .Border(2).BorderColor(Clr(S_VS.BorderColor))
+                              .Background(Clr(S_VS.TitleBgColor))
+                              .AlignCenter().AlignMiddle()
+                              .Text(GetInitials(ph?.NameEng ?? "OPD"))
+                              .FontSize(22).Bold().FontColor(Accent);
+                        }
+                    });
+
+                    // Tagline below logo — only if set
+                    if (!string.IsNullOrWhiteSpace(ph?.Tagline))
+                        logoCol.Item().PaddingTop(4).AlignCenter()
+                               .Text(ph.Tagline)
+                               .FontFamily(hdr.FontFamily)
+                               .FontSize(Math.Max(fs - 9, 6))
+                               .Italic().FontColor(Gray);
                 });
 
                 // ── Right: Dari clinic info (RTL) ─────────────────────────
                 row.RelativeItem().Column(info =>
                 {
+                    // Dari clinic name (above physician Dari name) — only if set
+                    if (!string.IsNullOrWhiteSpace(ph?.ClinicNameDari))
+                        info.Item().Element(e =>
+                            e.AlignRight().ContentFromRightToLeft()
+                             .Text(ph.ClinicNameDari)
+                             .FontFamily(_s.ClinicName.FontFamily)
+                             .FontSize(_s.ClinicName.FontSize).Bold()
+                             .FontColor(Clr(_s.ClinicName.FontColor)));
+
                     info.Item().Element(e =>
                         e.AlignRight().ContentFromRightToLeft()
                          .Text(ph?.NameDari ?? "کلینیک سرپایی")
@@ -231,13 +259,23 @@ public class PrescriptionDocument(PrescriptionData data) : IDocument
 
         container.Padding(pb.Padding).Row(row =>
         {
-            // Shamsi visit date — leftmost
+            // Shamsi visit date (+ optional next visit date below) — leftmost
             row.RelativeItem(2).AlignLeft().Element(e =>
-                e.ContentFromRightToLeft().Text(text =>
+                e.ContentFromRightToLeft().Column(col =>
                 {
-                    text.Span("تاریخ مراجعه:  ").Bold().FontFamily(pb.FontFamily).FontSize(fs);
-                    text.Span(v.HijriDate ?? v.OpdDate?.ToString("yyyy-MM-dd") ?? "—")
-                        .FontFamily(pb.FontFamily).FontSize(fs);
+                    col.Item().Text(text =>
+                    {
+                        text.Span("تاریخ مراجعه:  ").Bold().FontFamily(pb.FontFamily).FontSize(fs);
+                        text.Span(v.HijriDate ?? v.OpdDate?.ToString("yyyy-MM-dd") ?? "—")
+                            .FontFamily(pb.FontFamily).FontSize(fs);
+                    });
+                    if (!string.IsNullOrWhiteSpace(v.NextVisitDate))
+                        col.Item().PaddingTop(4).Text(text =>
+                        {
+                            text.Span("مراجعه بعدی:  ").Bold().FontFamily(pb.FontFamily).FontSize(fs);
+                            text.Span(v.NextVisitDate).FontFamily(pb.FontFamily).FontSize(fs)
+                                .FontColor(Clr("#1565C0"));
+                        });
                 }));
 
             // Age + Gender — two stacked rows in the centre

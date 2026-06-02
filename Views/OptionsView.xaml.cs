@@ -1,6 +1,7 @@
 using System.Windows;
 using System.Windows.Controls;
 using OPDClinic.Models;
+using OPDClinic.Services;
 using OPDClinic.ViewModels;
 
 namespace OPDClinic.Views;
@@ -112,6 +113,26 @@ public partial class OptionsView : UserControl
                 ViewModel.LoadPrescriptionNotesCommand.Execute(null);
         }
     }
+
+    // ── Export handlers ───────────────────────────────────────────────────────
+
+    private void ExportRoutes_Click(object sender, RoutedEventArgs e)
+        => ExportService.ExportRoutes(ViewModel.Routes);
+
+    private void ExportMedicineCategories_Click(object sender, RoutedEventArgs e)
+        => ExportService.ExportMedicineCategories(ViewModel.MedicineCategories);
+
+    private void ExportDosages_Click(object sender, RoutedEventArgs e)
+        => ExportService.ExportDosages(ViewModel.Dosages);
+
+    private void ExportMedicineNotes_Click(object sender, RoutedEventArgs e)
+        => ExportService.ExportMedicineNotes(ViewModel.MedicineNotes);
+
+    private void ExportPrescriptionNotes_Click(object sender, RoutedEventArgs e)
+        => ExportService.ExportPrescriptionNotes(ViewModel.PrescriptionNotes);
+
+    private void ExportLabTests_Click(object sender, RoutedEventArgs e)
+        => ExportService.ExportLabTests(ViewModel.LabTests);
 
     // ── Lab Tests ─────────────────────────────────────────────────────────────
 

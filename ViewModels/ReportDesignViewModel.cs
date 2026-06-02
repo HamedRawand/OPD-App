@@ -151,6 +151,7 @@ public partial class SectionStyleVm : ObservableObject
 public partial class ReportDesignViewModel : ObservableObject
 {
     // ── Section view-models ───────────────────────────────────────────────────
+    public SectionStyleVm ClinicName       { get; } = new(SectionStyle.MakeClinicName);
     public SectionStyleVm Header           { get; } = new(SectionStyle.MakeHeader);
     public SectionStyleVm PatientBar       { get; } = new(SectionStyle.MakePatientBar);
     public SectionStyleVm VitalSigns       { get; } = new(SectionStyle.MakeBox);
@@ -175,6 +176,7 @@ public partial class ReportDesignViewModel : ObservableObject
         var s = ReportSettingsService.Current;
         BlackAndWhiteMode = s.BlackAndWhiteMode;
         GlobalFontFamily  = s.GlobalFontFamily;
+        ClinicName       .LoadFrom(s.ClinicName);
         Header           .LoadFrom(s.Header);
         PatientBar       .LoadFrom(s.PatientBar);
         VitalSigns       .LoadFrom(s.VitalSigns);
@@ -199,6 +201,7 @@ public partial class ReportDesignViewModel : ObservableObject
         var def = new ReportSettings();
         BlackAndWhiteMode = def.BlackAndWhiteMode;
         GlobalFontFamily  = def.GlobalFontFamily;
+        ClinicName       .LoadFrom(def.ClinicName);
         Header           .LoadFrom(def.Header);
         PatientBar       .LoadFrom(def.PatientBar);
         VitalSigns       .LoadFrom(def.VitalSigns);
@@ -234,6 +237,7 @@ public partial class ReportDesignViewModel : ObservableObject
     {
         BlackAndWhiteMode = BlackAndWhiteMode,
         GlobalFontFamily  = GlobalFontFamily,
+        ClinicName       = ClinicName.ToModel(),
         Header           = Header.ToModel(),
         PatientBar       = PatientBar.ToModel(),
         VitalSigns       = VitalSigns.ToModel(),

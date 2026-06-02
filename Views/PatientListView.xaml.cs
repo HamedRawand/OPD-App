@@ -69,4 +69,13 @@ public partial class PatientListView : UserControl
             e.Handled = true;
         }
     }
+
+    private void ExportPatients_Click(object sender, RoutedEventArgs e)
+    {
+        // Export the currently filtered view (respects search / date / physician filter)
+        var rows = ViewModel.Patients?.Cast<PatientListRow>()
+                                      .Select(r => r.Patient)
+                            ?? [];
+        ExportService.ExportPatients(rows);
+    }
 }

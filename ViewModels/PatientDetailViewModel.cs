@@ -7,6 +7,9 @@ using OPDClinic.Models;
 
 namespace OPDClinic.ViewModels;
 
+/// <summary>One point in the vitals trend chart (chronological order).</summary>
+public record VitalsPoint(DateTime Date, double? Bw, double? SysBp);
+
 /// <summary>One card in the visit timeline shown in PatientDetailWindow.</summary>
 public partial class VisitListRow : ObservableObject
 {
@@ -101,8 +104,12 @@ public partial class PatientDetailViewModel : ObservableObject
     public string PatientHeader =>
         $"{Patient.PatientName}  ·  {Patient.PatientCode ?? "—"}";
 
-    [ObservableProperty]
-    private ObservableCollection<VisitListRow> _visits = [];
+    [ObservableProperty] private ObservableCollection<VisitListRow> _visits = [];
+    [ObservableProperty] private string _summaryText = "";
+    [ObservableProperty] private bool   _hasVitalsChart;
+
+    /// <summary>Chronologically ordered vitals data for the trend chart.</summary>
+    public List<VitalsPoint> VitalsHistory { get; private set; } = [];
 
     public PatientDetailViewModel(IDbContextFactory<AppDbContext> factory, Patient patient)
     {
@@ -127,5 +134,55 @@ public partial class PatientDetailViewModel : ObservableObject
 
         Visits = new ObservableCollection<VisitListRow>(
             visits.Select(v => new VisitListRow(v, Patient)));
+
+        // ── Summary stats ──────────────────────────────────────────────────────
+        if (visits.Count == 0)
+        {
+            SummaryText = "No visits recorded";
+        }
+        else if (visits.Count == 1)
+        {
+            var d = visits[0].OpdDate?.ToString("yyyy-MM-dd") ?? "—";
+            SummaryText = $"1 visit  ·  {d}";
+        }
+        else
+        {
+            var first  = visits.MinBy(v => v.OpdDate)?.OpdDate?.ToString("yyyy-MM-dd") ?? "—";
+            var latest = visits.MaxBy(v => v.OpdDate)?.OpdDate?.ToString("yyyy-MM-dd") ?? "—";
+            SummaryText = $"{visits.Count} visits  ·  First: {first}  ·  Latest: {latest}";
+        }
+
+        // ── Vitals trend data (chronological for the chart) ───────────────────
+        VitalsHistory = visits
+            .Where(v => v.OpdDate.HasValue)
+            .OrderBy(v => v.OpdDate)
+            .Select(v => new VitalsPoint(
+                v.OpdDate!.Value,
+                ParseBw(v.BW),
+                ParseSysBp(v.BP)))
+            .ToList();
+
+        var chartable = VitalsHistory.Count(p => p.Bw.HasValue || p.SysBp.HasValue);
+        HasVitalsChart = chartable >= 2;
+    }
+
+    // ── Parsing helpers ───────────────────────────────────────────────────────
+
+    /// <summary>Parse body weight — strips "kg", "KG" suffix and whitespace.</summary>
+    private static double? ParseBw(string? s)
+    {
+        if (string.IsNullOrWhiteSpace(s)) return null;
+        s = s.Trim().ToLowerInvariant().Replace("kg", "").Trim();
+        return double.TryParse(s, System.Globalization.NumberStyles.Any,
+            System.Globalization.CultureInfo.InvariantCulture, out var v) ? v : null;
+    }
+
+    /// <summary>Parse systolic blood pressure — takes the part before "/" in "120/80".</summary>
+    private static double? ParseSysBp(string? s)
+    {
+        if (string.IsNullOrWhiteSpace(s)) return null;
+        var part = s.Split('/')[0].Trim();
+        return double.TryParse(part, System.Globalization.NumberStyles.Any,
+            System.Globalization.CultureInfo.InvariantCulture, out var v) ? v : null;
     }
 }

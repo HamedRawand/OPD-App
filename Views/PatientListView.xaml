@@ -30,6 +30,10 @@
                                Foreground="{StaticResource TextSecondaryBrush}"
                                FontSize="12" Margin="0,0,16,0"
                                Text="{Binding TotalCount, StringFormat='{}({0} patients)'}"/>
+                    <Button Content="{DynamicResource Common.Export}"
+                            Style="{StaticResource SecondaryButton}"
+                            Click="ExportPatients_Click"
+                            Margin="0,0,8,0"/>
                     <Button Content="{DynamicResource PatList.NewVisit}"
                             Style="{StaticResource PrimaryButton}"
                             ToolTip="New patient  (Ctrl+N)"
