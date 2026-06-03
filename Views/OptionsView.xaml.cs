@@ -117,22 +117,22 @@ public partial class OptionsView : UserControl
     // ── Export handlers ───────────────────────────────────────────────────────
 
     private void ExportRoutes_Click(object sender, RoutedEventArgs e)
-        => ExportService.ExportRoutes(ViewModel.Routes);
+    { if (!App.Auth.Can(Services.Permission.ExportMedicineCatalog)) return; ExportService.ExportRoutes(ViewModel.Routes); }
 
     private void ExportMedicineCategories_Click(object sender, RoutedEventArgs e)
-        => ExportService.ExportMedicineCategories(ViewModel.MedicineCategories);
+    { if (!App.Auth.Can(Services.Permission.ExportMedicineCatalog)) return; ExportService.ExportMedicineCategories(ViewModel.MedicineCategories); }
 
     private void ExportDosages_Click(object sender, RoutedEventArgs e)
-        => ExportService.ExportDosages(ViewModel.Dosages);
+    { if (!App.Auth.Can(Services.Permission.ExportMedicineCatalog)) return; ExportService.ExportDosages(ViewModel.Dosages); }
 
     private void ExportMedicineNotes_Click(object sender, RoutedEventArgs e)
-        => ExportService.ExportMedicineNotes(ViewModel.MedicineNotes);
+    { if (!App.Auth.Can(Services.Permission.ExportMedicineCatalog)) return; ExportService.ExportMedicineNotes(ViewModel.MedicineNotes); }
 
     private void ExportPrescriptionNotes_Click(object sender, RoutedEventArgs e)
-        => ExportService.ExportPrescriptionNotes(ViewModel.PrescriptionNotes);
+    { if (!App.Auth.Can(Services.Permission.ExportMedicineCatalog)) return; ExportService.ExportPrescriptionNotes(ViewModel.PrescriptionNotes); }
 
     private void ExportLabTests_Click(object sender, RoutedEventArgs e)
-        => ExportService.ExportLabTests(ViewModel.LabTests);
+    { if (!App.Auth.Can(Services.Permission.ExportMedicineCatalog)) return; ExportService.ExportLabTests(ViewModel.LabTests); }
 
     // ── Lab Tests ─────────────────────────────────────────────────────────────
 

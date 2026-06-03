@@ -3,6 +3,10 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="clr-namespace:OPDClinic">
 
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVis"/>
+    </UserControl.Resources>
+
     <Grid Background="{StaticResource ContentBgBrush}">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -29,10 +33,12 @@
                             Style="{StaticResource SecondaryButton}"
                             Click="SmtpSettings_Click"
                             VerticalAlignment="Center"
-                            Margin="0,0,8,0"/>
+                            Margin="0,0,8,0"
+                            Visibility="{Binding CanManageSMTP, Converter={StaticResource BoolToVis}}"/>
                     <Button Content="{DynamicResource Users.Btn.Add}"
                             Style="{StaticResource PrimaryButton}"
                             Click="AddUser_Click"
+                            Visibility="{Binding CanAddUser, Converter={StaticResource BoolToVis}}"
                             VerticalAlignment="Center"/>
                 </StackPanel>
             </DockPanel>
@@ -142,7 +148,10 @@
                                         Padding="10,4" FontSize="11"
                                         Tag="{Binding}"
                                         Click="EditUser_Click"
-                                        Margin="0,0,6,0"/>
+                                        Margin="0,0,6,0"
+                                        Visibility="{Binding DataContext.CanEditUser,
+                                                     RelativeSource={RelativeSource AncestorType=UserControl},
+                                                     Converter={StaticResource BoolToVis}}"/>
 
                                 <!-- Toggle Active/Inactive -->
                                 <Button Padding="10,4" FontSize="11" Margin="0,0,6,0"
@@ -192,7 +201,10 @@
                                         Padding="10,4" FontSize="11"
                                         Command="{Binding DataContext.DeleteUserCommand,
                                                   RelativeSource={RelativeSource AncestorType=UserControl}}"
-                                        CommandParameter="{Binding}"/>
+                                        CommandParameter="{Binding}"
+                                        Visibility="{Binding DataContext.CanDeleteUser,
+                                                     RelativeSource={RelativeSource AncestorType=UserControl},
+                                                     Converter={StaticResource BoolToVis}}"/>
                             </StackPanel>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>

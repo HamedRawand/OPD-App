@@ -83,6 +83,7 @@
                     IsCancel="True" Padding="20,8" Margin="0,0,10,0"/>
             <Button Content="💾 Save Settings"
                     Style="{StaticResource PrimaryButton}"
+                    IsDefault="True"
                     Padding="20,8" Click="Save_Click"/>
         </StackPanel>
 

@@ -76,9 +76,21 @@ public partial class CatalogViewModel : ObservableObject
     partial void OnSearchTextChanged(string value)    { _view?.Refresh(); RefreshCount(); }
     partial void OnCategoryFilterChanged(string value) { _view?.Refresh(); RefreshCount(); }
 
+    // ── Authorization properties for XAML bindings ───────────────────────────
+    public bool CanAddMedicine    => App.Auth.Can(Services.Permission.AddMedicine);
+    public bool CanEditMedicine   => App.Auth.Can(Services.Permission.EditMedicine);
+    public bool CanDeleteMedicine => App.Auth.Can(Services.Permission.DeleteMedicineCatalog);
+    public bool CanExportMedicine => App.Auth.Can(Services.Permission.ExportMedicineCatalog);
+
     [RelayCommand]
     public void DeleteMedicine(MedicineList m)
     {
+        if (!App.Auth.Can(Services.Permission.DeleteMedicineCatalog))
+        {
+            MessageBox.Show("You do not have permission to delete medicines.",
+                "Access Denied", MessageBoxButton.OK, MessageBoxImage.Warning);
+            return;
+        }
         var confirm = MessageBox.Show(
             $"Delete '{m.MedicineName}'?",
             "Confirm Delete",

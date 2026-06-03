@@ -72,7 +72,7 @@ public partial class PatientListView : UserControl
 
     private void ExportPatients_Click(object sender, RoutedEventArgs e)
     {
-        // Export the currently filtered view (respects search / date / physician filter)
+        if (!App.Auth.Can(Services.Permission.ExportPatients)) return;
         var rows = ViewModel.Patients?.Cast<PatientListRow>()
                                       .Select(r => r.Patient)
                             ?? [];

@@ -19,6 +19,10 @@ public partial class BackupView : UserControl
         InitializeComponent();
         BackupFolderBox.Text = _backupFolder;
         RefreshBackupList();
+
+        // Merge from Another Clinic is restricted to full Admin only (not Co-Admin)
+        if (!App.Auth.IsFullAdmin)
+            MergeCard.Visibility = System.Windows.Visibility.Collapsed;
     }
 
     // ── Backup ────────────────────────────────────────────────────────────────

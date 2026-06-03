@@ -1,4 +1,5 @@
 using OPDClinic.Models;
+using OPDClinic.Services;
 
 namespace OPDClinic.Data;
 
@@ -20,6 +21,53 @@ public static class DbSeeder
             });
             db.SaveChanges();
         }
+
+        // Seed the co-admin account (idempotent — only created once)
+        if (!db.Users.Any(u => u.Username == "co-admin"))
+        {
+            db.Users.Add(new User
+            {
+                Username            = "co-admin",
+                PasswordHash        = BCrypt.Net.BCrypt.HashPassword("rx_coadmin"),
+                FullName            = "Co-Administrator",
+                Role                = UserRole.CoAdmin,
+                IsActive            = true,
+                MustChangePassword  = true,
+                CreatedAt           = DateTime.UtcNow
+            });
+            db.SaveChanges();
+        }
+
+        // Seed built-in editable system roles (idempotent)
+        SeedSystemRole(db, "Doctor",
+            "Built-in role for Doctors. Edit permissions here to control what Doctor-role users can do.",
+            [
+                Permission.ViewPatients,
+                Permission.RegisterPatient,
+                Permission.EditPatientInfo,
+                Permission.ExportPatients,
+                Permission.ViewClinicalData,
+                Permission.EnterClinicalData,
+                Permission.ExportVisits,
+                Permission.ViewPrescription,
+                Permission.AddPrescription,
+                Permission.EditPrescription,
+                Permission.DeletePrescriptionLine,
+                Permission.PrintPdf,
+                Permission.ViewPhysicians,
+                Permission.ViewMedicineCatalog,
+            ]);
+
+        SeedSystemRole(db, "Receptionist",
+            "Built-in role for Receptionists. Edit permissions here to control what Receptionist-role users can do.",
+            [
+                Permission.ViewPatients,
+                Permission.RegisterPatient,
+                Permission.EditPatientInfo,
+                Permission.PrintPdf,
+                Permission.ViewPhysicians,
+                Permission.ViewAllPhysicianPatients,
+            ]);
 
         if (!db.MedicineForms.Any())
         {
@@ -110,6 +158,23 @@ public static class DbSeeder
                 new RouteOfAdministration { RouteName = "Intralesional",     Abbreviation = null,  Category = "Specialized",  Description = "Injected directly into a lesion" },
                 new RouteOfAdministration { RouteName = "Implantation",      Abbreviation = null,  Category = "Specialized",  Description = "Drug-releasing implant under the skin" }
             );
+            db.SaveChanges();
+        }
+    }
+
+    private static void SeedSystemRole(AppDbContext db, string name, string description, Permission[] permissions)
+    {
+        if (!db.CustomRoles.Any(r => r.IsSystem && r.Name == name))
+        {
+            var role = new CustomRole
+            {
+                Name        = name,
+                Description = description,
+                IsSystem    = true,
+                CreatedAt   = DateTime.UtcNow
+            };
+            role.SetPermissions(permissions);
+            db.CustomRoles.Add(role);
             db.SaveChanges();
         }
     }

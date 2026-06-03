@@ -5,6 +5,7 @@ using System.Windows.Media.Imaging;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Win32;
 using OPDClinic.Data;
+using OPDClinic.Helpers;
 using OPDClinic.Models;
 using OPDClinic.Services;
 
@@ -19,6 +20,7 @@ public partial class PhysicianEditDialog : Window
     public PhysicianEditDialog(IDbContextFactory<AppDbContext> factory, Physician? physician = null)
     {
         InitializeComponent();
+        DialogHelper.ApplyConstraints(this);
         _factory  = factory;
         _existing = physician;
 

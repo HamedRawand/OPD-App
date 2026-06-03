@@ -132,7 +132,7 @@
                 </Border>
 
                 <!-- ═══ MERGE / IMPORT FROM ANOTHER CLINIC ═══ -->
-                <Border Style="{StaticResource Card}" Margin="0,0,0,24" Padding="24,20">
+                <Border x:Name="MergeCard" Style="{StaticResource Card}" Margin="0,0,0,24" Padding="24,20">
                     <StackPanel>
                         <TextBlock Text="Merge from Another Clinic" FontSize="15" FontWeight="Bold"
                                    Foreground="{StaticResource TextPrimaryBrush}" Margin="0,0,0,4"/>

@@ -4,6 +4,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using Microsoft.EntityFrameworkCore;
 using OPDClinic.Data;
+using OPDClinic.Helpers;
 using OPDClinic.Models;
 using OPDClinic.Services;
 
@@ -21,6 +22,7 @@ public partial class MedicineEditDialog : Window
     public MedicineEditDialog(IDbContextFactory<AppDbContext> factory, MedicineList? medicine = null)
     {
         InitializeComponent();
+        DialogHelper.ApplyConstraints(this);
         _factory  = factory;
         _existing = medicine;
 

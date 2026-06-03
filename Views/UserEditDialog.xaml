@@ -112,6 +112,7 @@
             <Button x:Name="SaveBtn"
                     Content="{DynamicResource Common.Save}"
                     Style="{StaticResource PrimaryButton}"
+                    IsDefault="True"
                     Padding="20,8" Click="Save_Click"/>
         </StackPanel>
 

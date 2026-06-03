@@ -1,4 +1,5 @@
 using System.Windows;
+using OPDClinic.Helpers;
 
 namespace OPDClinic.Views;
 
@@ -9,6 +10,7 @@ public partial class ResetPasswordDialog : Window
     public ResetPasswordDialog(string username)
     {
         InitializeComponent();
+        DialogHelper.ApplyConstraints(this);
         SubTitle.Text = $"Set a new password for user '{username}'.\nThe user will be required to change it on next login.";
     }
 

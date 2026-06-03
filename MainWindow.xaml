@@ -245,7 +245,8 @@
                             </StackPanel>
                         </Button>
 
-                        <Button Style="{StaticResource NavButton}"
+                        <Button x:Name="NavImportBtn"
+                                Style="{StaticResource NavButton}"
                                 Click="NavImport_Click"
                                 ToolTip="Import data from Access database">
                             <StackPanel Orientation="Horizontal" VerticalAlignment="Center">

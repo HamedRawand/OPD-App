@@ -15,6 +15,7 @@ public partial class RouteEditDialog : Window
     public RouteEditDialog(IDbContextFactory<AppDbContext> factory, RouteOfAdministration? route = null)
     {
         InitializeComponent();
+        DialogHelper.ApplyConstraints(this);
         _factory  = factory;
         _existing = route;
 

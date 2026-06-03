@@ -46,18 +46,34 @@ public partial class MainWindow : Window
         if (App.Auth.Can(Permission.ViewPatients))
             NavPatientsBtn.Visibility = Visibility.Visible;
 
-        if (App.Auth.Can(Permission.ManagePhysicians))
+        // Physicians nav: any physician permission grants access
+        if (App.Auth.CanAny(Permission.ViewPhysicians, Permission.AddPhysician,
+                Permission.EditPhysician, Permission.DeletePhysicians,
+                Permission.ExportPhysicians, Permission.ManagePhysicians))
             NavPhysiciansBtn.Visibility = Visibility.Visible;
 
-        if (App.Auth.Can(Permission.ManageMedicineCatalog))
+        // Medicine Catalog nav: any catalog permission grants access
+        if (App.Auth.CanAny(Permission.ViewMedicineCatalog, Permission.AddMedicine,
+                Permission.EditMedicine, Permission.DeleteMedicineCatalog,
+                Permission.ExportMedicineCatalog, Permission.ManageMedicineCatalog))
             NavMedicinesBtn.Visibility = Visibility.Visible;
 
-        if (App.Auth.Can(Permission.ManageMedicineCatalog) || App.Auth.Can(Permission.ManageUsers))
+        // Options nav: catalog or user permissions
+        if (App.Auth.CanAny(Permission.ViewMedicineCatalog, Permission.AddMedicine,
+                Permission.EditMedicine, Permission.DeleteMedicineCatalog,
+                Permission.ExportMedicineCatalog, Permission.ManageMedicineCatalog,
+                Permission.ViewUsers, Permission.AddUser, Permission.EditUser,
+                Permission.DeleteUsers, Permission.ExportUsers, Permission.ManageUsers))
             NavOptionsBtn.Visibility = Visibility.Visible;
 
         // ADMINISTRATION section: Users, Custom Roles, Import, Backup, Print Settings
-        if (App.Auth.Can(Permission.ManageUsers))
+        if (App.Auth.CanAny(Permission.ViewUsers, Permission.AddUser, Permission.EditUser,
+                Permission.DeleteUsers, Permission.ExportUsers, Permission.ManageUsers))
             AdminNav.Visibility = Visibility.Visible;
+
+        // Import Data is restricted to full Admin only (not Co-Admin)
+        if (!App.Auth.IsFullAdmin)
+            NavImportBtn.Visibility = Visibility.Collapsed;
 
         _dashboardView   = new DashboardView();
         _patientListView = new PatientListView();
@@ -69,14 +85,16 @@ public partial class MainWindow : Window
             _dashboardView.Reload();
             SetActiveNav(NavDashboardBtn);
         }
-        else if (App.Auth.Can(Permission.ManageMedicineCatalog))
+        else if (App.Auth.CanAny(Permission.ViewMedicineCatalog, Permission.AddMedicine,
+                     Permission.EditMedicine, Permission.ManageMedicineCatalog))
         {
             _catalogView = new CatalogView();
             ContentArea.Content = _catalogView;
             _catalogView.ViewModel.LoadMedicinesCommand.Execute(null);
             SetActiveNav(NavMedicinesBtn);
         }
-        else if (App.Auth.Can(Permission.ManagePhysicians))
+        else if (App.Auth.CanAny(Permission.ViewPhysicians, Permission.AddPhysician,
+                     Permission.EditPhysician, Permission.ManagePhysicians))
         {
             _physicianView = new PhysicianView();
             ContentArea.Content = _physicianView;

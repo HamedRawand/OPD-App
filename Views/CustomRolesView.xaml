@@ -21,7 +21,7 @@
                     <TextBlock Text="Custom Roles"
                                FontSize="20" FontWeight="Bold"
                                Foreground="{StaticResource TextPrimaryBrush}"/>
-                    <TextBlock Text="Define roles with custom permission sets for non-standard staff."
+                    <TextBlock Text="Manage built-in Doctor &amp; Receptionist roles, or define custom roles for non-standard staff."
                                FontSize="12" Foreground="{StaticResource TextSecondaryBrush}"
                                Margin="0,2,0,0"/>
                 </StackPanel>
@@ -59,8 +59,23 @@
                                   Style="{StaticResource AppDataGrid}"
                                   MinHeight="120">
                             <DataGrid.Columns>
-                                <DataGridTextColumn Header="Role Name" Width="*"
-                                                    Binding="{Binding Name}"/>
+                                <!-- Role Name + Built-in badge -->
+                                <DataGridTemplateColumn Header="Role Name" Width="*" CanUserSort="True" SortMemberPath="Name">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,2">
+                                                <TextBlock Text="{Binding Name}" VerticalAlignment="Center"/>
+                                                <Border Background="#EFF6FF" BorderBrush="#BFDBFE" BorderThickness="1"
+                                                        CornerRadius="3" Padding="5,1" Margin="7,0,0,0"
+                                                        Visibility="{Binding IsSystem, Converter={StaticResource BoolToVis}}"
+                                                        VerticalAlignment="Center">
+                                                    <TextBlock Text="Built-in" FontSize="10"
+                                                               Foreground="#1D4ED8" FontWeight="SemiBold"/>
+                                                </Border>
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
                                 <DataGridTextColumn Header="Description" Width="2*"
                                                     Binding="{Binding Description}">
                                     <DataGridTextColumn.ElementStyle>
@@ -80,14 +95,24 @@
                                         </DataTemplate>
                                     </DataGridTemplateColumn.CellTemplate>
                                 </DataGridTemplateColumn>
-                                <!-- Delete -->
+                                <!-- Delete (hidden for built-in system roles) -->
                                 <DataGridTemplateColumn Header="" Width="40" CanUserResize="False">
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
-                                            <Button Content="✕" Style="{StaticResource ActionButton}"
+                                            <Button Content="✕"
                                                     Foreground="{StaticResource DangerBrush}"
                                                     Tag="{Binding}"
-                                                    Click="DeleteRole_Click"/>
+                                                    Click="DeleteRole_Click">
+                                                <Button.Style>
+                                                    <Style TargetType="Button" BasedOn="{StaticResource ActionButton}">
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding IsSystem}" Value="True">
+                                                                <Setter Property="Visibility" Value="Hidden"/>
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </Button.Style>
+                                            </Button>
                                         </DataTemplate>
                                     </DataGridTemplateColumn.CellTemplate>
                                 </DataGridTemplateColumn>

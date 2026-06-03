@@ -22,6 +22,12 @@ public class CustomRole
     /// <summary>Free-text notes about additional responsibilities beyond the standard list.</summary>
     public string? AdditionalNotes { get; set; }
 
+    /// <summary>
+    /// True for the two built-in editable roles (Doctor, Receptionist).
+    /// System roles can have permissions edited but cannot be renamed or deleted.
+    /// </summary>
+    public bool IsSystem { get; set; }
+
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
     public HashSet<Permission> GetPermissions()

@@ -2,6 +2,7 @@ using System.Windows;
 using System.Windows.Controls;
 using Microsoft.EntityFrameworkCore;
 using OPDClinic.Data;
+using OPDClinic.Helpers;
 using OPDClinic.Models;
 
 namespace OPDClinic.Views;
@@ -16,6 +17,7 @@ public partial class PrescriptionLineEditDialog : Window
     public PrescriptionLineEditDialog(IDbContextFactory<AppDbContext> factory, MedicineUsage line)
     {
         InitializeComponent();
+        DialogHelper.ApplyConstraints(this);
         _line = line;
 
         // Load catalog data fresh from DB using a short-lived context

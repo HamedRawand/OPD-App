@@ -28,6 +28,20 @@ public partial class UserManagementViewModel : ObservableObject
     [ObservableProperty] private string _statusText = "";
     [ObservableProperty] private int    _userCount;
 
+    // ── Authorization properties for XAML bindings ───────────────────────────
+    public bool CanAddUser      => App.Auth.Can(Permission.AddUser);
+    public bool CanEditUser     => App.Auth.Can(Permission.EditUser);
+    public bool CanDeleteUser   => App.Auth.Can(Permission.DeleteUsers);
+    /// <summary>Only the full Admin can open Email/SMTP Settings.</summary>
+    public bool CanManageSMTP   => App.Auth.IsFullAdmin;
+
+    /// <summary>
+    /// Returns true when the current user is CoAdmin and the target user is Admin,
+    /// meaning the action must be blocked with a friendly message.
+    /// </summary>
+    private static bool IsAdminProtected(User user) =>
+        user.Role == UserRole.Admin && !App.Auth.IsFullAdmin;
+
     public UserManagementViewModel()
     {
         _searchDebounce.Tick += (_, _) =>
@@ -68,12 +82,19 @@ public partial class UserManagementViewModel : ObservableObject
         var q = SearchText.Trim().ToLower();
         return u.Username.ToLower().Contains(q) ||
                u.FullName.ToLower().Contains(q) ||
-               u.Role.ToString().ToLower().Contains(q);
+               u.RoleDisplayName.ToLower().Contains(q) ||
+               (u.Email ?? "").ToLower().Contains(q);
     }
 
     [RelayCommand]
     public void ToggleActive(User user)
     {
+        if (IsAdminProtected(user))
+        {
+            MessageBox.Show("Administrator accounts can only be managed by the system Admin.",
+                "Access Denied", MessageBoxButton.OK, MessageBoxImage.Warning);
+            return;
+        }
         if (user.Id == App.Auth.CurrentUser!.Id)
         {
             MessageBox.Show("You cannot deactivate your own account.",
@@ -110,6 +131,12 @@ public partial class UserManagementViewModel : ObservableObject
     [RelayCommand]
     public void UnlockUser(User user)
     {
+        if (IsAdminProtected(user))
+        {
+            MessageBox.Show("Administrator accounts can only be managed by the system Admin.",
+                "Access Denied", MessageBoxButton.OK, MessageBoxImage.Warning);
+            return;
+        }
         user.IsLocked = false;
         user.FailedLoginAttempts = 0;
         try
@@ -138,6 +165,12 @@ public partial class UserManagementViewModel : ObservableObject
     [RelayCommand]
     public void ResetPassword(User user)
     {
+        if (IsAdminProtected(user))
+        {
+            MessageBox.Show("Administrator accounts can only be managed by the system Admin.",
+                "Access Denied", MessageBoxButton.OK, MessageBoxImage.Warning);
+            return;
+        }
         var dlg = new Views.ResetPasswordDialog(user.Username);
         if (dlg.ShowDialog() != true) return;
 
@@ -176,6 +209,18 @@ public partial class UserManagementViewModel : ObservableObject
     [RelayCommand]
     public void DeleteUser(User user)
     {
+        if (!App.Auth.Can(Permission.DeleteUsers))
+        {
+            MessageBox.Show("You do not have permission to delete users.",
+                "Access Denied", MessageBoxButton.OK, MessageBoxImage.Warning);
+            return;
+        }
+        if (IsAdminProtected(user))
+        {
+            MessageBox.Show("Administrator accounts can only be managed by the system Admin.",
+                "Access Denied", MessageBoxButton.OK, MessageBoxImage.Warning);
+            return;
+        }
         if (user.Id == App.Auth.CurrentUser!.Id)
         {
             MessageBox.Show("You cannot delete your own account.",

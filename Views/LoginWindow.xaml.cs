@@ -1,4 +1,5 @@
 using System.Windows;
+using OPDClinic.Helpers;
 using OPDClinic.Services;
 
 namespace OPDClinic.Views;
@@ -8,6 +9,7 @@ public partial class LoginWindow : Window
     public LoginWindow()
     {
         InitializeComponent();
+        DialogHelper.ApplyConstraints(this);
     }
 
     private void SignIn_Click(object sender, RoutedEventArgs e)

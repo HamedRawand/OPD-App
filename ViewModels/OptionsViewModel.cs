@@ -64,6 +64,7 @@ public partial class OptionsViewModel : ObservableObject
     [RelayCommand]
     private void DeleteRoute(RouteOfAdministration item)
     {
+        if (!App.Auth.Can(Services.Permission.DeleteMedicineCatalog)) { MessageBox.Show("You do not have permission to delete catalog items.", "Access Denied", MessageBoxButton.OK, MessageBoxImage.Warning); return; }
         if (MessageBox.Show($"Delete route '{item.RouteName}'?",
                 "Confirm Delete", MessageBoxButton.YesNo, MessageBoxImage.Warning)
             != MessageBoxResult.Yes) return;
@@ -97,6 +98,7 @@ public partial class OptionsViewModel : ObservableObject
     [RelayCommand]
     private void DeleteDosage(Dosage item)
     {
+        if (!App.Auth.Can(Services.Permission.DeleteMedicineCatalog)) { MessageBox.Show("You do not have permission to delete catalog items.", "Access Denied", MessageBoxButton.OK, MessageBoxImage.Warning); return; }
         if (MessageBox.Show($"Delete dosage '{item.DosageText}'?",
                 "Confirm Delete", MessageBoxButton.YesNo, MessageBoxImage.Warning)
             != MessageBoxResult.Yes) return;
@@ -129,6 +131,7 @@ public partial class OptionsViewModel : ObservableObject
     [RelayCommand]
     private void DeleteMedicineCategory(MedicineForm item)
     {
+        if (!App.Auth.Can(Services.Permission.DeleteMedicineCatalog)) { MessageBox.Show("You do not have permission to delete catalog items.", "Access Denied", MessageBoxButton.OK, MessageBoxImage.Warning); return; }
         if (MessageBox.Show($"Delete medicine form '{item.FormName}'?",
                 "Confirm Delete", MessageBoxButton.YesNo, MessageBoxImage.Warning)
             != MessageBoxResult.Yes) return;
@@ -161,6 +164,7 @@ public partial class OptionsViewModel : ObservableObject
     [RelayCommand]
     private void DeleteMedicineNote(MedicineNote item)
     {
+        if (!App.Auth.Can(Services.Permission.DeleteMedicineCatalog)) { MessageBox.Show("You do not have permission to delete catalog items.", "Access Denied", MessageBoxButton.OK, MessageBoxImage.Warning); return; }
         if (MessageBox.Show($"Delete medicine note '{item.Notes}'?",
                 "Confirm Delete", MessageBoxButton.YesNo, MessageBoxImage.Warning)
             != MessageBoxResult.Yes) return;
@@ -193,6 +197,7 @@ public partial class OptionsViewModel : ObservableObject
     [RelayCommand]
     private void DeletePrescriptionNote(PrescriptionNote item)
     {
+        if (!App.Auth.Can(Services.Permission.DeleteMedicineCatalog)) { MessageBox.Show("You do not have permission to delete catalog items.", "Access Denied", MessageBoxButton.OK, MessageBoxImage.Warning); return; }
         if (MessageBox.Show($"Delete prescription note '{item.Notes}'?",
                 "Confirm Delete", MessageBoxButton.YesNo, MessageBoxImage.Warning)
             != MessageBoxResult.Yes) return;
@@ -225,6 +230,7 @@ public partial class OptionsViewModel : ObservableObject
     [RelayCommand]
     private void DeleteLabTest(LabTest item)
     {
+        if (!App.Auth.Can(Services.Permission.DeleteMedicineCatalog)) { MessageBox.Show("You do not have permission to delete catalog items.", "Access Denied", MessageBoxButton.OK, MessageBoxImage.Warning); return; }
         if (MessageBox.Show($"Delete lab test '{item.TestName}'?",
                 "Confirm Delete", MessageBoxButton.YesNo, MessageBoxImage.Warning)
             != MessageBoxResult.Yes) return;

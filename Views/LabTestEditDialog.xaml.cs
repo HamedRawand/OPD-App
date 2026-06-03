@@ -14,6 +14,7 @@ public partial class LabTestEditDialog : Window
     public LabTestEditDialog(IDbContextFactory<AppDbContext> factory, LabTest? labTest = null)
     {
         InitializeComponent();
+        DialogHelper.ApplyConstraints(this);
         _factory  = factory;
         _existing = labTest;
 

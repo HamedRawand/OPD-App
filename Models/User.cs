@@ -2,7 +2,13 @@ using System.ComponentModel.DataAnnotations;
 
 namespace OPDClinic.Models;
 
-public enum UserRole { Admin, Doctor, Receptionist }
+public enum UserRole
+{
+    Admin        = 0,
+    Doctor       = 1,
+    Receptionist = 2,
+    CoAdmin      = 3,   // Elevated installer/setup role — all Admin permissions minus 4 restricted actions
+}
 
 public class User
 {
@@ -46,5 +52,9 @@ public class User
     public CustomRole? CustomRole { get; set; }
 
     /// <summary>Custom role name when assigned, otherwise the built-in role enum name.</summary>
-    public string RoleDisplayName => CustomRole?.Name ?? Role.ToString();
+    public string RoleDisplayName => CustomRole?.Name ?? Role switch
+    {
+        UserRole.CoAdmin => "Co-Admin",
+        _                => Role.ToString()
+    };
 }

@@ -1,5 +1,6 @@
 using System.Windows;
 using System.Windows.Controls;
+using OPDClinic.Helpers;
 using OPDClinic.Models;
 using OPDClinic.Services;
 
@@ -25,6 +26,7 @@ public partial class UserEditDialog : Window
     public UserEditDialog(User? existing)
     {
         InitializeComponent();
+        DialogHelper.ApplyConstraints(this);
         _existing = existing;
         _isEdit   = existing != null;
 
@@ -80,14 +82,19 @@ public partial class UserEditDialog : Window
 
     private static List<RoleItem> BuildRoleItems(OPDClinic.Data.AppDbContext db)
     {
-        var items = new List<RoleItem>
-        {
-            new() { DisplayName = "Admin",        BuiltinRole = UserRole.Admin },
-            new() { DisplayName = "Doctor",       BuiltinRole = UserRole.Doctor },
-            new() { DisplayName = "Receptionist", BuiltinRole = UserRole.Receptionist }
-        };
+        var items = new List<RoleItem>();
 
-        var customs = db.CustomRoles.OrderBy(r => r.Name).ToList();
+        // Only full Admins can assign or view the Admin role in the dropdown.
+        // CoAdmin cannot create/promote other Admin accounts (privilege escalation prevention).
+        if (App.Auth.IsFullAdmin)
+            items.Add(new() { DisplayName = "Admin",    BuiltinRole = UserRole.Admin });
+
+        items.Add(new() { DisplayName = "Co-Admin",     BuiltinRole = UserRole.CoAdmin });
+        items.Add(new() { DisplayName = "Doctor",       BuiltinRole = UserRole.Doctor });
+        items.Add(new() { DisplayName = "Receptionist", BuiltinRole = UserRole.Receptionist });
+
+        // Exclude IsSystem roles (Doctor, Receptionist) — they're already represented above as built-in entries
+        var customs = db.CustomRoles.Where(r => !r.IsSystem).OrderBy(r => r.Name).ToList();
         foreach (var cr in customs)
             items.Add(new RoleItem { DisplayName = cr.Name, BuiltinRole = UserRole.Receptionist, CustomRoleId = cr.Id });
 
@@ -176,6 +183,7 @@ public partial class UserEditDialog : Window
                 // Sync in-memory copy (reflected in parent list)
                 _existing!.Username          = username;
                 _existing.FullName           = fullName;
+                _existing.Email              = string.IsNullOrWhiteSpace(email) ? null : email;
                 _existing.Role               = resolvedRole;
                 _existing.CustomRoleId       = customRoleId;
                 _existing.PhysicianId        = linkedPhysicianId;

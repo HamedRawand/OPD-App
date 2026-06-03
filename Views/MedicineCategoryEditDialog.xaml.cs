@@ -15,6 +15,7 @@ public partial class MedicineCategoryEditDialog : Window
     public MedicineCategoryEditDialog(IDbContextFactory<AppDbContext> factory, MedicineForm? form = null)
     {
         InitializeComponent();
+        DialogHelper.ApplyConstraints(this);
         _factory  = factory;
         _existing = form;
 

@@ -1,6 +1,7 @@
 using System.ComponentModel;
 using System.Windows;
 using System.Windows.Input;
+using OPDClinic.Helpers;
 using OPDClinic.Services;
 using OPDClinic.ViewModels;
 
@@ -15,6 +16,7 @@ public partial class PatientEditWindow : Window
     public PatientEditWindow(PatientEditViewModel vm)
     {
         InitializeComponent();
+        DialogHelper.ApplyConstraints(this);
         _vm = vm;
         DataContext = vm;
 

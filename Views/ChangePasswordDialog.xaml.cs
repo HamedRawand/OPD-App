@@ -1,4 +1,5 @@
 using System.Windows;
+using OPDClinic.Helpers;
 using OPDClinic.Services;
 
 namespace OPDClinic.Views;
@@ -8,6 +9,7 @@ public partial class ChangePasswordDialog : Window
     public ChangePasswordDialog()
     {
         InitializeComponent();
+        DialogHelper.ApplyConstraints(this);
     }
 
     private void Save_Click(object sender, RoutedEventArgs e)

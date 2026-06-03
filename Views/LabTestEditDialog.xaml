@@ -82,6 +82,7 @@
                 <Button DockPanel.Dock="Right"
                         Content="{DynamicResource Common.Save}"
                         Style="{StaticResource PrimaryButton}"
+                        IsDefault="True"
                         Click="Save_Click" MinWidth="120"/>
                 <Button DockPanel.Dock="Right"
                         Content="{DynamicResource Common.Cancel}"

@@ -19,7 +19,10 @@ public partial class CustomRolesViewModel : ObservableObject
     public void LoadRoles()
     {
         using var db = App.DbFactory.CreateDbContext();
-        var roles = db.CustomRoles.OrderBy(r => r.Name).ToList();
+        var roles = db.CustomRoles
+            .OrderByDescending(r => r.IsSystem)
+            .ThenBy(r => r.Name)
+            .ToList();
         Roles = new ObservableCollection<CustomRole>(roles);
         SelectedRole = null;
     }
@@ -43,6 +46,16 @@ public partial class CustomRolesViewModel : ObservableObject
     private void DeleteRole(CustomRole? role)
     {
         if (role is null) return;
+
+        if (role.IsSystem)
+        {
+            MessageBox.Show(
+                $"The \"{role.Name}\" role is a built-in role and cannot be deleted.\n\n" +
+                "You can edit its permissions using the ✏ button.",
+                "Cannot Delete Built-in Role",
+                MessageBoxButton.OK, MessageBoxImage.Information);
+            return;
+        }
 
         // Find affected users before showing the warning
         List<string> affectedNames;

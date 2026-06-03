@@ -31,9 +31,21 @@ public partial class PhysicianViewModel : ObservableObject
         PhysicianCount = Physicians.Count;
     }
 
+    // ── Authorization properties (used for XAML button visibility) ───────────
+    public bool CanAddPhysician     => App.Auth.Can(Permission.AddPhysician);
+    public bool CanEditPhysician    => App.Auth.Can(Permission.EditPhysician);
+    public bool CanDeletePhysician  => App.Auth.Can(Permission.DeletePhysicians);
+    public bool CanExportPhysicians => App.Auth.Can(Permission.ExportPhysicians);
+
     [RelayCommand]
     public void DeletePhysician(Physician p)
     {
+        if (!App.Auth.Can(Permission.DeletePhysicians))
+        {
+            MessageBox.Show("You do not have permission to delete physicians.",
+                "Access Denied", MessageBoxButton.OK, MessageBoxImage.Warning);
+            return;
+        }
         var confirm = MessageBox.Show(
             $"Delete physician '{p.NameEng}'?\n\nThis will not delete existing patient records.",
             "Confirm Delete",

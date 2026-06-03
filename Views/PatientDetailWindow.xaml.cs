@@ -3,6 +3,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Shapes;
+using OPDClinic.Helpers;
 using OPDClinic.Models;
 using OPDClinic.Services;
 using OPDClinic.ViewModels;
@@ -18,6 +19,7 @@ public partial class PatientDetailWindow : Window
     public PatientDetailWindow(Patient patient)
     {
         InitializeComponent();
+        DialogHelper.ApplyConstraints(this);
         _vm         = new PatientDetailViewModel(App.DbFactory, patient);
         DataContext = _vm;
 
@@ -46,6 +48,7 @@ public partial class PatientDetailWindow : Window
 
     private void ExportVisits_Click(object sender, RoutedEventArgs e)
     {
+        if (!App.Auth.Can(Permission.ExportVisits)) return;
         var visits = _vm.Visits.Select(r => r.Visit).ToList();
         ExportService.ExportVisits(visits, _vm.Patient);
     }
@@ -118,7 +121,7 @@ public partial class PatientDetailWindow : Window
 
     private void DeleteVisit_Click(object sender, RoutedEventArgs e)
     {
-        if (!App.Auth.Can(Permission.EnterClinicalData)) return;
+        if (!App.Auth.Can(Permission.DeleteVisit)) return;
         if (sender is not Button btn || btn.Tag is not VisitListRow row) return;
 
         var result = MessageBox.Show(

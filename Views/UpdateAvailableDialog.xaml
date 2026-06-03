@@ -113,6 +113,7 @@
                         DockPanel.Dock="Right"
                         Content="{DynamicResource Update.BtnInstall}"
                         Style="{StaticResource PrimaryButton}"
+                        IsDefault="True"
                         MinWidth="140" Click="UpdateNow_Click"/>
                 <Button DockPanel.Dock="Right"
                         Content="{DynamicResource Update.BtnLater}"

@@ -7,9 +7,9 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
     <ApplicationIcon>image\Caduceus.ico</ApplicationIcon>
-    <Version>2.0.9</Version>
-    <AssemblyVersion>2.0.9.0</AssemblyVersion>
-    <FileVersion>2.0.9.0</FileVersion>
+    <Version>2.1.0</Version>
+    <AssemblyVersion>2.1.0.0</AssemblyVersion>
+    <FileVersion>2.1.0.0</FileVersion>
     <Company>Rx Writer</Company>
     <Product>Rx Writer</Product>
     <Description>Outpatient Department Clinic Management System</Description>

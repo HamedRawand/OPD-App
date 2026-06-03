@@ -2,6 +2,7 @@ using System.Windows;
 using System.Windows.Controls;
 using Microsoft.EntityFrameworkCore;
 using OPDClinic.Data;
+using OPDClinic.Helpers;
 using OPDClinic.Models;
 
 namespace OPDClinic.Views;
@@ -17,6 +18,7 @@ public partial class MedicineNoteEditDialog : Window
     public MedicineNoteEditDialog(IDbContextFactory<AppDbContext> factory, MedicineNote? note = null)
     {
         InitializeComponent();
+        DialogHelper.ApplyConstraints(this);
         _factory  = factory;
         _existing = note;
 

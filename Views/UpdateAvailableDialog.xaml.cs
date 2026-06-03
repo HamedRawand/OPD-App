@@ -1,5 +1,6 @@
 using System.Reflection;
 using System.Windows;
+using OPDClinic.Helpers;
 using OPDClinic.Models;
 using OPDClinic.Services;
 
@@ -13,6 +14,7 @@ public partial class UpdateAvailableDialog : Window
     public UpdateAvailableDialog(UpdateInfo info)
     {
         InitializeComponent();
+        DialogHelper.ApplyConstraints(this);
         _info = info;
         Populate();
     }

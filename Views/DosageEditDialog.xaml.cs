@@ -15,6 +15,7 @@ public partial class DosageEditDialog : Window
     public DosageEditDialog(IDbContextFactory<AppDbContext> factory, Dosage? dosage = null)
     {
         InitializeComponent();
+        DialogHelper.ApplyConstraints(this);
         _factory  = factory;
         _existing = dosage;
 

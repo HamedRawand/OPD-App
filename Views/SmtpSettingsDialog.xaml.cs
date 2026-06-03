@@ -1,5 +1,6 @@
 using System.Windows;
 using System.Windows.Media;
+using OPDClinic.Helpers;
 using OPDClinic.Models;
 using OPDClinic.Services;
 
@@ -10,6 +11,7 @@ public partial class SmtpSettingsDialog : Window
     public SmtpSettingsDialog()
     {
         InitializeComponent();
+        DialogHelper.ApplyConstraints(this);
 
         var s = SmtpSettingsService.Current;
         SenderEmailBox.Text  = s.SenderEmail;
