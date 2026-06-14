@@ -35,8 +35,9 @@ public partial class MainWindow : Window
         InitializeComponent();
 
         var user = App.Auth.CurrentUser!;
-        UserNameText.Text = user.FullName;
-        UserRoleText.Text = App.Auth.CurrentRoleDisplayName;
+        UserNameText.Text    = user.FullName;
+        UserRoleText.Text    = App.Auth.CurrentRoleDisplayName;
+        UserInitialsText.Text = GetInitials(user.FullName);
 
         var v = Assembly.GetExecutingAssembly().GetName().Version;
         AppVersionText.Text = v is null ? "" : $"v{v.Major}.{v.Minor}.{v.Build}";
@@ -134,6 +135,17 @@ public partial class MainWindow : Window
     /// and 240 px (max) so it never looks too narrow on 800 px windows or too
     /// wide on large monitors / low-DPI screens.
     /// </summary>
+    /// <summary>Returns up to 2 initials from a full name (first + last word).</summary>
+    private static string GetInitials(string fullName)
+    {
+        var parts = fullName.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+        if (parts.Length == 0) return "?";
+        if (parts.Length == 1) return parts[0].Length >= 2
+            ? parts[0][..2].ToUpper()
+            : parts[0].ToUpper();
+        return $"{parts[0][0]}{parts[^1][0]}".ToUpper();
+    }
+
     private void UpdateSidebarWidth(double windowWidth)
     {
         var w = Math.Clamp(windowWidth * 0.19, 175, 240);

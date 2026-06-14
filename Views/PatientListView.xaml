@@ -135,13 +135,21 @@
                             </Style>
                         </DataGridTextColumn.ElementStyle>
                     </DataGridTextColumn>
-                    <DataGridTemplateColumn Header="" Width="100" CanUserResize="False">
+                    <DataGridTemplateColumn Header="" Width="190" CanUserResize="False">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
-                                <Button Content="{DynamicResource PatList.ViewHistory}"
-                                        Style="{StaticResource ActionButton}"
-                                        Tag="{Binding}" Click="ViewPatient_Click"
-                                        HorizontalAlignment="Center"/>
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                    <Button Content="{DynamicResource PatList.ViewHistory}"
+                                            Style="{StaticResource ActionButton}"
+                                            Tag="{Binding}" Click="ViewPatient_Click"/>
+                                    <!-- Delete button — visible only for patients with zero visits -->
+                                    <Button Content="Delete"
+                                            Style="{DynamicResource DangerButton}"
+                                            Tag="{Binding}" Click="DeletePatient_Click"
+                                            Margin="6,0,0,0"
+                                            Visibility="{Binding HasNoVisits,
+                                                         Converter={StaticResource BoolToVisible}}"/>
+                                </StackPanel>
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>

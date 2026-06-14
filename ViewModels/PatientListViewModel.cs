@@ -1,5 +1,6 @@
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Windows;
 using System.Windows.Data;
 using System.Windows.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -8,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using OPDClinic.Data;
 using OPDClinic.Models;
 using OPDClinic.Services;
+using Serilog;
 
 namespace OPDClinic.ViewModels;
 
@@ -29,6 +31,9 @@ public class PatientListRow
     public string  VisitCountText => VisitCount > 0
         ? $"{VisitCount} visit{(VisitCount == 1 ? "" : "s")}"
         : "No visits";
+
+    /// <summary>True when the patient has no visits — drives the inline Delete button in the list.</summary>
+    public bool HasNoVisits => VisitCount == 0;
 
     /// <summary>Non-null only for patients imported via backup merge.</summary>
     public string? SourceClinic   => Patient.SourceClinic;
@@ -202,5 +207,35 @@ public partial class PatientListViewModel : ObservableObject
         SearchText         = "";
         SelectedPhysician  = null;
         FilterDate         = null;
+    }
+
+    /// <summary>
+    /// Permanently deletes a patient (and all their data via cascade).
+    /// Confirmation is shown by the caller; this method only does the DB work and list update.
+    /// </summary>
+    [RelayCommand]
+    private void DeletePatient(PatientListRow row)
+    {
+        try
+        {
+            using var db = _factory.CreateDbContext();
+            var patient = db.Patients.Find(row.Patient.Id);
+            if (patient is not null)
+            {
+                db.Patients.Remove(patient);   // cascade: visits → rx lines → labs
+                db.SaveChanges();
+                AuditService.Log("PatientDeleted", "Patient", row.Patient.Id, row.Patient.PatientName);
+                Log.Information("PatientDeleted — PatientId:{Id} Name:{Name}",
+                    row.Patient.Id, row.Patient.PatientName);
+            }
+            _allRows.Remove(row);
+            RefreshCount();
+        }
+        catch (Exception ex)
+        {
+            Log.Error(ex, "Delete patient failed for PatientId={PatientId}", row.Patient.Id);
+            MessageBox.Show($"Delete failed:\n{ex.Message}",
+                "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+        }
     }
 }

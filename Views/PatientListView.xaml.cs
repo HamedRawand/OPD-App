@@ -70,6 +70,25 @@ public partial class PatientListView : UserControl
         }
     }
 
+    /// <summary>Deletes a patient with zero visits directly from the list.</summary>
+    private void DeletePatient_Click(object sender, RoutedEventArgs e)
+    {
+        if (!App.Auth.Can(Services.Permission.DeletePatient)) return;
+        if (sender is not Button btn || btn.Tag is not PatientListRow row) return;
+
+        var result = MessageBox.Show(
+            $"Delete patient '{row.PatientName}'?\n\n" +
+            "This patient has no visits. The record will be permanently deleted.\n" +
+            "This cannot be undone.",
+            "Delete Patient",
+            MessageBoxButton.YesNo,
+            MessageBoxImage.Warning);
+
+        if (result != MessageBoxResult.Yes) return;
+
+        ViewModel.DeletePatientCommand.Execute(row);
+    }
+
     private void ExportPatients_Click(object sender, RoutedEventArgs e)
     {
         if (!App.Auth.Can(Services.Permission.ExportPatients)) return;

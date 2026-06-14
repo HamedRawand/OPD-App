@@ -124,11 +124,71 @@ public partial class PatientDetailWindow : Window
         if (!App.Auth.Can(Permission.DeleteVisit)) return;
         if (sender is not Button btn || btn.Tag is not VisitListRow row) return;
 
+        bool isLastVisit = _vm.Visits.Count == 1;
+
+        string message = isLastVisit
+            ? $"This is the only visit for '{_vm.Patient.PatientName}'.\n\n" +
+              "Deleting it will permanently remove the patient record and all associated data.\n" +
+              "This cannot be undone."
+            : $"Delete visit from {row.DateText}?\n\n" +
+              "All prescription lines and lab tests for this visit will also be deleted.\n" +
+              "This cannot be undone.";
+
+        string title = isLastVisit ? "Delete Visit & Patient Record" : "Delete Visit";
+
+        var result = MessageBox.Show(message, title, MessageBoxButton.YesNo, MessageBoxImage.Warning);
+        if (result != MessageBoxResult.Yes) return;
+
+        try
+        {
+            if (isLastVisit)
+            {
+                using var db = App.DbFactory.CreateDbContext();
+                var patient = db.Patients.Find(_vm.Patient.Id);
+                if (patient is not null)
+                {
+                    db.Patients.Remove(patient);   // cascade: visits → rx lines → labs
+                    db.SaveChanges();
+                    AuditService.Log("VisitDeleted",    "Visit",   row.VisitId,      _vm.Patient.PatientName);
+                    AuditService.Log("PatientDeleted",  "Patient", _vm.Patient.Id,   _vm.Patient.PatientName);
+                    Log.Information("LastVisitDeleted+PatientDeleted — VisitId:{Vid} PatientId:{Pid}",
+                        row.VisitId, _vm.Patient.Id);
+                }
+                this.Close();
+            }
+            else
+            {
+                using var db = App.DbFactory.CreateDbContext();
+                var visit = db.Visits.Find(row.VisitId);
+                if (visit is not null)
+                {
+                    db.Visits.Remove(visit);
+                    db.SaveChanges();
+                    AuditService.Log("VisitDeleted", "Visit", row.VisitId, _vm.Patient.PatientName);
+                    Log.Information("VisitDeleted — VisitId:{Id} Patient:{Name}", row.VisitId, _vm.Patient.PatientName);
+                }
+                _vm.LoadVisitsCommand.Execute(null);
+            }
+        }
+        catch (Exception ex)
+        {
+            Log.Error(ex, "Delete visit failed for VisitId={VisitId}", row.VisitId);
+            MessageBox.Show($"Delete failed:\n{ex.Message}",
+                "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+        }
+    }
+
+    // ── Delete patient (empty-state button) ───────────────────────────────────
+
+    private void DeletePatient_Click(object sender, RoutedEventArgs e)
+    {
+        if (!App.Auth.Can(Permission.DeletePatient)) return;
+
         var result = MessageBox.Show(
-            $"Delete visit from {row.DateText}?\n\n" +
-            "All prescription lines and lab tests for this visit will also be deleted.\n" +
+            $"Permanently delete patient '{_vm.Patient.PatientName}'?\n\n" +
+            "All visits, prescriptions, and lab results for this patient will also be deleted.\n" +
             "This cannot be undone.",
-            "Delete Visit",
+            "Delete Patient Record",
             MessageBoxButton.YesNo,
             MessageBoxImage.Warning);
 
@@ -137,19 +197,19 @@ public partial class PatientDetailWindow : Window
         try
         {
             using var db = App.DbFactory.CreateDbContext();
-            var visit = db.Visits.Find(row.VisitId);
-            if (visit is not null)
+            var patient = db.Patients.Find(_vm.Patient.Id);
+            if (patient is not null)
             {
-                db.Visits.Remove(visit);
+                db.Patients.Remove(patient);   // cascade: visits → rx lines → labs
                 db.SaveChanges();
-                AuditService.Log("VisitDeleted", "Visit", row.VisitId, _vm.Patient.PatientName);
-                Log.Information("VisitDeleted — VisitId:{Id} Patient:{Name}", row.VisitId, _vm.Patient.PatientName);
+                AuditService.Log("PatientDeleted", "Patient", _vm.Patient.Id, _vm.Patient.PatientName);
+                Log.Information("PatientDeleted — PatientId:{Id} Name:{Name}", _vm.Patient.Id, _vm.Patient.PatientName);
             }
-            _vm.LoadVisitsCommand.Execute(null);
+            this.Close();
         }
         catch (Exception ex)
         {
-            Log.Error(ex, "Delete visit failed for VisitId={VisitId}", row.VisitId);
+            Log.Error(ex, "Delete patient failed for PatientId={PatientId}", _vm.Patient.Id);
             MessageBox.Show($"Delete failed:\n{ex.Message}",
                 "Error", MessageBoxButton.OK, MessageBoxImage.Error);
         }

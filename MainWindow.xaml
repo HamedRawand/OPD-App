@@ -30,104 +30,109 @@
                                TextWrapping="Wrap"/>
                 </Border>
 
-                <!-- Bottom: user info + language toggle + logout -->
-                <Border DockPanel.Dock="Bottom" Padding="14,14"
+                <!-- ═══ BOTTOM PANEL — user card + icon strip ═══ -->
+                <Border DockPanel.Dock="Bottom" Padding="12,10"
                         BorderBrush="#2E4A6A" BorderThickness="0,1,0,0">
                     <StackPanel>
-                        <TextBlock x:Name="UserNameText" Foreground="White"
-                                   FontSize="13" FontWeight="SemiBold"/>
-                        <TextBlock x:Name="UserRoleText" Foreground="#7EB3E8"
-                                   FontSize="11" Margin="0,2,0,10"/>
 
-                        <!-- Help / User Manual -->
-                        <Button x:Name="NavHelpBtn"
-                                Style="{StaticResource NavButton}"
-                                Foreground="#7EB3E8"
-                                Click="NavHelp_Click"
-                                ToolTip="Open the Rx Writer user manual"
-                                Margin="0,0,0,4">
-                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                                <TextBlock Text="&#xE897;" FontFamily="Segoe MDL2 Assets"
-                                           FontSize="14" Width="22" Margin="0,0,10,0"
-                                           VerticalAlignment="Center"/>
-                                <TextBlock Text="Help / Manual" VerticalAlignment="Center"/>
+                        <!-- User identity card: initials circle + name/role -->
+                        <Grid Margin="4,0,4,8">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <!-- Initials circle -->
+                            <Border Grid.Column="0"
+                                    Width="32" Height="32" CornerRadius="16"
+                                    Background="#1976D2" Margin="0,0,10,0"
+                                    VerticalAlignment="Center">
+                                <TextBlock x:Name="UserInitialsText"
+                                           Foreground="White" FontSize="11" FontWeight="Bold"
+                                           HorizontalAlignment="Center" VerticalAlignment="Center"
+                                           FontFamily="Calibri"/>
+                            </Border>
+                            <!-- Name + role stacked -->
+                            <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                <TextBlock x:Name="UserNameText"
+                                           Foreground="White" FontSize="12.5" FontWeight="SemiBold"
+                                           TextTrimming="CharacterEllipsis"/>
+                                <TextBlock x:Name="UserRoleText"
+                                           Foreground="#7EB3E8" FontSize="11"
+                                           TextTrimming="CharacterEllipsis"/>
                             </StackPanel>
-                        </Button>
+                        </Grid>
 
-                        <!-- About -->
-                        <Button x:Name="NavAboutBtn"
-                                Style="{StaticResource NavButton}"
-                                Foreground="#7EB3E8"
-                                Click="NavAbout_Click"
-                                ToolTip="About Rx Writer"
-                                Margin="0,0,0,4">
-                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                                <TextBlock Text="&#xE946;" FontFamily="Segoe MDL2 Assets"
-                                           FontSize="14" Width="22" Margin="0,0,10,0"
-                                           VerticalAlignment="Center"/>
-                                <TextBlock Text="About" VerticalAlignment="Center"/>
+                        <!-- Thin divider -->
+                        <Border Height="1" Background="#2E4A6A" Margin="-12,0,-12,8"/>
+
+                        <!-- Icon strip: utilities left | separator | logout right -->
+                        <Grid Margin="4,0,4,6">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+
+                            <!-- Left: utility icons -->
+                            <StackPanel Grid.Column="0" Orientation="Horizontal">
+                                <Button x:Name="NavHelpBtn"
+                                        Style="{StaticResource IconStripButton}"
+                                        Foreground="#7EB3E8"
+                                        Click="NavHelp_Click"
+                                        ToolTip="Help / Manual">
+                                    <TextBlock Text="&#xE897;" FontFamily="Segoe MDL2 Assets" FontSize="15"/>
+                                </Button>
+                                <Button x:Name="NavAboutBtn"
+                                        Style="{StaticResource IconStripButton}"
+                                        Foreground="#7EB3E8"
+                                        Click="NavAbout_Click"
+                                        ToolTip="About Rx Writer">
+                                    <TextBlock Text="&#xE946;" FontFamily="Segoe MDL2 Assets" FontSize="15"/>
+                                </Button>
+                                <Button x:Name="NavUpdatesBtn"
+                                        Style="{StaticResource IconStripButton}"
+                                        Foreground="#7EB3E8"
+                                        Click="NavUpdates_Click"
+                                        ToolTip="Check for Updates">
+                                    <TextBlock Text="&#xE895;" FontFamily="Segoe MDL2 Assets" FontSize="15"/>
+                                </Button>
+                                <Button x:Name="LangToggleBtn"
+                                        Style="{StaticResource IconStripButton}"
+                                        Foreground="#7EB3E8"
+                                        Click="LangToggle_Click"
+                                        ToolTip="Switch language / تغییر زبان">
+                                    <TextBlock Text="&#xE12B;" FontFamily="Segoe MDL2 Assets" FontSize="15"/>
+                                </Button>
                             </StackPanel>
-                        </Button>
 
-                        <!-- Check for Updates -->
-                        <Button x:Name="NavUpdatesBtn"
-                                Style="{StaticResource NavButton}"
-                                Foreground="#7EB3E8"
-                                Click="NavUpdates_Click"
-                                ToolTip="Check for software updates"
-                                Margin="0,0,0,4">
-                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                                <TextBlock Text="&#xE895;" FontFamily="Segoe MDL2 Assets"
-                                           FontSize="14" Width="22" Margin="0,0,10,0"
-                                           VerticalAlignment="Center"/>
-                                <TextBlock Text="{DynamicResource Nav.Updates}"
-                                           VerticalAlignment="Center"/>
+                            <!-- Right: separator + logout -->
+                            <StackPanel Grid.Column="1" Orientation="Horizontal">
+                                <Border Width="1" Background="#2E4A6A"
+                                        Margin="4,4" VerticalAlignment="Stretch"/>
+                                <Button Style="{StaticResource IconStripButton}"
+                                        Foreground="#FC8181"
+                                        Click="Logout_Click"
+                                        ToolTip="Sign out of Rx Writer">
+                                    <TextBlock Text="&#xE7E8;" FontFamily="Segoe MDL2 Assets" FontSize="15"/>
+                                </Button>
                             </StackPanel>
-                        </Button>
+                        </Grid>
 
-                        <!-- Language toggle -->
-                        <Button x:Name="LangToggleBtn"
-                                Style="{StaticResource NavButton}"
-                                Foreground="#7EB3E8"
-                                Click="LangToggle_Click"
-                                ToolTip="Switch language / تغییر زبان"
-                                Margin="0,0,0,4">
-                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                                <TextBlock Text="&#xE12B;" FontFamily="Segoe MDL2 Assets"
-                                           FontSize="14" Width="22" Margin="0,0,10,0"
-                                           VerticalAlignment="Center"/>
-                                <TextBlock Text="{DynamicResource Lang.Toggle}"
-                                           VerticalAlignment="Center"/>
-                            </StackPanel>
-                        </Button>
+                        <!-- Version + contact email -->
+                        <StackPanel Orientation="Horizontal" Margin="6,0,0,0">
+                            <TextBlock x:Name="AppVersionText"
+                                       Foreground="#4A6FA5" FontSize="10"
+                                       FontStyle="Italic" Margin="0,0,6,0"/>
+                            <TextBlock Text="·" Foreground="#2E4A6A" FontSize="10" Margin="0,0,6,0"/>
+                            <Button x:Name="ContactEmailBtn"
+                                    Content="info.rxwriter@gmail.com"
+                                    Foreground="#4A6FA5" FontSize="10"
+                                    FontStyle="Italic"
+                                    Background="Transparent" BorderThickness="0"
+                                    Padding="0" HorizontalAlignment="Left"
+                                    Cursor="Hand" Click="ContactEmail_Click"
+                                    ToolTip="Send feedback or suggestions"/>
+                        </StackPanel>
 
-                        <Button Style="{StaticResource NavButton}"
-                                Foreground="#FC8181"
-                                Click="Logout_Click"
-                                ToolTip="Sign out of Rx Writer">
-                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                                <TextBlock Text="&#xE8FB;" FontFamily="Segoe MDL2 Assets"
-                                           FontSize="14" Width="22" Margin="0,0,10,0"
-                                           VerticalAlignment="Center"/>
-                                <TextBlock Text="{DynamicResource Nav.Logout}"
-                                           VerticalAlignment="Center"/>
-                            </StackPanel>
-                        </Button>
-
-                        <!-- App version -->
-                        <TextBlock x:Name="AppVersionText"
-                                   Foreground="#4A6FA5" FontSize="11"
-                                   Margin="4,8,0,0" FontStyle="Italic"/>
-
-                        <!-- Contact email -->
-                        <Button x:Name="ContactEmailBtn"
-                                Content="info.rxwriter@gmail.com"
-                                Foreground="#4A6FA5" FontSize="10"
-                                FontStyle="Italic"
-                                Background="Transparent" BorderThickness="0"
-                                Padding="4,2,0,2" HorizontalAlignment="Left"
-                                Cursor="Hand" Click="ContactEmail_Click"
-                                ToolTip="Send feedback or suggestions"/>
                     </StackPanel>
                 </Border>
 
@@ -141,19 +146,24 @@
                     <!-- ── CLINICAL ──────────────────────────────────────────── -->
                     <TextBlock Text="CLINICAL"
                                FontSize="10" FontWeight="SemiBold"
-                               Foreground="#4A6FA5" Margin="10,0,0,6"/>
+                               Foreground="#4A6FA5" Margin="10,0,0,6"
+                               TextTrimming="CharacterEllipsis"/>
 
                     <Button x:Name="NavDashboardBtn"
                             Style="{StaticResource NavButton}"
                             Click="NavDashboard_Click"
                             ToolTip="Clinic overview and quick actions">
-                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                            <TextBlock Text="&#xE80F;" FontFamily="Segoe MDL2 Assets"
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="&#xE80F;" FontFamily="Segoe MDL2 Assets"
                                        FontSize="15" Width="22" Margin="0,0,10,0"
                                        VerticalAlignment="Center"/>
-                            <TextBlock Text="{DynamicResource Nav.Dashboard}"
-                                       VerticalAlignment="Center"/>
-                        </StackPanel>
+                            <TextBlock Grid.Column="1" Text="{DynamicResource Nav.Dashboard}"
+                                       VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
+                        </Grid>
                     </Button>
 
                     <Button x:Name="NavPatientsBtn"
@@ -161,13 +171,17 @@
                             Style="{StaticResource NavButton}"
                             Click="NavPatients_Click"
                             ToolTip="View and manage patient visits">
-                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                            <TextBlock Text="&#xE716;" FontFamily="Segoe MDL2 Assets"
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="&#xE716;" FontFamily="Segoe MDL2 Assets"
                                        FontSize="15" Width="22" Margin="0,0,10,0"
                                        VerticalAlignment="Center"/>
-                            <TextBlock Text="{DynamicResource Nav.Patients}"
-                                       VerticalAlignment="Center"/>
-                        </StackPanel>
+                            <TextBlock Grid.Column="1" Text="{DynamicResource Nav.Patients}"
+                                       VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
+                        </Grid>
                     </Button>
 
                     <!-- Physicians — visible when ManagePhysicians or Admin -->
@@ -176,13 +190,17 @@
                             Style="{StaticResource NavButton}"
                             Click="NavPhysicians_Click"
                             ToolTip="Manage physician profiles">
-                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                            <TextBlock Text="&#xE77B;" FontFamily="Segoe MDL2 Assets"
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="&#xE77B;" FontFamily="Segoe MDL2 Assets"
                                        FontSize="15" Width="22" Margin="0,0,10,0"
                                        VerticalAlignment="Center"/>
-                            <TextBlock Text="{DynamicResource Nav.Physicians}"
-                                       VerticalAlignment="Center"/>
-                        </StackPanel>
+                            <TextBlock Grid.Column="1" Text="{DynamicResource Nav.Physicians}"
+                                       VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
+                        </Grid>
                     </Button>
 
                     <!-- Medicines — visible when ManageMedicineCatalog or Admin -->
@@ -191,13 +209,17 @@
                             Style="{StaticResource NavButton}"
                             Click="NavMedicines_Click"
                             ToolTip="Manage the medicine catalog">
-                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                            <TextBlock Text="&#xE734;" FontFamily="Segoe MDL2 Assets"
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="&#xE734;" FontFamily="Segoe MDL2 Assets"
                                        FontSize="15" Width="22" Margin="0,0,10,0"
                                        VerticalAlignment="Center"/>
-                            <TextBlock Text="{DynamicResource Nav.Medicines}"
-                                       VerticalAlignment="Center"/>
-                        </StackPanel>
+                            <TextBlock Grid.Column="1" Text="{DynamicResource Nav.Medicines}"
+                                       VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
+                        </Grid>
                     </Button>
 
                     <!-- Options — visible when ManageMedicineCatalog or Admin -->
@@ -206,13 +228,17 @@
                             Style="{StaticResource NavButton}"
                             Click="NavOptions_Click"
                             ToolTip="Manage medicine categories, forms and notes">
-                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                            <TextBlock Text="&#xE713;" FontFamily="Segoe MDL2 Assets"
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="&#xE713;" FontFamily="Segoe MDL2 Assets"
                                        FontSize="15" Width="22" Margin="0,0,10,0"
                                        VerticalAlignment="Center"/>
-                            <TextBlock Text="{DynamicResource Nav.Options}"
-                                       VerticalAlignment="Center"/>
-                        </StackPanel>
+                            <TextBlock Grid.Column="1" Text="{DynamicResource Nav.Options}"
+                                       VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
+                        </Grid>
                     </Button>
 
                     <!-- ── ADMINISTRATION — visible only to Admin / ManageUsers ── -->
@@ -220,67 +246,89 @@
                         <Border Height="1" Background="#2E4A6A" Margin="4,10,4,8"/>
                         <TextBlock Text="ADMINISTRATION"
                                    FontSize="10" FontWeight="SemiBold"
-                                   Foreground="#4A6FA5" Margin="10,0,0,6"/>
+                                   Foreground="#4A6FA5" Margin="10,0,0,6"
+                                   TextTrimming="CharacterEllipsis"/>
 
                         <Button Style="{StaticResource NavButton}"
                                 Click="NavUsers_Click"
                                 ToolTip="Manage user accounts and roles">
-                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                                <TextBlock Text="&#xE8A5;" FontFamily="Segoe MDL2 Assets"
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0" Text="&#xE8A5;" FontFamily="Segoe MDL2 Assets"
                                            FontSize="15" Width="22" Margin="0,0,10,0"
                                            VerticalAlignment="Center"/>
-                                <TextBlock Text="{DynamicResource Nav.Users}"
-                                           VerticalAlignment="Center"/>
-                            </StackPanel>
+                                <TextBlock Grid.Column="1" Text="{DynamicResource Nav.Users}"
+                                           VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
+                            </Grid>
                         </Button>
 
                         <Button Style="{StaticResource NavButton}"
                                 Click="NavCustomRoles_Click"
                                 ToolTip="Define custom role permissions for non-standard staff">
-                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                                <TextBlock Text="&#xE8D7;" FontFamily="Segoe MDL2 Assets"
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0" Text="&#xE8D7;" FontFamily="Segoe MDL2 Assets"
                                            FontSize="15" Width="22" Margin="0,0,10,0"
                                            VerticalAlignment="Center"/>
-                                <TextBlock Text="Custom Roles" VerticalAlignment="Center"/>
-                            </StackPanel>
+                                <TextBlock Grid.Column="1" Text="Custom Roles"
+                                           VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
+                            </Grid>
                         </Button>
 
                         <Button x:Name="NavImportBtn"
                                 Style="{StaticResource NavButton}"
                                 Click="NavImport_Click"
                                 ToolTip="Import data from Access database">
-                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                                <TextBlock Text="&#xE8B5;" FontFamily="Segoe MDL2 Assets"
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0" Text="&#xE8B5;" FontFamily="Segoe MDL2 Assets"
                                            FontSize="15" Width="22" Margin="0,0,10,0"
                                            VerticalAlignment="Center"/>
-                                <TextBlock Text="{DynamicResource Nav.Import}"
-                                           VerticalAlignment="Center"/>
-                            </StackPanel>
+                                <TextBlock Grid.Column="1" Text="{DynamicResource Nav.Import}"
+                                           VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
+                            </Grid>
                         </Button>
 
                         <Button x:Name="NavBackupBtn"
                                 Style="{StaticResource NavButton}"
                                 Click="NavBackup_Click"
                                 ToolTip="Backup and restore the clinic database">
-                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                                <TextBlock Text="&#xE74E;" FontFamily="Segoe MDL2 Assets"
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0" Text="&#xE74E;" FontFamily="Segoe MDL2 Assets"
                                            FontSize="15" Width="22" Margin="0,0,10,0"
                                            VerticalAlignment="Center"/>
-                                <TextBlock Text="{DynamicResource Nav.Backup}"
-                                           VerticalAlignment="Center"/>
-                            </StackPanel>
+                                <TextBlock Grid.Column="1" Text="{DynamicResource Nav.Backup}"
+                                           VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
+                            </Grid>
                         </Button>
 
                         <Button Style="{StaticResource NavButton}"
                                 Click="NavSettings_Click"
                                 ToolTip="Customise report design and print settings">
-                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                                <TextBlock Text="&#xE771;" FontFamily="Segoe MDL2 Assets"
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0" Text="&#xE771;" FontFamily="Segoe MDL2 Assets"
                                            FontSize="15" Width="22" Margin="0,0,10,0"
                                            VerticalAlignment="Center"/>
-                                <TextBlock Text="Print Settings"
-                                           VerticalAlignment="Center"/>
-                            </StackPanel>
+                                <TextBlock Grid.Column="1" Text="Print Settings"
+                                           VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
+                            </Grid>
                         </Button>
 
                     </StackPanel>

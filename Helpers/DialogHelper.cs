@@ -10,14 +10,22 @@ public static class DialogHelper
 {
     /// <summary>
     /// Call this from a dialog constructor immediately after InitializeComponent().
-    /// Sets MaxWidth / MaxHeight to 95 % / 92 % of the current work area so the
-    /// dialog stays within bounds on small or high-DPI screens.
+    ///
+    /// • NoResize windows (fixed dialogs / SizeToContent): MaxWidth/MaxHeight are capped
+    ///   at 95% × 92% of the work area so content can never overflow the screen.
+    ///
+    /// • CanResize / CanResizeWithGrip windows: no MaxWidth/MaxHeight is set — the window
+    ///   can grow freely to full screen, exactly like the main application window.
     /// </summary>
     public static void ApplyConstraints(Window window)
     {
-        var wa = SystemParameters.WorkArea;
-        window.MaxWidth  = Math.Max(360, wa.Width  * 0.95);
-        window.MaxHeight = Math.Max(300, wa.Height * 0.92);
+        if (window.ResizeMode == ResizeMode.NoResize)
+        {
+            var wa = SystemParameters.WorkArea;
+            window.MaxWidth  = Math.Max(360, wa.Width  * 0.95);
+            window.MaxHeight = Math.Max(300, wa.Height * 0.92);
+        }
+        // Resizable windows: MaxWidth/MaxHeight left at WPF default (unlimited).
     }
 
     /// <summary>

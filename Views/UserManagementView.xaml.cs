@@ -20,7 +20,7 @@ public partial class UserManagementView : UserControl
     private void AddUser_Click(object sender, RoutedEventArgs e)
     {
         if (!App.Auth.Can(Services.Permission.AddUser)) return;
-        var dlg = new UserEditDialog(null);
+        var dlg = new UserEditDialog(null) { Owner = Window.GetWindow(this) };
         if (dlg.ShowDialog() != true) return;
         ViewModel.LoadUsersCommand.Execute(null);
     }
@@ -35,7 +35,7 @@ public partial class UserManagementView : UserControl
                 "Access Denied", MessageBoxButton.OK, MessageBoxImage.Warning);
             return;
         }
-        var dlg = new UserEditDialog(user);
+        var dlg = new UserEditDialog(user) { Owner = Window.GetWindow(this) };
         if (dlg.ShowDialog() != true) return;
         ViewModel.LoadUsersCommand.Execute(null);
     }

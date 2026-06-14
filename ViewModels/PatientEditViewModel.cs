@@ -22,7 +22,11 @@ public partial class PatientEditViewModel : ObservableObject
 
     // ── Permission gates (evaluated once at construction time) ────────────────
     public bool CanEnterClinicalData => App.Auth.Can(Permission.EnterClinicalData);
-    public bool CanWritePrescription  => App.Auth.Can(Permission.WritePrescription);
+    public bool CanWritePrescription  => App.Auth.CanAny(
+        Permission.ViewPrescription,
+        Permission.AddPrescription,
+        Permission.EditPrescription,
+        Permission.WritePrescription);   // legacy fallback for old custom roles
 
     /// <summary>Set after a successful save — used by callers to open the detail view.</summary>
     public int SavedPatientId { get; private set; }

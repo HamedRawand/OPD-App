@@ -171,7 +171,8 @@ public partial class UserManagementViewModel : ObservableObject
                 "Access Denied", MessageBoxButton.OK, MessageBoxImage.Warning);
             return;
         }
-        var dlg = new Views.ResetPasswordDialog(user.Username);
+        var dlg = new Views.ResetPasswordDialog(user.Username)
+            { Owner = Application.Current.MainWindow };
         if (dlg.ShowDialog() != true) return;
 
         var newHash = BCrypt.Net.BCrypt.HashPassword(dlg.NewPassword);

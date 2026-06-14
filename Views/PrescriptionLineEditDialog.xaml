@@ -3,6 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="{DynamicResource RxLine.Edit.Title}"
         Height="480" Width="520"
+        MinHeight="380" MinWidth="440"
         WindowStartupLocation="CenterOwner"
         ResizeMode="CanResizeWithGrip"
         FlowDirection="{DynamicResource App.FlowDirection}"
