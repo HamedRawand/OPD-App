@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using OPDClinic.Models;
 using OPDClinic.Services;
 
@@ -7,6 +8,13 @@ public static class DbSeeder
 {
     public static void Seed(AppDbContext db)
     {
+        // If the Patients table is empty, reset the AUTOINCREMENT counter so the
+        // first new patient gets P-00001. This handles fresh installs and the common
+        // backup-restore scenario where old patients were deleted before the backup.
+        if (!db.Patients.Any())
+            db.Database.ExecuteSqlRaw(
+                "UPDATE sqlite_sequence SET seq = 0 WHERE name = 'Patients'");
+
         if (!db.Users.Any())
         {
             db.Users.Add(new User
