@@ -69,8 +69,13 @@ public class PrescriptionDocument(PrescriptionData data) : IDocument
     private readonly ReportSettings _s = ReportSettingsService.Current;
 
     // ── Section style shortcuts ────────────────────────────────────────────────
-    private SectionStyle S_Hdr  => _s.Header;
-    private SectionStyle S_Tag  => _s.Tagline;
+    private SectionStyle S_DocEn   => _s.DoctorNameEn;
+    private SectionStyle S_SpEn    => _s.SpecialityEn;
+    private SectionStyle S_OtSpEn  => _s.OtherSpecialityEn;
+    private SectionStyle S_DocDar  => _s.DoctorNameDari;
+    private SectionStyle S_SpDar   => _s.SpecialityDari;
+    private SectionStyle S_OtSpDar => _s.OtherSpecialityDari;
+    private SectionStyle S_Tag     => _s.Tagline;
     private SectionStyle S_PBar => _s.PatientBar;
     private SectionStyle S_VS   => _s.VitalSigns;
     private SectionStyle S_CF   => _s.ClinicalFindings;
@@ -79,8 +84,8 @@ public class PrescriptionDocument(PrescriptionData data) : IDocument
     private SectionStyle S_Rx   => _s.RxSection;
     private SectionStyle S_Ftr  => _s.Footer;
 
-    // ── Accent color: taken from Header font color (#1565C0 by default) ────────
-    private string Accent => Clr(S_Hdr.FontColor);
+    // ── Accent color: taken from EN header font color (#1565C0 by default) ─────
+    private string Accent => Clr(S_DocEn.FontColor);
 
     // ── Muted secondary text (not exposed in settings — always a mid-gray) ─────
     private string Gray => Clr("#555555");
@@ -120,133 +125,214 @@ public class PrescriptionDocument(PrescriptionData data) : IDocument
                  .FontColor(Clr("#111111")));
 
             page.Header().Element(ComposeHeader);
-            page.Content().PaddingTop(10).Element(ComposeContent);
+            page.Content().PaddingTop((float)_s.PatientBarGap).Element(ComposeContent);
             page.Footer().Element(ComposeFooter);
         });
     }
 
-    // ── HEADER: [EN info]  [Logo]  [Dari info] ───────────────────────────────
+    // ── HEADER: [EN info ×2]  [Logo]  [Dari info ×1] ────────────────────────
     private void ComposeHeader(IContainer c)
     {
-        var ph   = data.Physician;
-        var hdr  = S_Hdr;
-        float fs = hdr.FontSize;
+        var ph      = data.Physician;
+        var docEn   = S_DocEn;
+        var spEn    = S_SpEn;
+        var otSpEn  = S_OtSpEn;
+        var docDar  = S_DocDar;
+        var spDar   = S_SpDar;
+        var otSpDar = S_OtSpDar;
 
         c.Column(col =>
         {
             col.Item().Row(row =>
             {
-                // ── Left: English clinic info ──────────────────────────────
-                row.RelativeItem().Column(info =>
+                // ── Left (weight 1): English clinic info ───────────────────
+                row.RelativeItem(1).Column(info =>
                 {
-                    // Clinic name (above physician name) — only if set
                     if (!string.IsNullOrWhiteSpace(ph?.ClinicNameEng))
                     {
-                        var cn = _s.ClinicName;
-                        var cnText = info.Item()
-                            .Text(ph.ClinicNameEng)
-                            .FontFamily(cn.FontFamily)
-                            .FontSize(cn.FontSize)
-                            .FontColor(Clr(cn.FontColor));
-                        if (cn.Bold)   cnText.Bold();
-                        if (cn.Italic) cnText.Italic();
+                        var cn = _s.ClinicNameEn;
+                        info.Item().Text(text =>
+                        {
+                            if      (cn.TextAlign == "Center") text.AlignCenter();
+                            else if (cn.TextAlign == "Right")  text.AlignRight();
+                            var sp = text.Span(ph.ClinicNameEng)
+                                .FontFamily(cn.FontFamily).FontSize(cn.FontSize)
+                                .FontColor(Clr(cn.FontColor));
+                            if (cn.Bold)   sp.Bold();
+                            if (cn.Italic) sp.Italic();
+                        });
                     }
 
-                    info.Item()
-                        .Text(ph?.NameEng ?? "Rx Writer")
-                        .FontFamily(hdr.FontFamily)
-                        .FontSize(fs).Bold().FontColor(Accent);
+                    info.Item().Text(text =>
+                    {
+                        if      (docEn.TextAlign == "Center") text.AlignCenter();
+                        else if (docEn.TextAlign == "Right")  text.AlignRight();
+                        var sp = text.Span(ph?.NameEng ?? "Rx Writer")
+                            .FontFamily(docEn.FontFamily).FontSize(docEn.FontSize)
+                            .FontColor(Clr(docEn.FontColor));
+                        if (docEn.Bold)   sp.Bold();
+                        if (docEn.Italic) sp.Italic();
+                    });
 
                     if (!string.IsNullOrWhiteSpace(ph?.SpecialityEng))
-                        info.Item().PaddingTop(2)
-                            .Text(ph.SpecialityEng)
-                            .FontFamily(hdr.FontFamily)
-                            .FontSize(Math.Max(fs - 7, 8)).FontColor(Clr("#111111"));
+                        info.Item().PaddingTop(2).Text(text =>
+                        {
+                            if      (spEn.TextAlign == "Center") text.AlignCenter();
+                            else if (spEn.TextAlign == "Right")  text.AlignRight();
+                            var sp = text.Span(ph.SpecialityEng)
+                                .FontFamily(spEn.FontFamily).FontSize(spEn.FontSize)
+                                .FontColor(Clr(spEn.FontColor));
+                            if (spEn.Bold)   sp.Bold();
+                            if (spEn.Italic) sp.Italic();
+                        });
 
                     if (!string.IsNullOrWhiteSpace(ph?.OtherSpecialityEng))
-                        info.Item().PaddingTop(1)
-                            .Text(ph.OtherSpecialityEng)
-                            .FontFamily(hdr.FontFamily)
-                            .FontSize(Math.Max(fs - 8, 7)).FontColor(Gray);
+                        info.Item().PaddingTop(1).Text(text =>
+                        {
+                            if      (otSpEn.TextAlign == "Center") text.AlignCenter();
+                            else if (otSpEn.TextAlign == "Right")  text.AlignRight();
+                            var sp = text.Span(ph.OtherSpecialityEng)
+                                .FontFamily(otSpEn.FontFamily).FontSize(otSpEn.FontSize)
+                                .FontColor(Clr(otSpEn.FontColor));
+                            if (otSpEn.Bold)   sp.Bold();
+                            if (otSpEn.Italic) sp.Italic();
+                        });
                 });
 
-                // ── Centre: Logo / initials circle (+ optional tagline below) ─
-                row.ConstantItem(94).AlignCenter().AlignMiddle().Column(logoCol =>
+                // ── Centre: Logo / initials circle (+ tagline pinned to bottom) ─
+                var logoSz    = (float)_s.LogoSize;
+                var circleSz  = Math.Max(logoSz - 4f, 20f);
+                var colWidth  = logoSz + 20f;
+                row.ConstantItem(colWidth).AlignCenter().Column(logoCol =>
                 {
                     logoCol.Item().AlignCenter().Element(av =>
                     {
                         if (ph?.SymbolImage is { Length: > 0 } img)
                         {
-                            av.Width(76).Height(76).Image(img).FitArea();
+                            av.Width(logoSz).Height(logoSz).Image(img).FitArea();
                         }
                         else
                         {
-                            av.Width(66).Height(66)
+                            av.Width(circleSz).Height(circleSz)
                               .Border(2).BorderColor(Clr(S_VS.BorderColor))
                               .Background(Clr(S_VS.TitleBgColor))
                               .AlignCenter().AlignMiddle()
                               .Text(GetInitials(ph?.NameEng ?? "OPD"))
-                              .FontSize(22).Bold().FontColor(Accent);
+                              .FontSize(Math.Max(circleSz * 0.34f, 10f)).Bold().FontColor(Accent);
                         }
                     });
 
-                    // Tagline below logo — only if set
                     if (!string.IsNullOrWhiteSpace(ph?.Tagline))
                     {
                         var tag = S_Tag;
-                        var tagText = logoCol.Item().PaddingTop(4).AlignCenter()
+                        var tagText = logoCol.Item().AlignCenter()
                                .Text(ph.Tagline)
-                               .FontFamily(tag.FontFamily)
-                               .FontSize(tag.FontSize)
+                               .FontFamily(tag.FontFamily).FontSize(tag.FontSize)
                                .FontColor(Clr(tag.FontColor));
                         if (tag.Bold)   tagText.Bold();
                         if (tag.Italic) tagText.Italic();
                     }
                 });
 
-                // ── Right: Dari clinic info (RTL) ─────────────────────────
-                row.RelativeItem().Column(info =>
+                // ── Right (weight 1): Dari clinic info (RTL) ──────────────
+                row.RelativeItem(1).Column(info =>
                 {
-                    // Dari clinic name (above physician Dari name) — only if set
                     if (!string.IsNullOrWhiteSpace(ph?.ClinicNameDari))
                     {
-                        var cn = _s.ClinicName;
-                        info.Item().Element(e =>
+                        var cn = _s.ClinicNameDari;
+                        info.Item().ContentFromRightToLeft().Text(text =>
                         {
-                            var t = e.AlignRight().ContentFromRightToLeft()
-                                 .Text(ph.ClinicNameDari)
-                                 .FontFamily(cn.FontFamily)
-                                 .FontSize(cn.FontSize)
-                                 .FontColor(Clr(cn.FontColor));
-                            if (cn.Bold)   t.Bold();
-                            if (cn.Italic) t.Italic();
+                            if      (cn.TextAlign == "Center") text.AlignCenter();
+                            else if (cn.TextAlign == "Left")   text.AlignLeft();
+                            else                               text.AlignRight();
+                            var sp = text.Span(ph.ClinicNameDari)
+                                .FontFamily(cn.FontFamily).FontSize(cn.FontSize)
+                                .FontColor(Clr(cn.FontColor));
+                            if (cn.Bold)   sp.Bold();
+                            if (cn.Italic) sp.Italic();
                         });
                     }
 
-                    info.Item().Element(e =>
-                        e.AlignRight().ContentFromRightToLeft()
-                         .Text(ph?.NameDari ?? "کلینیک سرپایی")
-                         .FontFamily(hdr.FontFamily)
-                         .FontSize(Math.Max(fs - 1, 8)).Bold().FontColor(Accent));
+                    info.Item().ContentFromRightToLeft().Text(text =>
+                    {
+                        if      (docDar.TextAlign == "Center") text.AlignCenter();
+                        else if (docDar.TextAlign == "Left")   text.AlignLeft();
+                        else                                   text.AlignRight();
+                        var sp = text.Span(ph?.NameDari ?? "کلینیک سرپایی")
+                            .FontFamily(docDar.FontFamily).FontSize(docDar.FontSize)
+                            .FontColor(Clr(docDar.FontColor));
+                        if (docDar.Bold)   sp.Bold();
+                        if (docDar.Italic) sp.Italic();
+                    });
 
                     if (!string.IsNullOrWhiteSpace(ph?.SpecialityDari))
-                        info.Item().PaddingTop(2).Element(e =>
-                            e.AlignRight().ContentFromRightToLeft()
-                             .Text(ph.SpecialityDari)
-                             .FontFamily(hdr.FontFamily)
-                             .FontSize(Math.Max(fs - 7, 8)).FontColor(Clr("#111111")));
+                        info.Item().PaddingTop(2).ContentFromRightToLeft().Text(text =>
+                        {
+                            if      (spDar.TextAlign == "Center") text.AlignCenter();
+                            else if (spDar.TextAlign == "Left")   text.AlignLeft();
+                            else                                   text.AlignRight();
+                            var sp = text.Span(ph.SpecialityDari)
+                                .FontFamily(spDar.FontFamily).FontSize(spDar.FontSize)
+                                .FontColor(Clr(spDar.FontColor));
+                            if (spDar.Bold)   sp.Bold();
+                            if (spDar.Italic) sp.Italic();
+                        });
 
                     if (!string.IsNullOrWhiteSpace(ph?.OtherSpecialityDari))
-                        info.Item().PaddingTop(1).Element(e =>
-                            e.AlignRight().ContentFromRightToLeft()
-                             .Text(ph.OtherSpecialityDari)
-                             .FontFamily(hdr.FontFamily)
-                             .FontSize(Math.Max(fs - 8, 7)).FontColor(Gray));
+                        info.Item().PaddingTop(1).ContentFromRightToLeft().Text(text =>
+                        {
+                            if      (otSpDar.TextAlign == "Center") text.AlignCenter();
+                            else if (otSpDar.TextAlign == "Left")   text.AlignLeft();
+                            else                                     text.AlignRight();
+                            var sp = text.Span(ph.OtherSpecialityDari)
+                                .FontFamily(otSpDar.FontFamily).FontSize(otSpDar.FontSize)
+                                .FontColor(Clr(otSpDar.FontColor));
+                            if (otSpDar.Bold)   sp.Bold();
+                            if (otSpDar.Italic) sp.Italic();
+                        });
                 });
             });
 
             // Divider line
-            col.Item().PaddingTop(8).BorderBottom(2.5f).BorderColor(Accent);
+            if (_s.DividerVisible)
+            {
+                var dt = (float)_s.DividerThickness;
+                var dc = Clr(_s.DividerColor);
+                switch (_s.DividerStyle)
+                {
+                    case "Double":
+                        col.Item().PaddingTop(8).BorderBottom(dt).BorderColor(dc);
+                        col.Item().PaddingTop(3).BorderBottom(dt).BorderColor(dc);
+                        break;
+                    case "Dashed":
+                        // 8pt dash · 4pt gap · ~42 repeats across A4 content width
+                        col.Item().PaddingTop(8).Height(dt).Row(row =>
+                        {
+                            for (int i = 0; i < 40; i++)
+                            {
+                                row.ConstantItem(8).Background(dc);
+                                row.ConstantItem(4);
+                            }
+                            row.RelativeItem();
+                        });
+                        break;
+                    case "Dotted":
+                        // 2pt dot · 3pt gap · ~99 repeats across A4 content width
+                        col.Item().PaddingTop(8).Height(dt).Row(row =>
+                        {
+                            for (int i = 0; i < 97; i++)
+                            {
+                                row.ConstantItem(2).Background(dc);
+                                row.ConstantItem(3);
+                            }
+                            row.RelativeItem();
+                        });
+                        break;
+                    default: // Solid
+                        col.Item().PaddingTop(8).BorderBottom(dt).BorderColor(dc);
+                        break;
+                }
+            }
         });
     }
 
@@ -266,74 +352,87 @@ public class PrescriptionDocument(PrescriptionData data) : IDocument
     // ── PATIENT INFO BAR ─────────────────────────────────────────────────────
     private void ComposePatientBar(IContainer c)
     {
-        var p  = data.Patient;
-        var v  = data.Visit;
-        var pb = S_PBar;
+        var p   = data.Patient;
+        var v   = data.Visit;
+        var pb  = S_PBar;
+        var pid = _s.PatientId;
         float fs = pb.FontSize;
 
         var container = c.Background(Clr(pb.BackgroundColor));
         if (pb.ShowBorder)
             container = container.BorderLeft(pb.BorderThickness).BorderColor(Clr(pb.BorderColor));
 
-        container.Padding(pb.Padding).Row(row =>
+        container.Padding(pb.Padding).Column(col =>
         {
-            // Shamsi visit date (+ optional next visit date below) — leftmost
-            row.RelativeItem(2).AlignLeft().Element(e =>
-                e.ContentFromRightToLeft().Column(col =>
-                {
-                    col.Item().Text(text =>
-                    {
-                        text.Span("تاریخ مراجعه:  ").Bold().FontFamily(pb.FontFamily).FontSize(fs);
-                        text.Span(v.HijriDate ?? v.OpdDate?.ToString("yyyy-MM-dd") ?? "—")
-                            .FontFamily(pb.FontFamily).FontSize(fs);
-                    });
-                    if (!string.IsNullOrWhiteSpace(v.NextVisitDate))
-                        col.Item().PaddingTop(4).Text(text =>
-                        {
-                            text.Span("مراجعه بعدی:  ").Bold().FontFamily(pb.FontFamily).FontSize(fs);
-                            text.Span(v.NextVisitDate).FontFamily(pb.FontFamily).FontSize(fs)
-                                .FontColor(Clr("#1565C0"));
-                        });
-                }));
-
-            // Age + Gender — two stacked rows in the centre
-            row.RelativeItem(2).AlignCenter().Column(col =>
+            // ── Row 1 (RTL order): Date | Sex | Age | Name ───────────────────
+            // Row items are added left→right; ContentFromRightToLeft() is NOT used
+            // on the outer row, so first item = leftmost. Visually right-to-left:
+            // Name (rightmost) | Age | Sex | Date (leftmost).
+            col.Item().Row(row =>
             {
-                col.Item().AlignCenter().Element(e =>
-                    e.ContentFromRightToLeft().Text(text =>
+                // Date — leftmost in PDF = rightmost when read RTL
+                row.RelativeItem(3).Element(e =>
+                    e.ContentFromRightToLeft().Column(dc =>
                     {
-                        text.Span("سن مریض:  ").Bold().FontFamily(pb.FontFamily).FontSize(fs);
-                        text.Span(v.Age.HasValue ? v.Age.Value.ToString() : "—")
-                            .FontFamily(pb.FontFamily).FontSize(fs);
+                        dc.Item().Text(text =>
+                        {
+                            text.Span("تاریخ:  ").Bold().FontFamily(pb.FontFamily).FontSize(fs);
+                            text.Span(v.HijriDate ?? v.OpdDate?.ToString("yyyy-MM-dd") ?? "—")
+                                .FontFamily(pb.FontFamily).FontSize(fs);
+                        });
+                        if (!string.IsNullOrWhiteSpace(v.NextVisitDate))
+                            dc.Item().PaddingTop(3).Text(text =>
+                            {
+                                text.Span("مراجعه بعدی:  ").Bold().FontFamily(pb.FontFamily).FontSize(fs - 1);
+                                text.Span(v.NextVisitDate).FontFamily(pb.FontFamily).FontSize(fs - 1)
+                                    .FontColor(Clr("#1565C0"));
+                            });
                     }));
-                col.Item().AlignCenter().PaddingTop(4).Element(e =>
+
+                // Sex
+                row.RelativeItem(2).AlignCenter().Element(e =>
                     e.ContentFromRightToLeft().Text(text =>
                     {
-                        text.Span("جنسیت مریض:  ").Bold().FontFamily(pb.FontFamily).FontSize(fs);
+                        text.Span("جنسیت:  ").Bold().FontFamily(pb.FontFamily).FontSize(fs);
                         text.Span(TranslateSex(CleanFieldValue(p.Sex)))
                             .FontFamily(pb.FontFamily).FontSize(fs);
                     }));
-            });
 
-            // Name + Patient ID — rightmost, RTL
-            row.RelativeItem(3).AlignRight().Element(e =>
-                e.ContentFromRightToLeft().Column(col =>
-                {
-                    col.Item().Text(text =>
+                // Age
+                row.RelativeItem(2).AlignCenter().Element(e =>
+                    e.ContentFromRightToLeft().Text(text =>
+                    {
+                        text.Span("سن:  ").Bold().FontFamily(pb.FontFamily).FontSize(fs);
+                        text.Span(v.Age.HasValue ? v.Age.Value.ToString() : "—")
+                            .FontFamily(pb.FontFamily).FontSize(fs);
+                    }));
+
+                // Name — rightmost in PDF = leftmost when read RTL (most prominent)
+                row.RelativeItem(3).AlignRight().Element(e =>
+                    e.ContentFromRightToLeft().Text(text =>
                     {
                         text.Span("نام مریض:  ").Bold().FontFamily(pb.FontFamily).FontSize(fs);
                         text.Span(p.PatientName ?? "—").Bold()
-                            .FontFamily(pb.FontFamily).FontSize(fs + 2).FontColor(Accent);
-                    });
-                    if (!string.IsNullOrWhiteSpace(p.PatientCode))
-                        col.Item().Text(text =>
-                        {
-                            text.Span("ID:  ").Bold().FontFamily(pb.FontFamily).FontSize(fs - 1)
-                                .FontColor(Clr("#555555"));
-                            text.Span(p.PatientCode).FontFamily(pb.FontFamily).FontSize(fs - 1)
-                                .FontColor(Clr("#555555"));
-                        });
-                }));
+                            .FontFamily(pb.FontFamily).FontSize(fs + 1).FontColor(Accent);
+                    }));
+            });
+
+            // ── Row 2: Patient ID (optional) ──────────────────────────────────
+            if (_s.ShowPatientId && !string.IsNullOrWhiteSpace(p.PatientCode))
+            {
+                col.Item().PaddingTop(3).Element(e =>
+                    e.ContentFromRightToLeft().Text(text =>
+                    {
+                        text.Span("نمبر مسلسل:  ").Bold()
+                            .FontFamily(pid.FontFamily).FontSize(pid.FontSize)
+                            .FontColor(Clr(pid.FontColor));
+                        var sp = text.Span(p.PatientCode)
+                            .FontFamily(pid.FontFamily).FontSize(pid.FontSize)
+                            .FontColor(Clr(pid.FontColor));
+                        if (pid.Bold)   sp.Bold();
+                        if (pid.Italic) sp.Italic();
+                    }));
+            }
         });
     }
 
@@ -389,14 +488,18 @@ public class PrescriptionDocument(PrescriptionData data) : IDocument
 
             col.Item().Padding(st.Padding).Column(vs =>
             {
+                float gap = Math.Max(st.LabelSpacing, 0f);
+
                 // BP + PR
                 if (!string.IsNullOrEmpty(v.BP) || !string.IsNullOrEmpty(v.PR))
                     vs.Item().PaddingBottom(2).Row(r =>
                     {
-                        r.AutoItem().Text("BP: ").FontFamily(st.FontFamily).FontSize(fs).Bold();
+                        r.AutoItem().Text("BP:").FontFamily(st.FontFamily).FontSize(fs).Bold();
+                        r.ConstantItem(gap);
                         r.AutoItem().Text(v.BP ?? "—").FontFamily(st.FontFamily).FontSize(fs);
                         r.ConstantItem(18);
-                        r.AutoItem().Text("PR: ").FontFamily(st.FontFamily).FontSize(fs).Bold();
+                        r.AutoItem().Text("PR:").FontFamily(st.FontFamily).FontSize(fs).Bold();
+                        r.ConstantItem(gap);
                         r.AutoItem().Text(v.PR ?? "—").FontFamily(st.FontFamily).FontSize(fs);
                     });
 
@@ -404,7 +507,8 @@ public class PrescriptionDocument(PrescriptionData data) : IDocument
                 if (!string.IsNullOrEmpty(v.RR))
                     vs.Item().PaddingTop(6).Row(r =>
                     {
-                        r.AutoItem().Text("RR: ").FontFamily(st.FontFamily).FontSize(fs).Bold();
+                        r.AutoItem().Text("RR:").FontFamily(st.FontFamily).FontSize(fs).Bold();
+                        r.ConstantItem(gap);
                         r.AutoItem().Text(v.RR).FontFamily(st.FontFamily).FontSize(fs);
                     });
 
@@ -412,10 +516,12 @@ public class PrescriptionDocument(PrescriptionData data) : IDocument
                 if (!string.IsNullOrEmpty(v.BT) || !string.IsNullOrEmpty(v.BW))
                     vs.Item().PaddingTop(6).Row(r =>
                     {
-                        r.AutoItem().Text("BT: ").FontFamily(st.FontFamily).FontSize(fs).Bold();
+                        r.AutoItem().Text("BT:").FontFamily(st.FontFamily).FontSize(fs).Bold();
+                        r.ConstantItem(gap);
                         r.AutoItem().Text(v.BT ?? "—").FontFamily(st.FontFamily).FontSize(fs);
                         r.ConstantItem(18);
-                        r.AutoItem().Text("BW: ").FontFamily(st.FontFamily).FontSize(fs).Bold();
+                        r.AutoItem().Text("BW:").FontFamily(st.FontFamily).FontSize(fs).Bold();
+                        r.ConstantItem(gap);
                         r.AutoItem().Text(v.BW ?? "—").FontFamily(st.FontFamily).FontSize(fs);
                     });
 
@@ -447,9 +553,13 @@ public class PrescriptionDocument(PrescriptionData data) : IDocument
                 .FontColor(Clr(st.TitleFontColor));
             if (st.TitleBold) titleText.Bold();
 
-            col.Item().Padding(st.Padding)
-               .Text(string.IsNullOrWhiteSpace(content) ? "—" : content)
-               .FontFamily(st.FontFamily).FontSize(fs).FontColor(Clr(st.FontColor));
+            var body = string.IsNullOrWhiteSpace(content) ? "—" : content;
+            col.Item().Padding(st.Padding).Text(text =>
+            {
+                if      (st.TextAlign == "Center") text.AlignCenter();
+                else if (st.TextAlign == "Right")  text.AlignRight();
+                text.Span(body).FontFamily(st.FontFamily).FontSize(fs).FontColor(Clr(st.FontColor));
+            });
         });
     }
 
@@ -485,12 +595,16 @@ public class PrescriptionDocument(PrescriptionData data) : IDocument
                 {
                     if (multiGroup)
                     {
-                        var catText = body.Item().PaddingBottom(3)
-                            .Text(grp.Key)
-                            .FontFamily(st.FontFamily)
-                            .FontSize(Math.Max(fs - 0.5f, 6))
-                            .FontColor(Clr(st.FontColor));
-                        catText.Bold();
+                        body.Item().PaddingBottom(3).Text(text =>
+                        {
+                            if      (st.TextAlign == "Center") text.AlignCenter();
+                            else if (st.TextAlign == "Right")  text.AlignRight();
+                            text.Span(grp.Key)
+                                .FontFamily(st.FontFamily)
+                                .FontSize(Math.Max(fs - 0.5f, 6))
+                                .FontColor(Clr(st.FontColor))
+                                .Bold();
+                        });
                     }
 
                     foreach (var t in grp)
@@ -502,8 +616,12 @@ public class PrescriptionDocument(PrescriptionData data) : IDocument
                         body.Item()
                             .PaddingLeft(multiGroup ? 10 : 0)
                             .PaddingBottom(3)
-                            .Text($"•  {label}")
-                            .FontFamily(st.FontFamily).FontSize(fs).FontColor(Clr(st.FontColor));
+                            .Text(text =>
+                            {
+                                if      (st.TextAlign == "Center") text.AlignCenter();
+                                else if (st.TextAlign == "Right")  text.AlignRight();
+                                text.Span($"•  {label}").FontFamily(st.FontFamily).FontSize(fs).FontColor(Clr(st.FontColor));
+                            });
                     }
 
                     if (multiGroup)
@@ -620,11 +738,36 @@ public class PrescriptionDocument(PrescriptionData data) : IDocument
         byte[]? phoneIcon = TryLoadImage(Path.Combine(imgDir, "PhoneNumber.png"));
         byte[]? waIcon    = TryLoadImage(Path.Combine(imgDir, "WhatsApp.png"));
 
-        var outer = c;
-        if (st.ShowBorder)
-            outer = outer.BorderTop(st.BorderThickness).BorderColor(Clr(st.BorderColor));
+        c.Column(mainCol =>
+        {
+            if (_s.FooterDividerVisible)
+            {
+                var dt = (float)_s.FooterDividerThickness;
+                var dc = Clr(_s.FooterDividerColor);
+                switch (_s.FooterDividerStyle)
+                {
+                    case "Double":
+                        mainCol.Item().BorderBottom(dt).BorderColor(dc);
+                        mainCol.Item().PaddingTop(3).BorderBottom(dt).BorderColor(dc);
+                        break;
+                    case "Dashed":
+                        mainCol.Item().Height(dt).Row(row =>
+                        {
+                            for (int i = 0; i < 40; i++) { row.ConstantItem(8).Background(dc); row.ConstantItem(4); }
+                            row.RelativeItem();
+                        }); break;
+                    case "Dotted":
+                        mainCol.Item().Height(dt).Row(row =>
+                        {
+                            for (int i = 0; i < 97; i++) { row.ConstantItem(2).Background(dc); row.ConstantItem(3); }
+                            row.RelativeItem();
+                        }); break;
+                    default: // Solid
+                        mainCol.Item().BorderBottom(dt).BorderColor(dc); break;
+                }
+            }
 
-        outer.PaddingTop(st.Padding).Column(col =>
+            mainCol.Item().PaddingTop(st.Padding).Column(col =>
         {
             bool hasContact   = !string.IsNullOrWhiteSpace(ph?.ContactNumber);
             bool hasWhatsApp  = !string.IsNullOrWhiteSpace(ph?.WhatsAppNumber);
@@ -698,7 +841,8 @@ public class PrescriptionDocument(PrescriptionData data) : IDocument
                        .FontFamily(st.FontFamily).FontSize(fs).FontColor(Clr(st.FontColor));
                 });
             }
-        });
+        }); // inner col
+        }); // mainCol
     }
 
     // ── Helpers ───────────────────────────────────────────────────────────────

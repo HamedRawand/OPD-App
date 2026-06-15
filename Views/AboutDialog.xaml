@@ -2,7 +2,7 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="About Rx Writer"
-        SizeToContent="Height" Width="440"
+        Width="500" Height="600"
         ResizeMode="NoResize"
         WindowStartupLocation="CenterOwner"
         Background="{StaticResource ContentBgBrush}"
@@ -11,68 +11,128 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>  <!-- blue header  -->
-            <RowDefinition Height="*"/>     <!-- body         -->
-            <RowDefinition Height="Auto"/>  <!-- close button -->
+            <RowDefinition Height="*"/>     <!-- scrollable body -->
+            <RowDefinition Height="Auto"/>  <!-- sticky footer  -->
         </Grid.RowDefinitions>
 
         <!-- ── Header ──────────────────────────────────────────────────────── -->
-        <Border Grid.Row="0" Background="{StaticResource PrimaryBrush}" Padding="28,22">
+        <Border Grid.Row="0" Background="{StaticResource PrimaryBrush}" Padding="28,20">
             <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                <!-- Rx badge -->
                 <Border Width="52" Height="52" Background="White"
                         CornerRadius="26" Margin="0,0,18,0">
                     <TextBlock Text="Rx" FontSize="20" FontWeight="Bold"
                                Foreground="{StaticResource PrimaryBrush}" FontStyle="Italic"
-                               HorizontalAlignment="Center" VerticalAlignment="Center"/></Border>
+                               HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                </Border>
                 <StackPanel VerticalAlignment="Center">
                     <TextBlock Text="Rx Writer"
                                FontSize="22" FontWeight="Bold" Foreground="White"/>
-                            <TextBlock x:Name="VersionText"
-                               FontSize="12" Foreground="#BBDEFB" Margin="0,4,0,0"/>
+                    <TextBlock x:Name="VersionText"
+                               FontSize="12" Foreground="#BBDEFB" Margin="0,3,0,0"/>
+                    <TextBlock x:Name="ReleaseDateText"
+                               FontSize="11" Foreground="#90CAF9" Margin="0,2,0,0"/>
                 </StackPanel>
             </StackPanel>
         </Border>
 
-        <!-- ── Body ────────────────────────────────────────────────────────── -->
-        <StackPanel Grid.Row="1" Margin="28,22,28,8">
+        <!-- ── Scrollable body ─────────────────────────────────────────────── -->
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+            <StackPanel Margin="24,20,24,12">
 
-            <TextBlock Text="Outpatient Department Clinic Management System"
-                       FontSize="12" Foreground="#555555" TextWrapping="Wrap"
-                       LineHeight="20"/>
+                <!-- Description -->
+                <TextBlock Text="Outpatient Department Clinic Management System"
+                           FontSize="12" Foreground="#444444" TextWrapping="Wrap"/>
+                <TextBlock Text="A lightweight solution for any outpatient department clinic."
+                           FontSize="11" Foreground="#777777" Margin="0,5,0,0"
+                           TextWrapping="Wrap"/>
 
-            <TextBlock Text="A lightweight solution for any outpatient department clinic."
-                       FontSize="11" Foreground="#777777" Margin="0,6,0,0"
-                       TextWrapping="Wrap" LineHeight="18"/>
+                <!-- ── Database stats ──────────────────────────────────────── -->
+                <Border Height="1" Background="#E2E8F0" Margin="0,16,0,16"/>
 
-            <!-- Divider -->
-            <Border Height="1" Background="#E2E8F0" Margin="0,18,0,18"/>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                    <Border Background="#EFF6FF" CornerRadius="10" Padding="22,10" Margin="0,0,10,0">
+                        <StackPanel>
+                            <TextBlock x:Name="PatientCountText"
+                                       FontSize="22" FontWeight="Bold"
+                                       Foreground="{StaticResource PrimaryBrush}"
+                                       HorizontalAlignment="Center" Text="—"/>
+                            <TextBlock Text="Patients" FontSize="11" Foreground="#6B7280"
+                                       HorizontalAlignment="Center" Margin="0,2,0,0"/>
+                        </StackPanel>
+                    </Border>
+                    <Border Background="#F0FDF4" CornerRadius="10" Padding="22,10" Margin="0,0,10,0">
+                        <StackPanel>
+                            <TextBlock x:Name="VisitCountText"
+                                       FontSize="22" FontWeight="Bold" Foreground="#15803D"
+                                       HorizontalAlignment="Center" Text="—"/>
+                            <TextBlock Text="Visits" FontSize="11" Foreground="#6B7280"
+                                       HorizontalAlignment="Center" Margin="0,2,0,0"/>
+                        </StackPanel>
+                    </Border>
+                    <Border Background="#FFF7ED" CornerRadius="10" Padding="22,10">
+                        <StackPanel>
+                            <TextBlock x:Name="MedicineCountText"
+                                       FontSize="22" FontWeight="Bold" Foreground="#C2410C"
+                                       HorizontalAlignment="Center" Text="—"/>
+                            <TextBlock Text="Medicines" FontSize="11" Foreground="#6B7280"
+                                       HorizontalAlignment="Center" Margin="0,2,0,0"/>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
 
-            <!-- Contact row -->
-            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                <TextBlock Text="&#xE715;" FontFamily="Segoe MDL2 Assets"
-                           FontSize="15" Foreground="{StaticResource PrimaryBrush}"
-                           VerticalAlignment="Center" Margin="0,0,10,0"/>
-                <TextBlock Text="Feedback &amp; Support:"
-                           FontSize="11" FontWeight="SemiBold" Foreground="#444"
-                           VerticalAlignment="Center" Margin="0,0,8,0"/>
-                <Button x:Name="EmailBtn"
-                        Content="info.rxwriter@gmail.com"
-                        FontSize="11" Foreground="{StaticResource PrimaryBrush}"
-                        Background="Transparent" BorderThickness="0"
-                        Padding="0" Cursor="Hand"
-                        Click="EmailBtn_Click"
-                        ToolTip="Click to send an email"/>
+                <!-- ── What's New ──────────────────────────────────────────── -->
+                <Border Height="1" Background="#E2E8F0" Margin="0,18,0,16"/>
+
+                <TextBlock Text="WHAT'S NEW"
+                           FontSize="10" FontWeight="SemiBold" Foreground="#4A6FA5"
+                           Margin="0,0,0,10"/>
+
+                <!-- Release note cards — populated in code-behind -->
+                <StackPanel x:Name="ReleaseCardsPanel"/>
+
+                <!-- ── Links ───────────────────────────────────────────────── -->
+                <Border Height="1" Background="#E2E8F0" Margin="0,16,0,16"/>
+
+                <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                    <TextBlock Text="&#xE715;" FontFamily="Segoe MDL2 Assets"
+                               FontSize="14" Foreground="{StaticResource PrimaryBrush}"
+                               VerticalAlignment="Center" Margin="0,0,10,0"/>
+                    <TextBlock Text="Support:" FontSize="11" FontWeight="SemiBold"
+                               Foreground="#444" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                    <Button x:Name="EmailBtn"
+                            Content="info.rxwriter@gmail.com"
+                            FontSize="11" Foreground="{StaticResource PrimaryBrush}"
+                            Background="Transparent" BorderThickness="0"
+                            Padding="0" Cursor="Hand" Click="EmailBtn_Click"
+                            ToolTip="Send a support email"/>
+                </StackPanel>
+
+<TextBlock x:Name="CopyrightText"
+                           FontSize="10" Foreground="#AAAAAA"
+                           HorizontalAlignment="Center" Margin="0,4,0,0"/>
+
             </StackPanel>
+        </ScrollViewer>
 
-
-        </StackPanel>
-
-        <!-- ── Close button ─────────────────────────────────────────────────── -->
-        <Border Grid.Row="2" BorderBrush="{StaticResource BorderBrush}"
-                BorderThickness="0,1,0,0" Padding="16,10">
-            <Button Content="Close" Style="{StaticResource SecondaryButton}"
-                    MinWidth="90" HorizontalAlignment="Right"
-                    IsCancel="True" Click="Close_Click"/>
+        <!-- ── Sticky footer ───────────────────────────────────────────────── -->
+        <Border Grid.Row="2"
+                Background="{StaticResource ContentBgBrush}"
+                BorderBrush="{StaticResource BorderBrush}"
+                BorderThickness="0,1,0,0"
+                Padding="20,12">
+            <Grid>
+                <Button x:Name="CheckUpdatesBtn"
+                        Content="Check for Updates"
+                        Style="{StaticResource SecondaryButton}"
+                        HorizontalAlignment="Left"
+                        MinWidth="150" Padding="16,8"
+                        Click="CheckUpdates_Click"/>
+                <Button Content="Close"
+                        Style="{StaticResource SecondaryButton}"
+                        HorizontalAlignment="Right"
+                        MinWidth="90" Padding="20,8"
+                        IsCancel="True" Click="Close_Click"/>
+            </Grid>
         </Border>
     </Grid>
 </Window>

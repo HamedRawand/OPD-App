@@ -29,8 +29,11 @@ public partial class PrescriptionViewModel : ObservableObject
     private bool _suppressFormFilter;
 
     // ── Role-based permission ──
-    /// <summary>True for Admin and Doctor; false for Receptionist. Drives UI visibility.</summary>
-    public bool CanWritePrescription { get; } = App.Auth.Can(Permission.WritePrescription);
+    /// <summary>True when user has any prescription-write capability. Drives UI visibility.</summary>
+    public bool CanWritePrescription { get; } = App.Auth.CanAny(
+        Permission.WritePrescription,   // legacy
+        Permission.AddPrescription,
+        Permission.EditPrescription);
 
     // ── Catalog data (read-only lists) ──
     public List<MedicineList>      AllMedicines      { get; }

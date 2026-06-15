@@ -103,18 +103,20 @@ public partial class PatientListViewModel : ObservableObject
             await Task.Yield();
 
             var currentUser = App.Auth.CurrentUser!;
-            int? doctorPhysicianId = (!App.Auth.Can(Permission.ViewAllPhysicianPatients)
-                                      && currentUser.PhysicianId.HasValue)
-                                     ? currentUser.PhysicianId
-                                     : null;
+            bool restrictToOwn = !App.Auth.Can(Permission.ViewAllPhysicianPatients);
+            int? ownPhysicianId = currentUser.PhysicianId;
 
             using var db = _factory.CreateDbContext();
 
-            // Base patient query — doctors only see their own patients
+            // Base patient query — restricted users only see their own patients.
+            // If restricted but PhysicianId is not linked, return nothing (not everything).
             var patientQuery = db.Patients.AsQueryable();
-            if (doctorPhysicianId.HasValue)
-                patientQuery = patientQuery
-                    .Where(p => p.Visits.Any(v => v.PhysicianId == doctorPhysicianId.Value));
+            if (restrictToOwn)
+            {
+                patientQuery = ownPhysicianId.HasValue
+                    ? patientQuery.Where(p => p.Visits.Any(v => v.PhysicianId == ownPhysicianId.Value))
+                    : patientQuery.Where(_ => false);
+            }
 
             var totalInDb = patientQuery.Count();
 

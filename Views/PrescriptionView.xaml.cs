@@ -16,7 +16,7 @@ public partial class PrescriptionView : UserControl
 
     private void DeleteLine_Click(object sender, RoutedEventArgs e)
     {
-        if (!App.Auth.Can(Permission.WritePrescription)) return;
+        if (!App.Auth.CanAny(Permission.WritePrescription, Permission.DeletePrescriptionLine)) return;
         if (sender is Button btn && btn.Tag is MedicineUsage line &&
             DataContext is PrescriptionViewModel vm)
         {
@@ -32,7 +32,7 @@ public partial class PrescriptionView : UserControl
 
     private void EditLine_Click(object sender, RoutedEventArgs e)
     {
-        if (!App.Auth.Can(Permission.WritePrescription)) return;
+        if (!App.Auth.CanAny(Permission.WritePrescription, Permission.EditPrescription)) return;
         if (sender is not Button btn || btn.Tag is not MedicineUsage line) return;
         if (DataContext is not PrescriptionViewModel vm) return;
 

@@ -13,6 +13,11 @@ namespace OPDClinic.ViewModels;
 public partial class SectionStyleVm : ObservableObject
 {
     private readonly Func<SectionStyle> _defaults;
+    private static int _instanceCounter;
+
+    /// <summary>Unique per-instance group name so RadioButtons in one section
+    /// don't interfere with RadioButtons in another section's DataTemplate.</summary>
+    public string AlignGroupName { get; } = $"Align_{System.Threading.Interlocked.Increment(ref _instanceCounter)}";
 
     public SectionStyleVm(Func<SectionStyle> defaults)
     {
@@ -40,7 +45,7 @@ public partial class SectionStyleVm : ObservableObject
     [ObservableProperty][NotifyPropertyChangedFor(nameof(BgBrush))]
     private string _backgroundColor = "#FFFFFF";
 
-    [ObservableProperty]
+    [ObservableProperty][NotifyPropertyChangedFor(nameof(PaddingThicknessWpf))]
     private double _padding = 7;
 
     // ── Border ────────────────────────────────────────────────────────────────
@@ -65,6 +70,31 @@ public partial class SectionStyleVm : ObservableObject
     [ObservableProperty][NotifyPropertyChangedFor(nameof(TitleFontWeightWpf))]
     private bool _titleBold = true;
 
+    // ── Text alignment ────────────────────────────────────────────────────────
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(IsAlignLeft), nameof(IsAlignCenter), nameof(IsAlignRight), nameof(TextAlignmentWpf), nameof(TextAlignmentWpfRtl))]
+    private string _textAlign = "Left";
+
+    public bool IsAlignLeft
+    {
+        get => TextAlign == "Left";
+        set { if (value) TextAlign = "Left"; }
+    }
+    public bool IsAlignCenter
+    {
+        get => TextAlign == "Center";
+        set { if (value) TextAlign = "Center"; }
+    }
+    public bool IsAlignRight
+    {
+        get => TextAlign == "Right";
+        set { if (value) TextAlign = "Right"; }
+    }
+
+    // ── Label spacing (Vital Signs only) ──────────────────────────────────────
+    [ObservableProperty]
+    private double _labelSpacing = 8;
+
     // ── Computed WPF properties (used by live preview bindings) ───────────────
     public FontFamily FontFamilyWpf      => SafeFont(FontFamily);
     public double     FontSizeWpf        => Math.Clamp(FontSize, 6, 36);
@@ -76,8 +106,13 @@ public partial class SectionStyleVm : ObservableObject
     public Brush      BorderColorBrush   => SafeBrush(BorderColor,   Colors.Gray);
     public Brush      TitleFontBrush     => SafeBrush(TitleFontColor, Colors.DarkBlue);
     public Brush      TitleBgBrush       => SafeBrush(TitleBgColor,  Colors.LightGray);
-    public Thickness  BorderThicknessWpf => ShowBorder ? new Thickness(BorderThickness) : new Thickness(0);
-    public Visibility BorderVisibility   => ShowBorder ? Visibility.Visible : Visibility.Collapsed;
+    public Thickness     BorderThicknessWpf  => ShowBorder ? new Thickness(BorderThickness) : new Thickness(0);
+    public Visibility    BorderVisibility    => ShowBorder ? Visibility.Visible : Visibility.Collapsed;
+    public Thickness     PaddingThicknessWpf  => new Thickness(Padding);
+    public TextAlignment TextAlignmentWpf    => TextAlign switch { "Center" => TextAlignment.Center, "Right" => TextAlignment.Right, _ => TextAlignment.Left };
+    // RTL columns (FlowDirection=RightToLeft): Left/Right are logically inverted in WPF, so swap them
+    // so the user's "Right" selection still means physically right-aligned text.
+    public TextAlignment TextAlignmentWpfRtl => TextAlign switch { "Center" => TextAlignment.Center, "Right" => TextAlignment.Left, _ => TextAlignment.Right };
 
     // ── Commands ──────────────────────────────────────────────────────────────
     [RelayCommand]
@@ -99,6 +134,8 @@ public partial class SectionStyleVm : ObservableObject
         TitleFontColor  = s.TitleFontColor;
         TitleBgColor    = s.TitleBgColor;
         TitleBold       = s.TitleBold;
+        TextAlign       = s.TextAlign;
+        LabelSpacing    = s.LabelSpacing;
     }
 
     public SectionStyle ToModel() => new()
@@ -115,7 +152,9 @@ public partial class SectionStyleVm : ObservableObject
         BorderColor     = BorderColor,
         TitleFontColor  = TitleFontColor,
         TitleBgColor    = TitleBgColor,
-        TitleBold       = TitleBold
+        TitleBold       = TitleBold,
+        TextAlign       = TextAlign,
+        LabelSpacing    = (float)LabelSpacing
     };
 
     // ── Static lists for XAML ─────────────────────────────────────────────────
@@ -157,10 +196,17 @@ public partial class SectionStyleVm : ObservableObject
 public partial class ReportDesignViewModel : ObservableObject
 {
     // ── Section view-models ───────────────────────────────────────────────────
-    public SectionStyleVm ClinicName       { get; } = new(SectionStyle.MakeClinicName);
-    public SectionStyleVm Tagline          { get; } = new(SectionStyle.MakeTagline);
-    public SectionStyleVm Header           { get; } = new(SectionStyle.MakeHeader);
-    public SectionStyleVm PatientBar       { get; } = new(SectionStyle.MakePatientBar);
+    public SectionStyleVm ClinicNameEn        { get; } = new(SectionStyle.MakeClinicName);
+    public SectionStyleVm ClinicNameDari      { get; } = new(SectionStyle.MakeClinicNameDari);
+    public SectionStyleVm Tagline             { get; } = new(SectionStyle.MakeTagline);
+    public SectionStyleVm DoctorNameEn        { get; } = new(SectionStyle.MakeDoctorNameEn);
+    public SectionStyleVm SpecialityEn        { get; } = new(SectionStyle.MakeSpecialityEn);
+    public SectionStyleVm OtherSpecialityEn   { get; } = new(SectionStyle.MakeOtherSpecialityEn);
+    public SectionStyleVm DoctorNameDari      { get; } = new(SectionStyle.MakeDoctorNameDari);
+    public SectionStyleVm SpecialityDari      { get; } = new(SectionStyle.MakeSpecialityDari);
+    public SectionStyleVm OtherSpecialityDari { get; } = new(SectionStyle.MakeOtherSpecialityDari);
+    public SectionStyleVm PatientBar          { get; } = new(SectionStyle.MakePatientBar);
+    public SectionStyleVm PatientId           { get; } = new(SectionStyle.MakePatientId);
     public SectionStyleVm VitalSigns       { get; } = new(SectionStyle.MakeBox);
     public SectionStyleVm ClinicalFindings { get; } = new(SectionStyle.MakeBox);
     public SectionStyleVm Diagnosis        { get; } = new(SectionStyle.MakeBox);
@@ -171,6 +217,74 @@ public partial class ReportDesignViewModel : ObservableObject
     // ── Global ────────────────────────────────────────────────────────────────
     [ObservableProperty] private bool   _blackAndWhiteMode;
     [ObservableProperty] private string _globalFontFamily = "Calibri";
+    [ObservableProperty] private double _logoSize = 54;
+    [ObservableProperty] private double _patientBarGap = 4;
+    [ObservableProperty] private bool   _showPatientId = true;
+
+    // ── Header divider ────────────────────────────────────────────────────────
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(DividerThicknessWpf))]
+    private bool _dividerVisible = true;
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(DividerThicknessWpf))]
+    private double _dividerThickness = 2.5;
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(DividerBrush))]
+    private string _dividerColor = "#1565C0";
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(DividerDashArrayWpf), nameof(DividerIsSingle), nameof(DividerIsDouble))]
+    private string _dividerStyle = "Solid";
+
+    public Brush             DividerBrush        => SafeBrush(DividerColor, Colors.DarkBlue);
+    public Thickness         DividerThicknessWpf => DividerVisible ? new Thickness(0, DividerThickness, 0, 0) : new Thickness(0);
+    public DoubleCollection? DividerDashArrayWpf => DividerStyle switch {
+        "Dashed" => new DoubleCollection { 6, 3 },
+        "Dotted" => new DoubleCollection { 1.5, 2 },
+        _        => null
+    };
+    public bool DividerIsSingle => DividerStyle != "Double";
+    public bool DividerIsDouble => DividerStyle == "Double";
+
+    // ── Footer divider ────────────────────────────────────────────────────────
+    [ObservableProperty]
+    private bool _footerDividerVisible = true;
+
+    [ObservableProperty]
+    private double _footerDividerThickness = 1.5;
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(FooterDividerBrush))]
+    private string _footerDividerColor = "#1565C0";
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(FooterDividerDashArrayWpf), nameof(FooterDividerIsSingle), nameof(FooterDividerIsDouble))]
+    private string _footerDividerStyle = "Solid";
+
+    public Brush             FooterDividerBrush        => SafeBrush(FooterDividerColor, Colors.DarkBlue);
+    public DoubleCollection? FooterDividerDashArrayWpf => FooterDividerStyle switch {
+        "Dashed" => new DoubleCollection { 6, 3 },
+        "Dotted" => new DoubleCollection { 1.5, 2 },
+        _        => null
+    };
+    public bool FooterDividerIsSingle => FooterDividerStyle != "Double";
+    public bool FooterDividerIsDouble => FooterDividerStyle == "Double";
+
+    public static List<string> DividerStyleOptions { get; } = ["Solid", "Dashed", "Dotted", "Double"];
+
+    private static Brush SafeBrush(string hex, Color fallback)
+    {
+        try
+        {
+            var c = (Color)ColorConverter.ConvertFromString(hex);
+            var b = new SolidColorBrush(c);
+            b.Freeze();
+            return b;
+        }
+        catch { return new SolidColorBrush(fallback); }
+    }
 
     // ── Status bar ────────────────────────────────────────────────────────────
     [ObservableProperty] private string _statusMessage  = "";
@@ -183,10 +297,28 @@ public partial class ReportDesignViewModel : ObservableObject
         var s = ReportSettingsService.Current;
         BlackAndWhiteMode = s.BlackAndWhiteMode;
         GlobalFontFamily  = s.GlobalFontFamily;
-        ClinicName       .LoadFrom(s.ClinicName);
-        Tagline          .LoadFrom(s.Tagline);
-        Header           .LoadFrom(s.Header);
-        PatientBar       .LoadFrom(s.PatientBar);
+        LogoSize          = s.LogoSize;
+        PatientBarGap     = s.PatientBarGap;
+        ShowPatientId     = s.ShowPatientId;
+        DividerVisible    = s.DividerVisible;
+        DividerThickness  = s.DividerThickness;
+        DividerColor      = s.DividerColor;
+        DividerStyle      = s.DividerStyle;
+        FooterDividerVisible    = s.FooterDividerVisible;
+        FooterDividerThickness  = s.FooterDividerThickness;
+        FooterDividerColor      = s.FooterDividerColor;
+        FooterDividerStyle      = s.FooterDividerStyle;
+        ClinicNameEn        .LoadFrom(s.ClinicNameEn);
+        ClinicNameDari      .LoadFrom(s.ClinicNameDari);
+        Tagline             .LoadFrom(s.Tagline);
+        DoctorNameEn        .LoadFrom(s.DoctorNameEn);
+        SpecialityEn        .LoadFrom(s.SpecialityEn);
+        OtherSpecialityEn   .LoadFrom(s.OtherSpecialityEn);
+        DoctorNameDari      .LoadFrom(s.DoctorNameDari);
+        SpecialityDari      .LoadFrom(s.SpecialityDari);
+        OtherSpecialityDari .LoadFrom(s.OtherSpecialityDari);
+        PatientBar          .LoadFrom(s.PatientBar);
+        PatientId           .LoadFrom(s.PatientId);
         VitalSigns       .LoadFrom(s.VitalSigns);
         ClinicalFindings .LoadFrom(s.ClinicalFindings);
         Diagnosis        .LoadFrom(s.Diagnosis);
@@ -209,10 +341,28 @@ public partial class ReportDesignViewModel : ObservableObject
         var def = new ReportSettings();
         BlackAndWhiteMode = def.BlackAndWhiteMode;
         GlobalFontFamily  = def.GlobalFontFamily;
-        ClinicName       .LoadFrom(def.ClinicName);
-        Tagline          .LoadFrom(def.Tagline);
-        Header           .LoadFrom(def.Header);
-        PatientBar       .LoadFrom(def.PatientBar);
+        LogoSize          = def.LogoSize;
+        PatientBarGap     = def.PatientBarGap;
+        ShowPatientId     = def.ShowPatientId;
+        DividerVisible    = def.DividerVisible;
+        DividerThickness  = def.DividerThickness;
+        DividerColor      = def.DividerColor;
+        DividerStyle      = def.DividerStyle;
+        FooterDividerVisible    = def.FooterDividerVisible;
+        FooterDividerThickness  = def.FooterDividerThickness;
+        FooterDividerColor      = def.FooterDividerColor;
+        FooterDividerStyle      = def.FooterDividerStyle;
+        ClinicNameEn        .LoadFrom(def.ClinicNameEn);
+        ClinicNameDari      .LoadFrom(def.ClinicNameDari);
+        Tagline             .LoadFrom(def.Tagline);
+        DoctorNameEn        .LoadFrom(def.DoctorNameEn);
+        SpecialityEn        .LoadFrom(def.SpecialityEn);
+        OtherSpecialityEn   .LoadFrom(def.OtherSpecialityEn);
+        DoctorNameDari      .LoadFrom(def.DoctorNameDari);
+        SpecialityDari      .LoadFrom(def.SpecialityDari);
+        OtherSpecialityDari .LoadFrom(def.OtherSpecialityDari);
+        PatientBar          .LoadFrom(def.PatientBar);
+        PatientId           .LoadFrom(def.PatientId);
         VitalSigns       .LoadFrom(def.VitalSigns);
         ClinicalFindings .LoadFrom(def.ClinicalFindings);
         Diagnosis        .LoadFrom(def.Diagnosis);
@@ -226,7 +376,12 @@ public partial class ReportDesignViewModel : ObservableObject
     public void ApplyBwPalette()
     {
         // Override colours with grayscale-safe equivalents
-        Header.FontColor           = "#000000";
+        DoctorNameEn.FontColor      = "#000000";
+        SpecialityEn.FontColor      = "#000000";
+        OtherSpecialityEn.FontColor = "#000000";
+        DoctorNameDari.FontColor      = "#000000";
+        SpecialityDari.FontColor      = "#000000";
+        OtherSpecialityDari.FontColor = "#000000";
         PatientBar.BackgroundColor = "#EBEBEB";
         PatientBar.BorderColor     = "#444444";
         foreach (var s in new[] { VitalSigns, ClinicalFindings, Diagnosis, LabTests })
@@ -246,10 +401,28 @@ public partial class ReportDesignViewModel : ObservableObject
     {
         BlackAndWhiteMode = BlackAndWhiteMode,
         GlobalFontFamily  = GlobalFontFamily,
-        ClinicName       = ClinicName.ToModel(),
-        Tagline          = Tagline.ToModel(),
-        Header           = Header.ToModel(),
-        PatientBar       = PatientBar.ToModel(),
+        LogoSize          = LogoSize,
+        PatientBarGap     = PatientBarGap,
+        ShowPatientId     = ShowPatientId,
+        DividerVisible    = DividerVisible,
+        DividerThickness  = DividerThickness,
+        DividerColor      = DividerColor,
+        DividerStyle      = DividerStyle,
+        FooterDividerVisible    = FooterDividerVisible,
+        FooterDividerThickness  = FooterDividerThickness,
+        FooterDividerColor      = FooterDividerColor,
+        FooterDividerStyle      = FooterDividerStyle,
+        ClinicNameEn        = ClinicNameEn.ToModel(),
+        ClinicNameDari      = ClinicNameDari.ToModel(),
+        Tagline             = Tagline.ToModel(),
+        DoctorNameEn        = DoctorNameEn.ToModel(),
+        SpecialityEn        = SpecialityEn.ToModel(),
+        OtherSpecialityEn   = OtherSpecialityEn.ToModel(),
+        DoctorNameDari      = DoctorNameDari.ToModel(),
+        SpecialityDari      = SpecialityDari.ToModel(),
+        OtherSpecialityDari = OtherSpecialityDari.ToModel(),
+        PatientBar          = PatientBar.ToModel(),
+        PatientId           = PatientId.ToModel(),
         VitalSigns       = VitalSigns.ToModel(),
         ClinicalFindings = ClinicalFindings.ToModel(),
         Diagnosis        = Diagnosis.ToModel(),

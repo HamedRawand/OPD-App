@@ -6,14 +6,24 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
+    <UseWindowsForms>true</UseWindowsForms>
     <ApplicationIcon>image\Caduceus.ico</ApplicationIcon>
-    <Version>2.1.1</Version>
-    <AssemblyVersion>2.1.1.0</AssemblyVersion>
-    <FileVersion>2.1.1.0</FileVersion>
+    <Version>2.1.3</Version>
+    <AssemblyVersion>2.1.3.0</AssemblyVersion>
+    <FileVersion>2.1.3.0</FileVersion>
     <Company>Rx Writer</Company>
     <Product>Rx Writer</Product>
     <Description>Outpatient Department Clinic Management System</Description>
   </PropertyGroup>
+
+  <!-- UseWindowsForms adds global usings for System.Windows.Forms and System.Drawing
+       that conflict with WPF types (Brush, Color, FontFamily, etc.).
+       We keep the assemblies but remove the implicit global usings so only
+       ReportDesignView.xaml.cs uses them with fully-qualified names. -->
+  <ItemGroup>
+    <Using Remove="System.Windows.Forms"/>
+    <Using Remove="System.Drawing"/>
+  </ItemGroup>
 
   <ItemGroup>
     <Content Include="image\Caduceus.ico" />

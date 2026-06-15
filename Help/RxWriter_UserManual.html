@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Rx Writer — User Manual v2.0.4</title>
+<title>Rx Writer — User Manual v2.1.3</title>
 <style>
 /* ═══════════════════════════════════════════════
    GLOBAL RESET & TYPOGRAPHY
@@ -519,7 +519,7 @@ kbd {
     Designed for any medical outpatient clinic<br/>
     English / دری Bilingual Support
   </div>
-  <div class="cover-version">Version 2.0.4 · 2026</div>
+  <div class="cover-version">Version 2.1.3 · 2026</div>
 </div>
 
 <!-- ══════════════════════════════════════════
@@ -654,6 +654,15 @@ kbd {
     </div>
   </div>
 
+  <div class="callout tip">
+    <span class="callout-icon">🔑</span>
+    <div class="callout-body">
+      <strong>Forgot your password?</strong>
+      <p>Click the <strong>Forgot your password?</strong> link below the Sign In button. Enter your username and the email address registered on your account. Rx Writer will send a temporary password to that email address. You will be required to change it on your next login.</p>
+      <p>If your email is not set up, contact your Administrator to reset your password from <strong>User Management</strong>.</p>
+    </div>
+  </div>
+
   <hr class="section-divider"/>
 
   <h3 id="ch1-firstpw">Changing Your Password on First Login</h3>
@@ -688,29 +697,32 @@ kbd {
       <tr>
         <th>Feature</th>
         <th>Admin</th>
+        <th>Co-Admin</th>
         <th>Doctor</th>
         <th>Receptionist</th>
         <th>Custom Role</th>
       </tr>
     </thead>
     <tbody>
-      <tr><td>Dashboard</td><td>✅</td><td>✅</td><td>✅</td><td>Configurable</td></tr>
-      <tr><td>View Patient List</td><td>✅</td><td>✅ (own patients)</td><td>✅</td><td>Configurable</td></tr>
-      <tr><td>Register New Patient</td><td>✅</td><td>✅</td><td>✅</td><td>Configurable</td></tr>
-      <tr><td>Enter Clinical Data / Vitals</td><td>✅</td><td>✅</td><td>❌</td><td>Configurable</td></tr>
-      <tr><td>Write &amp; Edit Prescriptions</td><td>✅</td><td>✅</td><td>❌</td><td>Configurable</td></tr>
-      <tr><td>Print Prescription PDF</td><td>✅</td><td>✅</td><td>✅</td><td>Configurable</td></tr>
-      <tr><td>Manage Physicians</td><td>✅</td><td>❌</td><td>❌</td><td>Configurable</td></tr>
-      <tr><td>Manage Medicine Catalog</td><td>✅</td><td>❌</td><td>❌</td><td>Configurable</td></tr>
-      <tr><td>User Management / Administration</td><td>✅</td><td>❌</td><td>❌</td><td>Configurable</td></tr>
+      <tr><td>Dashboard</td><td>✅</td><td>✅</td><td>✅</td><td>✅</td><td>Configurable</td></tr>
+      <tr><td>View Patient List</td><td>✅</td><td>✅</td><td>✅ (own patients)</td><td>✅</td><td>Configurable</td></tr>
+      <tr><td>Register / Edit Patients</td><td>✅</td><td>✅</td><td>✅</td><td>✅</td><td>Configurable</td></tr>
+      <tr><td>Delete Patients &amp; Visits</td><td>✅</td><td>✅</td><td>✅</td><td>❌</td><td>Configurable</td></tr>
+      <tr><td>Enter Clinical Data / Vitals</td><td>✅</td><td>✅</td><td>✅</td><td>❌</td><td>Configurable</td></tr>
+      <tr><td>Write &amp; Edit Prescriptions</td><td>✅</td><td>✅</td><td>✅</td><td>❌</td><td>Configurable</td></tr>
+      <tr><td>Print Prescription PDF</td><td>✅</td><td>✅</td><td>✅</td><td>✅</td><td>Configurable</td></tr>
+      <tr><td>Manage Medicine Catalog</td><td>✅</td><td>✅</td><td>✅</td><td>❌</td><td>Configurable</td></tr>
+      <tr><td>Manage Physicians</td><td>✅</td><td>✅</td><td>❌</td><td>❌</td><td>Configurable</td></tr>
+      <tr><td>User Management / Administration</td><td>✅</td><td>✅ (limited)</td><td>❌</td><td>❌</td><td>Configurable</td></tr>
     </tbody>
   </table>
 
   <div class="callout info">
     <span class="callout-icon">ℹ️</span>
     <div class="callout-body">
-      <strong>Custom Roles</strong>
-      <p>Administrators can create custom roles (e.g. "Lab Technician", "Pharmacist") with any combination of the above permissions. See Chapter 8 — Custom Roles.</p>
+      <strong>Co-Admin &amp; Custom Roles</strong>
+      <p><strong>Co-Admin</strong> has nearly identical access to Admin but cannot manage Admin-level user accounts, access SMTP settings, import data, or merge clinic backups.</p>
+      <p><strong>Custom Roles</strong> let Administrators define any permission combination (e.g. "Lab Technician", "Pharmacist"). See Chapter 8 — Custom Roles.</p>
     </div>
   </div>
 </div>
@@ -792,9 +804,10 @@ kbd {
       <tr><td>Custom Roles</td><td>Admin only</td><td>Define custom permission sets</td></tr>
       <tr><td>Import</td><td>Admin only</td><td>One-time data import from Access DB</td></tr>
       <tr><td>Backup</td><td>Admin only</td><td>Create, restore, and merge backups</td></tr>
-      <tr><td>Options</td><td>Admin only</td><td>Edit lookup tables (routes, dosages…)</td></tr>
+      <tr><td>Options</td><td>Users with medicine or user management permission</td><td>Edit lookup tables (routes, dosages…)</td></tr>
       <tr><td>Print Settings</td><td>Admin only</td><td>Customise prescription PDF layout</td></tr>
-      <tr><td rowspan="4"><strong>FOOTER</strong></td><td>About</td><td>All users</td><td>App version and contact info</td></tr>
+      <tr><td rowspan="5"><strong>FOOTER</strong></td><td>Help / Manual</td><td>All users</td><td>Open the built-in user manual in a browser</td></tr>
+      <tr><td>About</td><td>All users</td><td>App version, stats, release notes, and update check</td></tr>
       <tr><td>Check for Updates</td><td>All users</td><td>Manual update check</td></tr>
       <tr><td>دری / English</td><td>All users</td><td>Switch UI language</td></tr>
       <tr><td>Logout</td><td>All users</td><td>Sign out and return to Login</td></tr>
@@ -825,7 +838,7 @@ kbd {
   <p>The Dashboard is the first screen you see after logging in. It shows a real-time summary of the clinic's activity and provides quick shortcuts to the most common tasks.</p>
 
   <h3>Stat Cards</h3>
-  <p>Four colour-coded cards appear at the top of the Dashboard:</p>
+  <p>Five colour-coded cards appear at the top of the Dashboard:</p>
 
   <table class="keep-together">
     <thead><tr><th>Card</th><th>Colour</th><th>What it shows</th></tr></thead>
@@ -834,6 +847,7 @@ kbd {
       <tr><td><strong>Today's Visits</strong></td><td style="color:#16A34A;">Green</td><td>Number of patients seen today (by Gregorian date).</td></tr>
       <tr><td><strong>Medicines in Catalog</strong></td><td style="color:#EA580C;">Orange</td><td>Total medicines in the drug catalog.</td></tr>
       <tr><td><strong>Physicians</strong></td><td style="color:#7C3AED;">Purple</td><td>Number of registered physician profiles.</td></tr>
+      <tr><td><strong>Total Visits</strong></td><td style="color:#0F766E;">Teal</td><td>All-time total number of visit records across all patients.</td></tr>
     </tbody>
   </table>
 
@@ -920,8 +934,11 @@ kbd {
     <tbody>
       <tr><td><strong>✏ Edit</strong></td><td>Opens the selected visit for editing. Receptionists see limited fields (no vitals, clinical data, or Rx tab).</td></tr>
       <tr><td><strong>🖨 Print</strong></td><td>Generates and opens the prescription PDF for the selected visit in your default PDF viewer.</td></tr>
+      <tr><td><strong>🗑 Delete</strong></td><td>Appears only on patient rows with no visits (zero-visit records). Permanently removes the patient record. Requires the <em>Delete Patient</em> permission.</td></tr>
     </tbody>
   </table>
+
+  <p>The <strong>⬇ Export</strong> button in the Patient List toolbar exports the currently filtered list to Excel (.xlsx) or CSV.</p>
 
   <hr class="section-divider"/>
 
@@ -946,6 +963,7 @@ kbd {
       <tr><td><strong>Physician</strong></td><td>Select the attending physician. Required for prescription printing.</td></tr>
       <tr><td><strong>Visit Date (Gregorian)</strong></td><td>Use the date picker. The Shamsi (Solar Hijri) date fills in automatically.</td></tr>
       <tr><td><strong>Visit Date (Shamsi)</strong></td><td>You can also type the Shamsi date directly; the Gregorian date syncs automatically. Format: DD/MM/YYYY.</td></tr>
+      <tr><td><strong>Next Visit Date (Shamsi)</strong></td><td>Optional. Enter the expected follow-up date in Solar Hijri format (e.g. 1404/5/20). Prints in blue below the visit date on the prescription PDF.</td></tr>
     </tbody>
   </table>
 
@@ -1000,6 +1018,8 @@ kbd {
 
   <p>The Patient Detail window lists every recorded visit for that patient in reverse-chronological order with the date, physician, diagnosis, and a summary of the prescription.</p>
 
+  <p>A <strong>summary stats bar</strong> at the top shows the total visit count, first visit date, and latest visit date. If there are two or more visits with recorded vitals, a collapsible <strong>Vitals Trend</strong> chart shows BW and systolic BP sparklines over time.</p>
+
   <table>
     <thead><tr><th>Button</th><th>What it does</th></tr></thead>
     <tbody>
@@ -1007,6 +1027,8 @@ kbd {
       <tr><td><strong>✏ Edit</strong></td><td>Edit the details of a past visit.</td></tr>
       <tr><td><strong>🖨 Print</strong></td><td>Print the prescription PDF for a past visit.</td></tr>
       <tr><td><strong>↻ Repeat</strong></td><td>Create a new visit pre-filled with the same prescription as the selected row. Vitals are left blank for the doctor to fill in. See Chapter 5 — Repeating a Prescription.</td></tr>
+      <tr><td><strong>🗑 Delete Visit</strong></td><td>Delete a specific visit. If it is the <em>last remaining visit</em> for the patient, you will be offered the option to also delete the entire patient record. Requires the <em>Delete Visit</em> permission.</td></tr>
+      <tr><td><strong>⬇ Export</strong></td><td>Export all visits for this patient to Excel or CSV.</td></tr>
     </tbody>
   </table>
 </div>
@@ -1202,7 +1224,7 @@ kbd {
   </ul>
 
   <h3>Linking a Physician to a User Account</h3>
-  <p>When creating a Doctor user account (see Chapter 8 — User Management), you can link it to a physician profile. This allows the system to:</p>
+  <p>When creating a <strong>Doctor</strong> user account or a user with a <strong>Custom Role</strong> (see Chapter 8 — User Management), you can link it to a physician profile. This allows the system to:</p>
   <ul>
     <li>Show only that doctor's patients in their Patient List.</li>
     <li>Show only their patients on the Dashboard.</li>
@@ -1235,7 +1257,7 @@ kbd {
     <li>Enter the <strong>Medicine Name</strong>.</li>
     <li>Enter the <strong>Generic Name</strong> (optional).</li>
     <li>Select the <strong>Category</strong> (the drug form type, e.g. Tablet, Injection, Syrup).</li>
-    <li>Enter the <strong>Strength</strong> (e.g. 500mg, 10ml).</li>
+    <li>Add one or more <strong>Strengths</strong> (e.g. 250mg, 500mg). Click <strong>+ Add</strong> to add each strength value to the list. Use the <strong>✕</strong> button to remove one. The first strength in the list is used as the default in the prescription form.</li>
     <li>Click <strong>Save</strong>.</li>
   </ol>
 
@@ -1244,6 +1266,8 @@ kbd {
     <li>Click <strong>✏ Edit</strong> on the row to modify a medicine's details.</li>
     <li>Click <strong>🗑 Delete</strong> to remove a medicine. A confirmation dialog appears. Deleting a medicine from the catalog does not affect existing prescriptions that already contain it.</li>
   </ul>
+
+  <p>The <strong>⬇ Export</strong> button in the Medicine Catalog header exports the catalog (respecting any active search or category filter) to Excel (.xlsx) or CSV.</p>
 
   <div class="callout warn">
     <span class="callout-icon">⚠️</span>
@@ -1287,7 +1311,8 @@ kbd {
     <li>Enter a unique <strong>Username</strong>.</li>
     <li>Enter the user's <strong>Full Name</strong>.</li>
     <li>Select a <strong>Role</strong>: Admin, Doctor, Receptionist, or any saved Custom Role.</li>
-    <li>If the role is <strong>Doctor</strong>, link the account to a Physician profile using the Physician dropdown that appears. This scopes the doctor's patient list to their own patients.</li>
+    <li>If the role is <strong>Doctor</strong> or a <strong>Custom Role</strong>, link the account to a Physician profile using the Physician dropdown that appears. This scopes that user's patient list to their own patients.</li>
+    <li>Enter the user's <strong>Email address</strong>. This is used for the Forgot Password flow (a temporary password is emailed to this address when requested).</li>
     <li>Enter a temporary <strong>Password</strong> and check <strong>"Must change password on next login"</strong> so the user sets their own password on first use.</li>
     <li>Click <strong>Save</strong>.</li>
   </ol>
@@ -1312,6 +1337,9 @@ kbd {
     </div>
   </div>
 
+  <h4>Email Settings</h4>
+  <p>Click <strong>📧 Email Settings</strong> in the User Management header to configure the Gmail SMTP account used for sending password-reset emails. You will need a Gmail address with an App Password (16-character code generated in Gmail's security settings). Once configured, the <strong>Forgot Password</strong> link on the login screen becomes functional.</p>
+
   <hr class="section-divider"/>
 
   <h3 id="ch8-roles">Custom Roles</h3>
@@ -1328,16 +1356,38 @@ kbd {
   </ol>
 
   <table>
-    <thead><tr><th>Permission</th><th>What it grants</th></tr></thead>
+    <thead><tr><th>Group</th><th>Permission</th><th>What it grants</th></tr></thead>
     <tbody>
-      <tr><td>View Patients</td><td>Access to the Patient List</td></tr>
+      <tr><td rowspan="6"><strong>Patients</strong></td><td>View Patients</td><td>Access the Patient List</td></tr>
       <tr><td>Register Patient</td><td>Create new patient visit records</td></tr>
+      <tr><td>Edit Patient Info</td><td>Edit name, phone, and basic patient details</td></tr>
+      <tr><td>Delete Patient</td><td>Delete zero-visit patient records and the last visit</td></tr>
+      <tr><td>Export Patients</td><td>Export the patient list to Excel/CSV</td></tr>
+      <tr><td>View All Patients</td><td>See all physicians' patients (without this, only own patients are shown)</td></tr>
+      <tr><td rowspan="4"><strong>Visits / Clinical</strong></td><td>View Clinical Data</td><td>Read vitals and clinical findings</td></tr>
       <tr><td>Enter Clinical Data</td><td>Edit vitals, clinical findings, and diagnosis</td></tr>
-      <tr><td>Write Prescription</td><td>Access the Prescription tab; add, edit, and delete medicine lines</td></tr>
-      <tr><td>Print / Export PDF</td><td>Generate and open the prescription PDF</td></tr>
-      <tr><td>Manage Physicians</td><td>Add, edit, and delete physician profiles</td></tr>
-      <tr><td>Manage Medicine Catalog</td><td>Add, edit, and delete medicines</td></tr>
-      <tr><td>Manage Users</td><td>Full Administration sidebar access</td></tr>
+      <tr><td>Delete Visit</td><td>Delete individual visit records</td></tr>
+      <tr><td>Export Visits</td><td>Export visit records to Excel/CSV</td></tr>
+      <tr><td rowspan="5"><strong>Prescriptions</strong></td><td>View Prescription</td><td>Read prescription lines</td></tr>
+      <tr><td>Add Prescription</td><td>Add medicine lines to a prescription</td></tr>
+      <tr><td>Edit Prescription</td><td>Modify existing prescription lines</td></tr>
+      <tr><td>Delete Prescription Line</td><td>Remove a line from a prescription</td></tr>
+      <tr><td>Print PDF</td><td>Generate and open the prescription PDF</td></tr>
+      <tr><td rowspan="5"><strong>Medicine Catalog</strong></td><td>View Medicine Catalog</td><td>Browse the medicine catalog (required for prescription autocomplete)</td></tr>
+      <tr><td>Add Medicine</td><td>Add new medicines to the catalog</td></tr>
+      <tr><td>Edit Medicine</td><td>Modify existing medicine entries</td></tr>
+      <tr><td>Delete Medicine Catalog</td><td>Remove medicines from the catalog</td></tr>
+      <tr><td>Export Medicine Catalog</td><td>Export the catalog to Excel/CSV</td></tr>
+      <tr><td rowspan="5"><strong>Physicians</strong></td><td>View Physicians</td><td>Browse physician profiles</td></tr>
+      <tr><td>Add Physician</td><td>Create new physician profiles</td></tr>
+      <tr><td>Edit Physician</td><td>Modify physician details</td></tr>
+      <tr><td>Delete Physicians</td><td>Remove physician profiles</td></tr>
+      <tr><td>Export Physicians</td><td>Export the physician list to Excel/CSV</td></tr>
+      <tr><td rowspan="5"><strong>Users</strong></td><td>View Users</td><td>See the User Management page</td></tr>
+      <tr><td>Add User</td><td>Create new user accounts</td></tr>
+      <tr><td>Edit User</td><td>Modify existing user accounts</td></tr>
+      <tr><td>Delete Users</td><td>Remove user accounts</td></tr>
+      <tr><td>Export Users</td><td>Export the user list to Excel/CSV</td></tr>
     </tbody>
   </table>
 
@@ -1350,6 +1400,9 @@ kbd {
 
   <h4>Deleting a Custom Role</h4>
   <p>When you delete a custom role, Rx Writer shows you the names of all users currently assigned to that role. Those users will be reverted to the <strong>Receptionist</strong> role. Confirm the deletion to proceed.</p>
+
+  <h4>Built-in Editable Roles (Doctor &amp; Receptionist)</h4>
+  <p>The <strong>Doctor</strong> and <strong>Receptionist</strong> roles appear in the Custom Roles list with a blue <strong>Built-in</strong> badge. These roles cannot be renamed or deleted, but their permission sets <em>can</em> be edited here. Changes take effect the next time affected users log in.</p>
 
   <div class="callout info">
     <span class="callout-icon">ℹ️</span>
@@ -1501,14 +1554,18 @@ kbd {
   <table>
     <thead><tr><th>Section</th><th>Controls</th></tr></thead>
     <tbody>
-      <tr><td>Header</td><td>Font, size, colours for the clinic name &amp; speciality lines</td></tr>
-      <tr><td>Patient Bar</td><td>Background colour, border, font for the patient info row</td></tr>
-      <tr><td>Vital Signs</td><td>Box header colour, border, padding</td></tr>
-      <tr><td>Clinical Findings</td><td>Box header colour, border, padding</td></tr>
-      <tr><td>Diagnosis</td><td>Box header colour, border, padding</td></tr>
-      <tr><td>Lab Tests</td><td>Box header colour, border, padding</td></tr>
-      <tr><td>Rx (Prescription List)</td><td>Font, line spacing, medicine name size</td></tr>
-      <tr><td>Footer</td><td>Font, colour for the contact/address footer</td></tr>
+      <tr><td>Clinic Name</td><td>Font, size, colour for the clinic name line above the physician name</td></tr>
+      <tr><td>Header</td><td>Font, size, colours for the physician name &amp; speciality lines</td></tr>
+      <tr><td>Tagline / Motto</td><td>Font, colour for the tagline printed below the logo</td></tr>
+      <tr><td>Header Divider Line</td><td>Visibility, thickness (0.5 pt steps), colour, and style (Solid / Dashed / Dotted / Double)</td></tr>
+      <tr><td>Patient Bar</td><td>Background colour, border, font; field order is fixed RTL (Name | Age | Sex | Date). <strong>Patient ID row</strong> (نمبر مسلسل) can be shown or hidden independently. <strong>Gap</strong> slider controls spacing between the header divider and the patient bar.</td></tr>
+      <tr><td>Vital Signs</td><td>Box header colour, border, padding; <strong>Label Spacing</strong> controls the gap between each vital's label and its value.</td></tr>
+      <tr><td>Clinical Findings</td><td>Box header colour, border, padding, text alignment</td></tr>
+      <tr><td>Diagnosis</td><td>Box header colour, border, padding, text alignment</td></tr>
+      <tr><td>Lab Tests</td><td>Box header colour, border, padding, text alignment</td></tr>
+      <tr><td>Rx (Prescription List)</td><td>Font, line spacing, medicine name size, text alignment</td></tr>
+      <tr><td>Footer</td><td>Font, colour for the contact/address footer, text alignment</td></tr>
+      <tr><td>Footer Divider Line</td><td>Independent visibility, thickness, colour, and style — separate from the header divider</td></tr>
     </tbody>
   </table>
 
@@ -1517,6 +1574,15 @@ kbd {
     <li><strong>Global Font Family</strong> — changes the font used throughout the entire prescription (default: Calibri).</li>
     <li><strong>Black &amp; White Mode</strong> — converts all colours to grayscale for B&amp;W laser printers.</li>
     <li><strong>Apply B&amp;W Palette</strong> — one-click button that sets the recommended B&amp;W-optimised palette for all sections.</li>
+  </ul>
+
+  <h4>Per-Section Controls</h4>
+  <p>Each section card provides the following controls (where applicable):</p>
+  <ul>
+    <li><strong>Font, Size, Bold, Italic</strong> — typography for that section.</li>
+    <li><strong>Colour swatches</strong> — click any colour swatch to open the Windows colour picker and choose any colour.</li>
+    <li><strong>Text Alignment</strong> — Left, Center, or Right for section content.</li>
+    <li><strong>Border &amp; Padding</strong> — control the box border width and internal spacing.</li>
   </ul>
 
   <h4>Live Preview</h4>
@@ -1708,7 +1774,7 @@ kbd {
     <span class="callout-icon">✅</span>
     <div class="callout-body">
       <strong>Check the current version</strong>
-      <p>The current version number (e.g. <em>v2.0.4</em>) is always shown at the bottom of the sidebar in small italic text. You can also see it in the <strong>About</strong> dialog (click About at the bottom of the sidebar).</p>
+      <p>The current version number (e.g. <em>v2.1.3</em>) is always shown at the bottom of the sidebar in small italic text. You can also see it in the <strong>About</strong> dialog (click About at the bottom of the sidebar).</p>
     </div>
   </div>
 </div>
@@ -1787,7 +1853,8 @@ kbd {
   <hr class="section-divider"/>
 
   <h3>I forgot my password</h3>
-  <p>Contact your Administrator. They can reset your password from <strong>Administration → User Management → 🔑 Reset Password</strong>. You will be required to set a new password on your next login.</p>
+  <p>If your account has an email address registered, click the <strong>Forgot your password?</strong> link below the Sign In button. Enter your username and email address to receive a temporary password by email.</p>
+  <p>If email is not set up at your clinic, contact your Administrator. They can reset your password from <strong>Administration → User Management → 🔑 Reset Password</strong>. You will be required to set a new password on your next login.</p>
 
   <hr class="section-divider"/>
 
@@ -1855,7 +1922,7 @@ kbd {
      FOOTER
 ══════════════════════════════════════════ -->
 <div class="manual-footer no-print">
-  <p>Rx Writer User Manual — Version 2.0.4 · 2026</p>
+  <p>Rx Writer User Manual — Version 2.1.3 · 2026</p>
   <p>Clinic Management &amp; Prescription Software</p>
   <p style="margin-top:8px;"><a href="mailto:info.rxwriter@gmail.com">info.rxwriter@gmail.com</a></p>
   <p style="margin-top:16px;"><button onclick="window.print()" style="background:#1565C0;border:none;color:white;padding:8px 24px;border-radius:6px;cursor:pointer;font-size:11pt;font-weight:600;">🖨 Print / Save as PDF</button></p>
@@ -1863,3 +1930,4 @@ kbd {
 
 </body>
 </html>
+

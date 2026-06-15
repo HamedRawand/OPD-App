@@ -42,20 +42,26 @@ public partial class DashboardViewModel : ObservableObject
         var today = DateTime.Today;
 
         var currentUser = App.Auth.CurrentUser!;
-        int? doctorPhysicianId = (!App.Auth.Can(Permission.ViewAllPhysicianPatients)
-                                   && currentUser.PhysicianId.HasValue)
-                                 ? currentUser.PhysicianId
-                                 : null;
+        bool restrictToOwn = !App.Auth.Can(Permission.ViewAllPhysicianPatients);
+        int? ownPhysicianId = currentUser.PhysicianId;
 
         // ── Stat counts ───────────────────────────────────────────────────────
-        var visitQuery = doctorPhysicianId.HasValue
-            ? db.Visits.Where(v => v.PhysicianId == doctorPhysicianId.Value)
-            : db.Visits.AsQueryable();
+        // Restricted users with no linked physician see nothing (not everything).
+        IQueryable<Visit> visitQuery;
+        if (!restrictToOwn)
+            visitQuery = db.Visits.AsQueryable();
+        else if (ownPhysicianId.HasValue)
+            visitQuery = db.Visits.Where(v => v.PhysicianId == ownPhysicianId.Value);
+        else
+            visitQuery = db.Visits.Where(_ => false);
 
         // Total unique patients (filtered for doctors)
-        TotalPatients = doctorPhysicianId.HasValue
-            ? db.Patients.Count(p => p.Visits.Any(v => v.PhysicianId == doctorPhysicianId.Value))
-            : db.Patients.Count();
+        if (!restrictToOwn)
+            TotalPatients = db.Patients.Count();
+        else if (ownPhysicianId.HasValue)
+            TotalPatients = db.Patients.Count(p => p.Visits.Any(v => v.PhysicianId == ownPhysicianId.Value));
+        else
+            TotalPatients = 0;
 
         TotalMedicines  = db.MedicineLists.Count();
         TotalPhysicians = db.Physicians.Count();

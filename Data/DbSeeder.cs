@@ -45,17 +45,22 @@ public static class DbSeeder
                 Permission.ViewPatients,
                 Permission.RegisterPatient,
                 Permission.EditPatientInfo,
+                Permission.DeletePatient,
                 Permission.ExportPatients,
                 Permission.ViewClinicalData,
                 Permission.EnterClinicalData,
+                Permission.DeleteVisit,
                 Permission.ExportVisits,
                 Permission.ViewPrescription,
                 Permission.AddPrescription,
                 Permission.EditPrescription,
                 Permission.DeletePrescriptionLine,
                 Permission.PrintPdf,
-                Permission.ViewPhysicians,
                 Permission.ViewMedicineCatalog,
+                Permission.AddMedicine,
+                Permission.EditMedicine,
+                Permission.DeleteMedicineCatalog,
+                Permission.ExportMedicineCatalog,
             ]);
 
         SeedSystemRole(db, "Receptionist",
@@ -164,7 +169,8 @@ public static class DbSeeder
 
     private static void SeedSystemRole(AppDbContext db, string name, string description, Permission[] permissions)
     {
-        if (!db.CustomRoles.Any(r => r.IsSystem && r.Name == name))
+        var existing = db.CustomRoles.FirstOrDefault(r => r.IsSystem && r.Name == name);
+        if (existing is null)
         {
             var role = new CustomRole
             {
@@ -175,7 +181,11 @@ public static class DbSeeder
             };
             role.SetPermissions(permissions);
             db.CustomRoles.Add(role);
-            db.SaveChanges();
         }
+        else
+        {
+            existing.SetPermissions(permissions);
+        }
+        db.SaveChanges();
     }
 }

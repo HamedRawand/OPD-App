@@ -105,10 +105,12 @@ public partial class UserEditDialog : Window
 
     private void RoleBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
-        // Show physician link only for the built-in Doctor role
+        // Show physician link for built-in Doctor OR any custom role.
+        // Custom role users may lack ViewAllPhysicianPatients, so they need a PhysicianId
+        // to be filtered to their own patients in PatientListViewModel.
         var selected = RoleBox.SelectedItem as RoleItem;
         PhysicianLinkSection.Visibility =
-            selected is { IsCustom: false, BuiltinRole: UserRole.Doctor }
+            selected is { IsCustom: false, BuiltinRole: UserRole.Doctor } || selected is { IsCustom: true }
                 ? Visibility.Visible
                 : Visibility.Collapsed;
     }
@@ -146,9 +148,11 @@ public partial class UserEditDialog : Window
 
         var resolvedRole      = roleItem.BuiltinRole;
         var customRoleId      = roleItem.CustomRoleId;
-        var linkedPhysicianId = (roleItem is { IsCustom: false, BuiltinRole: UserRole.Doctor })
-            ? (PhysicianBox.SelectedItem as Physician)?.Id
-            : null;
+        // Save physician link for built-in Doctor and all custom roles
+        var linkedPhysicianId =
+            (roleItem is { IsCustom: false, BuiltinRole: UserRole.Doctor } || roleItem is { IsCustom: true })
+                ? (PhysicianBox.SelectedItem as Physician)?.Id
+                : null;
 
         try
         {

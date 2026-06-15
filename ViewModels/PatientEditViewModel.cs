@@ -286,7 +286,7 @@ public partial class PatientEditViewModel : ObservableObject
                 visit.ClinicalFindings = ClinicalFindings.Trim();
                 visit.Diagnosis        = Diagnosis.Trim();
             }
-            if (App.Auth.Can(Permission.WritePrescription))
+            if (App.Auth.CanAny(Permission.WritePrescription, Permission.AddPrescription, Permission.EditPrescription))
                 visit.FooterNote = Prescription.SelectedPrescriptionNote?.Notes;
             visit.NextVisitDate = string.IsNullOrWhiteSpace(NextVisitDate) ? null : NextVisitDate.Trim();
             visit.LastUpdated = DateTime.UtcNow;
@@ -295,7 +295,7 @@ public partial class PatientEditViewModel : ObservableObject
             // ── 3. Prescription lines + lab tests ─────────────────────────────
             SavedPatientId = patient.Id;
             SavedVisitId   = visit.Id;
-            if (App.Auth.Can(Permission.WritePrescription))
+            if (App.Auth.CanAny(Permission.WritePrescription, Permission.AddPrescription, Permission.EditPrescription))
                 Prescription.SaveToDb(visit.Id, db);
 
             tx.Commit();
