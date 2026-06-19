@@ -263,11 +263,20 @@
                         ToolTip="Save visit  (Ctrl+S)"
                         Command="{Binding SaveCommand}" MinWidth="140"/>
                 <Button DockPanel.Dock="Right"
-                        Content="{DynamicResource PatEdit.Btn.SavePrint}"
                         Style="{StaticResource SecondaryButton}"
                         ToolTip="Save and open prescription PDF  (Ctrl+P)"
                         Click="SaveAndPrint_Click"
-                        Margin="0,0,10,0" MinWidth="150"/>
+                        Margin="0,0,10,0" MinWidth="150">
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                        <Viewbox Width="13" Height="13" Stretch="Uniform" Margin="0,0,6,0" VerticalAlignment="Center">
+                            <Canvas Width="24" Height="24">
+                                <Path Fill="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
+                                      Data="{StaticResource Ico.Printer}"/>
+                            </Canvas>
+                        </Viewbox>
+                        <TextBlock Text="{DynamicResource PatEdit.Btn.SavePrint}" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </Button>
                 <Button DockPanel.Dock="Right"
                         Content="{DynamicResource PatEdit.Btn.Cancel}"
                         Style="{StaticResource SecondaryButton}"

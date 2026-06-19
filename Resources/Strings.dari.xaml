@@ -89,8 +89,8 @@
     <sys:String x:Key="PatEdit.Vital.RR">تنفس</sys:String>
     <sys:String x:Key="PatEdit.Vital.BT">حرارت (°C)</sys:String>
     <sys:String x:Key="PatEdit.Vital.BW">وزن (kg)</sys:String>
-    <sys:String x:Key="PatEdit.Btn.Save">💾  ذخیره</sys:String>
-    <sys:String x:Key="PatEdit.Btn.SavePrint">🖨  ذخیره و چاپ</sys:String>
+    <sys:String x:Key="PatEdit.Btn.Save">ذخیره</sys:String>
+    <sys:String x:Key="PatEdit.Btn.SavePrint">ذخیره و چاپ</sys:String>
     <sys:String x:Key="PatEdit.Btn.Cancel">لغو</sys:String>
 
     <!-- Prescription -->
@@ -280,7 +280,7 @@
     <sys:String x:Key="Common.Edit">✏ ویرایش</sys:String>
     <sys:String x:Key="Common.Clear">✕ پاک کردن</sys:String>
     <sys:String x:Key="Common.Delete">✕ حذف</sys:String>
-    <sys:String x:Key="Common.Print">🖨 چاپ</sys:String>
+    <sys:String x:Key="Common.Print">چاپ</sys:String>
     <sys:String x:Key="Common.Save">ذخیره</sys:String>
     <sys:String x:Key="Common.Cancel">لغو</sys:String>
     <sys:String x:Key="Common.Add">اضافه</sys:String>

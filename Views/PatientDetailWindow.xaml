@@ -159,10 +159,19 @@
                                                         Style="{DynamicResource ActionButton}"
                                                         Tag="{Binding}" Click="EditVisit_Click"
                                                         Margin="0,0,4,0"/>
-                                                <Button Content="{DynamicResource Common.Print}"
-                                                        Style="{DynamicResource ActionButton}"
+                                                <Button Style="{DynamicResource ActionButton}"
                                                         Tag="{Binding}" Click="PrintVisit_Click"
-                                                        Margin="0,0,4,0"/>
+                                                        Margin="0,0,4,0">
+                                                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                                        <Viewbox Width="11" Height="11" Stretch="Uniform" Margin="0,0,5,0" VerticalAlignment="Center">
+                                                            <Canvas Width="24" Height="24">
+                                                                <Path Fill="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
+                                                                      Data="{StaticResource Ico.Printer}"/>
+                                                            </Canvas>
+                                                        </Viewbox>
+                                                        <TextBlock Text="{DynamicResource Common.Print}" VerticalAlignment="Center"/>
+                                                    </StackPanel>
+                                                </Button>
                                                 <Button Content="{DynamicResource Common.Repeat}"
                                                         Style="{DynamicResource ActionButton}"
                                                         ToolTip="Open a new visit pre-filled with this prescription"

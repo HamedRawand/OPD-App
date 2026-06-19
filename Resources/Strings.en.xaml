@@ -89,8 +89,8 @@
     <sys:String x:Key="PatEdit.Vital.RR">RR</sys:String>
     <sys:String x:Key="PatEdit.Vital.BT">BT (°C)</sys:String>
     <sys:String x:Key="PatEdit.Vital.BW">BW (kg)</sys:String>
-    <sys:String x:Key="PatEdit.Btn.Save">💾  Save Visit</sys:String>
-    <sys:String x:Key="PatEdit.Btn.SavePrint">🖨  Save &amp; Print</sys:String>
+    <sys:String x:Key="PatEdit.Btn.Save">Save Visit</sys:String>
+    <sys:String x:Key="PatEdit.Btn.SavePrint">Save &amp; Print</sys:String>
     <sys:String x:Key="PatEdit.Btn.Cancel">Cancel</sys:String>
 
     <!-- Prescription -->
@@ -280,7 +280,7 @@
     <sys:String x:Key="Common.Edit">✏ Edit</sys:String>
     <sys:String x:Key="Common.Delete">✕ Delete</sys:String>
     <sys:String x:Key="Common.Clear">✕ Clear</sys:String>
-    <sys:String x:Key="Common.Print">🖨 Print</sys:String>
+    <sys:String x:Key="Common.Print">Print</sys:String>
     <sys:String x:Key="Common.Save">Save</sys:String>
     <sys:String x:Key="Common.Cancel">Cancel</sys:String>
     <sys:String x:Key="Common.Add">Add</sys:String>
