@@ -1,4 +1,5 @@
 using System.Windows;
+using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 using Microsoft.EntityFrameworkCore;
 using OPDClinic.Data;
@@ -44,6 +45,17 @@ public partial class App : Application
         };
 
         Log.Information("Rx Writer starting up");
+
+        // Explicitly set the window icon on every window via a class handler so it
+        // shows correctly in the title bar and taskbar on Windows 7 SP1+.
+        // Without this, WPF on Win7 sometimes fails to pick up the ApplicationIcon resource.
+        var iconUri = new Uri("pack://application:,,,/OPDClinic;component/image/Caduceus.ico");
+        EventManager.RegisterClassHandler(typeof(Window), Window.LoadedEvent,
+            new RoutedEventHandler((s, _) =>
+            {
+                if (s is Window w && w.Icon == null)
+                    w.Icon = BitmapFrame.Create(iconUri);
+            }));
 
         // ── PDF licence ────────────────────────────────────────────────────────
         QuestPDF.Settings.License = LicenseType.Community;
