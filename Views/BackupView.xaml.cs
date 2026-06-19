@@ -29,14 +29,16 @@ public partial class BackupView : UserControl
 
     private void ChangeFolder_Click(object sender, RoutedEventArgs e)
     {
-        var dlg = new OpenFolderDialog
+        // OpenFolderDialog is .NET 8+ only; use WinForms FolderBrowserDialog on .NET 6
+        using var dlg = new System.Windows.Forms.FolderBrowserDialog
         {
-            Title = "Select backup folder",
-            InitialDirectory = _backupFolder
+            Description         = "Select backup folder",
+            SelectedPath        = _backupFolder,
+            UseDescriptionForTitle = true
         };
-        if (dlg.ShowDialog() != true) return;
+        if (dlg.ShowDialog() != System.Windows.Forms.DialogResult.OK) return;
 
-        _backupFolder = dlg.FolderName;
+        _backupFolder = dlg.SelectedPath;
         BackupFolderBox.Text = _backupFolder;
         RefreshBackupList();
     }
