@@ -325,9 +325,11 @@
             <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center"
                         Visibility="{Binding Visits.Count, Mode=OneWay,
                                      Converter={x:Static local:Converters.ZeroToVisible}}">
-                <TextBlock Text="&#xE716;" FontFamily="Segoe MDL2 Assets" FontSize="48"
-                           HorizontalAlignment="Center"
-                           Foreground="{StaticResource BorderBrush}"/>
+                <Viewbox Width="48" Height="48" Stretch="Uniform" HorizontalAlignment="Center">
+                    <Canvas Width="24" Height="24">
+                        <Path Fill="{StaticResource BorderBrush}" Data="{StaticResource Ico.Person}"/>
+                    </Canvas>
+                </Viewbox>
                 <TextBlock Text="No visits recorded"
                            FontSize="14" FontWeight="SemiBold"
                            HorizontalAlignment="Center"

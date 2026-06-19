@@ -137,9 +137,11 @@
             <!-- Empty state — shown when no medicines match the current filters -->
             <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center"
                         Visibility="{Binding TotalCount, Converter={x:Static local:Converters.ZeroToVisible}}">
-                <TextBlock Text="&#xE8EC;" FontFamily="Segoe MDL2 Assets" FontSize="52"
-                           HorizontalAlignment="Center"
-                           Foreground="{StaticResource BorderBrush}"/>
+                <Viewbox Width="52" Height="52" Stretch="Uniform" HorizontalAlignment="Center">
+                    <Canvas Width="24" Height="24">
+                        <Path Fill="{StaticResource BorderBrush}" Data="{StaticResource Ico.Box}"/>
+                    </Canvas>
+                </Viewbox>
                 <TextBlock Text="No medicines found"
                            FontSize="15" FontWeight="SemiBold"
                            HorizontalAlignment="Center"

@@ -79,28 +79,28 @@
                                         Foreground="#7EB3E8"
                                         Click="NavHelp_Click"
                                         ToolTip="Help / Manual">
-                                    <TextBlock Text="&#xE897;" FontFamily="Segoe MDL2 Assets" FontSize="15"/>
+                                    <Viewbox Width="15" Height="15" Stretch="Uniform"><Canvas Width="24" Height="24"><Path Fill="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}" Data="{StaticResource Ico.Help}"/></Canvas></Viewbox>
                                 </Button>
                                 <Button x:Name="NavAboutBtn"
                                         Style="{StaticResource IconStripButton}"
                                         Foreground="#7EB3E8"
                                         Click="NavAbout_Click"
                                         ToolTip="About Rx Writer">
-                                    <TextBlock Text="&#xE946;" FontFamily="Segoe MDL2 Assets" FontSize="15"/>
+                                    <Viewbox Width="15" Height="15" Stretch="Uniform"><Canvas Width="24" Height="24"><Path Fill="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}" Data="{StaticResource Ico.Info}"/></Canvas></Viewbox>
                                 </Button>
                                 <Button x:Name="NavUpdatesBtn"
                                         Style="{StaticResource IconStripButton}"
                                         Foreground="#7EB3E8"
                                         Click="NavUpdates_Click"
                                         ToolTip="Check for Updates">
-                                    <TextBlock Text="&#xE895;" FontFamily="Segoe MDL2 Assets" FontSize="15"/>
+                                    <Viewbox Width="15" Height="15" Stretch="Uniform"><Canvas Width="24" Height="24"><Path Fill="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}" Data="{StaticResource Ico.Sync}"/></Canvas></Viewbox>
                                 </Button>
                                 <Button x:Name="LangToggleBtn"
                                         Style="{StaticResource IconStripButton}"
                                         Foreground="#7EB3E8"
                                         Click="LangToggle_Click"
                                         ToolTip="Switch language / تغییر زبان">
-                                    <TextBlock Text="&#xE12B;" FontFamily="Segoe MDL2 Assets" FontSize="15"/>
+                                    <Viewbox Width="15" Height="15" Stretch="Uniform"><Canvas Width="24" Height="24"><Path Fill="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}" Data="{StaticResource Ico.Globe}"/></Canvas></Viewbox>
                                 </Button>
                             </StackPanel>
 
@@ -112,7 +112,7 @@
                                         Foreground="#FC8181"
                                         Click="Logout_Click"
                                         ToolTip="Sign out of Rx Writer">
-                                    <TextBlock Text="&#xE7E8;" FontFamily="Segoe MDL2 Assets" FontSize="15"/>
+                                    <Viewbox Width="15" Height="15" Stretch="Uniform"><Canvas Width="24" Height="24"><Path Fill="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}" Data="{StaticResource Ico.Logout}"/></Canvas></Viewbox>
                                 </Button>
                             </StackPanel>
                         </Grid>
@@ -158,9 +158,13 @@
                                 <ColumnDefinition Width="Auto"/>
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
-                            <TextBlock Grid.Column="0" Text="&#xE80F;" FontFamily="Segoe MDL2 Assets"
-                                       FontSize="15" Width="22" Margin="0,0,10,0"
-                                       VerticalAlignment="Center"/>
+                            <Viewbox Grid.Column="0" Width="22" Height="16" Stretch="Uniform"
+                                     VerticalAlignment="Center" Margin="0,0,10,0">
+                                <Canvas Width="24" Height="24">
+                                    <Path Fill="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
+                                          Data="{StaticResource Ico.Home}"/>
+                                </Canvas>
+                            </Viewbox>
                             <TextBlock Grid.Column="1" Text="{DynamicResource Nav.Dashboard}"
                                        VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
                         </Grid>
@@ -176,9 +180,13 @@
                                 <ColumnDefinition Width="Auto"/>
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
-                            <TextBlock Grid.Column="0" Text="&#xE716;" FontFamily="Segoe MDL2 Assets"
-                                       FontSize="15" Width="22" Margin="0,0,10,0"
-                                       VerticalAlignment="Center"/>
+                            <Viewbox Grid.Column="0" Width="22" Height="16" Stretch="Uniform"
+                                     VerticalAlignment="Center" Margin="0,0,10,0">
+                                <Canvas Width="24" Height="24">
+                                    <Path Fill="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
+                                          Data="{StaticResource Ico.Person}"/>
+                                </Canvas>
+                            </Viewbox>
                             <TextBlock Grid.Column="1" Text="{DynamicResource Nav.Patients}"
                                        VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
                         </Grid>
@@ -195,9 +203,13 @@
                                 <ColumnDefinition Width="Auto"/>
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
-                            <TextBlock Grid.Column="0" Text="&#xE77B;" FontFamily="Segoe MDL2 Assets"
-                                       FontSize="15" Width="22" Margin="0,0,10,0"
-                                       VerticalAlignment="Center"/>
+                            <Viewbox Grid.Column="0" Width="22" Height="16" Stretch="Uniform"
+                                     VerticalAlignment="Center" Margin="0,0,10,0">
+                                <Canvas Width="24" Height="24">
+                                    <Path Fill="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
+                                          Data="{StaticResource Ico.Person}"/>
+                                </Canvas>
+                            </Viewbox>
                             <TextBlock Grid.Column="1" Text="{DynamicResource Nav.Physicians}"
                                        VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
                         </Grid>
@@ -214,9 +226,13 @@
                                 <ColumnDefinition Width="Auto"/>
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
-                            <TextBlock Grid.Column="0" Text="&#xE734;" FontFamily="Segoe MDL2 Assets"
-                                       FontSize="15" Width="22" Margin="0,0,10,0"
-                                       VerticalAlignment="Center"/>
+                            <Viewbox Grid.Column="0" Width="22" Height="16" Stretch="Uniform"
+                                     VerticalAlignment="Center" Margin="0,0,10,0">
+                                <Canvas Width="24" Height="24">
+                                    <Path Fill="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
+                                          Data="{StaticResource Ico.Pill}"/>
+                                </Canvas>
+                            </Viewbox>
                             <TextBlock Grid.Column="1" Text="{DynamicResource Nav.Medicines}"
                                        VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
                         </Grid>
@@ -233,9 +249,13 @@
                                 <ColumnDefinition Width="Auto"/>
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
-                            <TextBlock Grid.Column="0" Text="&#xE713;" FontFamily="Segoe MDL2 Assets"
-                                       FontSize="15" Width="22" Margin="0,0,10,0"
-                                       VerticalAlignment="Center"/>
+                            <Viewbox Grid.Column="0" Width="22" Height="16" Stretch="Uniform"
+                                     VerticalAlignment="Center" Margin="0,0,10,0">
+                                <Canvas Width="24" Height="24">
+                                    <Path Fill="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
+                                          Data="{StaticResource Ico.Settings}"/>
+                                </Canvas>
+                            </Viewbox>
                             <TextBlock Grid.Column="1" Text="{DynamicResource Nav.Options}"
                                        VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
                         </Grid>
@@ -257,9 +277,13 @@
                                     <ColumnDefinition Width="Auto"/>
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
-                                <TextBlock Grid.Column="0" Text="&#xE8A5;" FontFamily="Segoe MDL2 Assets"
-                                           FontSize="15" Width="22" Margin="0,0,10,0"
-                                           VerticalAlignment="Center"/>
+                                <Viewbox Grid.Column="0" Width="22" Height="16" Stretch="Uniform"
+                                         VerticalAlignment="Center" Margin="0,0,10,0">
+                                    <Canvas Width="24" Height="24">
+                                        <Path Fill="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
+                                              Data="{StaticResource Ico.Group}"/>
+                                    </Canvas>
+                                </Viewbox>
                                 <TextBlock Grid.Column="1" Text="{DynamicResource Nav.Users}"
                                            VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
                             </Grid>
@@ -273,9 +297,13 @@
                                     <ColumnDefinition Width="Auto"/>
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
-                                <TextBlock Grid.Column="0" Text="&#xE8D7;" FontFamily="Segoe MDL2 Assets"
-                                           FontSize="15" Width="22" Margin="0,0,10,0"
-                                           VerticalAlignment="Center"/>
+                                <Viewbox Grid.Column="0" Width="22" Height="16" Stretch="Uniform"
+                                         VerticalAlignment="Center" Margin="0,0,10,0">
+                                    <Canvas Width="24" Height="24">
+                                        <Path Fill="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
+                                              Data="{StaticResource Ico.Shield}"/>
+                                    </Canvas>
+                                </Viewbox>
                                 <TextBlock Grid.Column="1" Text="Custom Roles"
                                            VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
                             </Grid>
@@ -290,9 +318,13 @@
                                     <ColumnDefinition Width="Auto"/>
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
-                                <TextBlock Grid.Column="0" Text="&#xE8B5;" FontFamily="Segoe MDL2 Assets"
-                                           FontSize="15" Width="22" Margin="0,0,10,0"
-                                           VerticalAlignment="Center"/>
+                                <Viewbox Grid.Column="0" Width="22" Height="16" Stretch="Uniform"
+                                         VerticalAlignment="Center" Margin="0,0,10,0">
+                                    <Canvas Width="24" Height="24">
+                                        <Path Fill="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
+                                              Data="{StaticResource Ico.Download}"/>
+                                    </Canvas>
+                                </Viewbox>
                                 <TextBlock Grid.Column="1" Text="{DynamicResource Nav.Import}"
                                            VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
                             </Grid>
@@ -307,9 +339,13 @@
                                     <ColumnDefinition Width="Auto"/>
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
-                                <TextBlock Grid.Column="0" Text="&#xE74E;" FontFamily="Segoe MDL2 Assets"
-                                           FontSize="15" Width="22" Margin="0,0,10,0"
-                                           VerticalAlignment="Center"/>
+                                <Viewbox Grid.Column="0" Width="22" Height="16" Stretch="Uniform"
+                                         VerticalAlignment="Center" Margin="0,0,10,0">
+                                    <Canvas Width="24" Height="24">
+                                        <Path Fill="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
+                                              Data="{StaticResource Ico.Archive}"/>
+                                    </Canvas>
+                                </Viewbox>
                                 <TextBlock Grid.Column="1" Text="{DynamicResource Nav.Backup}"
                                            VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
                             </Grid>
@@ -323,9 +359,13 @@
                                     <ColumnDefinition Width="Auto"/>
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
-                                <TextBlock Grid.Column="0" Text="&#xE771;" FontFamily="Segoe MDL2 Assets"
-                                           FontSize="15" Width="22" Margin="0,0,10,0"
-                                           VerticalAlignment="Center"/>
+                                <Viewbox Grid.Column="0" Width="22" Height="16" Stretch="Uniform"
+                                         VerticalAlignment="Center" Margin="0,0,10,0">
+                                    <Canvas Width="24" Height="24">
+                                        <Path Fill="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
+                                              Data="{StaticResource Ico.Printer}"/>
+                                    </Canvas>
+                                </Viewbox>
                                 <TextBlock Grid.Column="1" Text="Print Settings"
                                            VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
                             </Grid>
@@ -353,10 +393,12 @@
                     HorizontalAlignment="Center" VerticalAlignment="Center"
                     Width="360" Padding="40,36">
                 <StackPanel>
-                    <TextBlock Text="&#xE72E;" FontFamily="Segoe MDL2 Assets"
-                               FontSize="48" HorizontalAlignment="Center"
-                               Foreground="{StaticResource PrimaryBrush}"
-                               Margin="0,0,0,12"/>
+                    <Viewbox Width="48" Height="48" Stretch="Uniform"
+                             HorizontalAlignment="Center" Margin="0,0,0,12">
+                        <Canvas Width="24" Height="24">
+                            <Path Fill="{StaticResource PrimaryBrush}" Data="{StaticResource Ico.Lock}"/>
+                        </Canvas>
+                    </Viewbox>
                     <TextBlock Text="Session Locked" FontSize="18" FontWeight="Bold"
                                HorizontalAlignment="Center"
                                Foreground="{StaticResource TextPrimaryBrush}"

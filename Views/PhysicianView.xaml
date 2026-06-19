@@ -161,9 +161,11 @@
         <!-- Empty state — shown when no physicians are registered -->
         <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center"
                     Visibility="{Binding PhysicianCount, Converter={x:Static local:Converters.ZeroToVisible}}">
-            <TextBlock Text="&#xE77B;" FontFamily="Segoe MDL2 Assets" FontSize="52"
-                       HorizontalAlignment="Center"
-                       Foreground="{StaticResource BorderBrush}"/>
+            <Viewbox Width="52" Height="52" Stretch="Uniform" HorizontalAlignment="Center">
+                <Canvas Width="24" Height="24">
+                    <Path Fill="{StaticResource BorderBrush}" Data="{StaticResource Ico.Person}"/>
+                </Canvas>
+            </Viewbox>
             <TextBlock Text="No physicians registered"
                        FontSize="15" FontWeight="SemiBold"
                        HorizontalAlignment="Center"

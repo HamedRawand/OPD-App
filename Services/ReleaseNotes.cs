@@ -11,13 +11,13 @@ public static class ReleaseNotes
 
     public static readonly Entry[] Recent =
     [
+        new("2.1.6", "2026-06-19",
+        [
+            "App icons now display correctly on Windows 7 (sidebar, title bar, taskbar)",
+        ]),
         new("2.1.5", "2026-06-19",
         [
             "Windows 7 SP1 and above now supported (32-bit and 64-bit)",
-        ]),
-        new("2.1.4", "2026-06-16",
-        [
-            "Patient ID resets to P-00001 on fresh install or after all patients are deleted",
         ]),
     ];
 

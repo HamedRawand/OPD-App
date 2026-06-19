@@ -87,11 +87,12 @@
                                        FontSize="11"
                                        Foreground="{StaticResource TextSecondaryBrush}"/>
                         </StackPanel>
-                        <TextBlock Text="&#xE716;" FontFamily="Segoe MDL2 Assets"
-                                   FontSize="40" Opacity="0.15"
-                                   Foreground="{StaticResource Accent.Blue}"
-                                   HorizontalAlignment="Right" VerticalAlignment="Center"
-                                   Margin="0,0,4,0" FlowDirection="LeftToRight"/>
+                        <Viewbox Width="40" Height="40" Stretch="Uniform" Opacity="0.15"
+                                 HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,4,0">
+                            <Canvas Width="24" Height="24">
+                                <Path Fill="{StaticResource Accent.Blue}" Data="{StaticResource Ico.Person}"/>
+                            </Canvas>
+                        </Viewbox>
                     </Grid>
                 </Border>
 
@@ -111,11 +112,12 @@
                                        FontSize="11"
                                        Foreground="{StaticResource TextSecondaryBrush}"/>
                         </StackPanel>
-                        <TextBlock Text="&#xE787;" FontFamily="Segoe MDL2 Assets"
-                                   FontSize="40" Opacity="0.15"
-                                   Foreground="{StaticResource Accent.Green}"
-                                   HorizontalAlignment="Right" VerticalAlignment="Center"
-                                   Margin="0,0,4,0" FlowDirection="LeftToRight"/>
+                        <Viewbox Width="40" Height="40" Stretch="Uniform" Opacity="0.15"
+                                 HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,4,0">
+                            <Canvas Width="24" Height="24">
+                                <Path Fill="{StaticResource Accent.Green}" Data="{StaticResource Ico.Calendar}"/>
+                            </Canvas>
+                        </Viewbox>
                     </Grid>
                 </Border>
 
@@ -135,11 +137,12 @@
                                        FontSize="11"
                                        Foreground="{StaticResource TextSecondaryBrush}"/>
                         </StackPanel>
-                        <TextBlock Text="&#xE734;" FontFamily="Segoe MDL2 Assets"
-                                   FontSize="40" Opacity="0.15"
-                                   Foreground="{StaticResource Accent.Orange}"
-                                   HorizontalAlignment="Right" VerticalAlignment="Center"
-                                   Margin="0,0,4,0" FlowDirection="LeftToRight"/>
+                        <Viewbox Width="40" Height="40" Stretch="Uniform" Opacity="0.15"
+                                 HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,4,0">
+                            <Canvas Width="24" Height="24">
+                                <Path Fill="{StaticResource Accent.Orange}" Data="{StaticResource Ico.Pill}"/>
+                            </Canvas>
+                        </Viewbox>
                     </Grid>
                 </Border>
 
@@ -159,11 +162,12 @@
                                        FontSize="11"
                                        Foreground="{StaticResource TextSecondaryBrush}"/>
                         </StackPanel>
-                        <TextBlock Text="&#xE77B;" FontFamily="Segoe MDL2 Assets"
-                                   FontSize="40" Opacity="0.15"
-                                   Foreground="{StaticResource Accent.Purple}"
-                                   HorizontalAlignment="Right" VerticalAlignment="Center"
-                                   Margin="0,0,4,0" FlowDirection="LeftToRight"/>
+                        <Viewbox Width="40" Height="40" Stretch="Uniform" Opacity="0.15"
+                                 HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,4,0">
+                            <Canvas Width="24" Height="24">
+                                <Path Fill="{StaticResource Accent.Purple}" Data="{StaticResource Ico.Person}"/>
+                            </Canvas>
+                        </Viewbox>
                     </Grid>
                 </Border>
 
@@ -183,11 +187,12 @@
                                        FontSize="11"
                                        Foreground="{StaticResource TextSecondaryBrush}"/>
                         </StackPanel>
-                        <TextBlock Text="&#xE7C3;" FontFamily="Segoe MDL2 Assets"
-                                   FontSize="40" Opacity="0.15"
-                                   Foreground="{StaticResource Accent.Teal}"
-                                   HorizontalAlignment="Right" VerticalAlignment="Center"
-                                   Margin="0,0,4,0" FlowDirection="LeftToRight"/>
+                        <Viewbox Width="40" Height="40" Stretch="Uniform" Opacity="0.15"
+                                 HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,4,0">
+                            <Canvas Width="24" Height="24">
+                                <Path Fill="{StaticResource Accent.Teal}" Data="{StaticResource Ico.Info}"/>
+                            </Canvas>
+                        </Viewbox>
                     </Grid>
                 </Border>
 
@@ -211,9 +216,11 @@
                                    Style="{StaticResource SectionHeader}"
                                    Margin="0,0,0,8"/>
                         <StackPanel DockPanel.Dock="Left" VerticalAlignment="Center">
-                            <TextBlock Text="&#xE74E;" FontFamily="Segoe MDL2 Assets"
-                                       FontSize="32" Foreground="{StaticResource PrimaryBrush}"
-                                       Margin="0,0,16,0"/>
+                            <Viewbox Width="32" Height="32" Stretch="Uniform" Margin="0,0,16,0">
+                            <Canvas Width="24" Height="24">
+                                <Path Fill="{StaticResource PrimaryBrush}" Data="{StaticResource Ico.Archive}"/>
+                            </Canvas>
+                        </Viewbox>
                         </StackPanel>
                         <StackPanel VerticalAlignment="Center">
                             <TextBlock x:Name="LastBackupDateText"
@@ -234,9 +241,12 @@
                                    Style="{StaticResource SectionHeader}"
                                    Margin="0,0,0,8"/>
                         <DockPanel>
-                            <TextBlock Text="&#xEDA3;" FontFamily="Segoe MDL2 Assets"
-                                       FontSize="28" Foreground="{StaticResource PrimaryBrush}"
-                                       Margin="0,0,12,0" VerticalAlignment="Center"/>
+                            <Viewbox Width="28" Height="28" Stretch="Uniform"
+                                     Margin="0,0,12,0" VerticalAlignment="Center">
+                                <Canvas Width="24" Height="24">
+                                    <Path Fill="{StaticResource PrimaryBrush}" Data="{StaticResource Ico.Database}"/>
+                                </Canvas>
+                            </Viewbox>
                             <TextBlock x:Name="DbSizeText"
                                        FontSize="18" FontWeight="Bold"
                                        Foreground="{StaticResource TextPrimaryBrush}"

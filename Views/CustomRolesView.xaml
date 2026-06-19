@@ -125,9 +125,12 @@
                             Visibility="{Binding Roles.Count,
                                          Converter={x:Static local:Converters.ZeroToVisible}}">
                         <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
-                            <TextBlock Text="&#xE8D7;" FontFamily="Segoe MDL2 Assets"
-                                       FontSize="40" HorizontalAlignment="Center"
-                                       Foreground="#BFC9D9" Margin="0,0,0,12"/>
+                            <Viewbox Width="40" Height="40" Stretch="Uniform"
+                                     HorizontalAlignment="Center" Margin="0,0,0,12">
+                                <Canvas Width="24" Height="24">
+                                    <Path Fill="#BFC9D9" Data="{StaticResource Ico.Shield}"/>
+                                </Canvas>
+                            </Viewbox>
                             <TextBlock Text="No custom roles yet"
                                        FontSize="14" FontWeight="SemiBold"
                                        Foreground="{StaticResource TextSecondaryBrush}"
@@ -152,9 +155,12 @@
                 <!-- No-selection placeholder — visibility managed in code-behind -->
                 <StackPanel x:Name="NoSelectionPanel"
                             HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,60,0,0">
-                    <TextBlock Text="&#xE8D7;" FontFamily="Segoe MDL2 Assets"
-                               FontSize="40" HorizontalAlignment="Center"
-                               Foreground="#BFC9D9" Margin="0,0,0,10"/>
+                    <Viewbox Width="40" Height="40" Stretch="Uniform"
+                             HorizontalAlignment="Center" Margin="0,0,0,10">
+                        <Canvas Width="24" Height="24">
+                            <Path Fill="#BFC9D9" Data="{StaticResource Ico.Shield}"/>
+                        </Canvas>
+                    </Viewbox>
                     <TextBlock Text="Select a role to see details"
                                FontSize="13" Foreground="{StaticResource TextSecondaryBrush}"
                                HorizontalAlignment="Center"/>

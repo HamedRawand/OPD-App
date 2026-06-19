@@ -1,5 +1,4 @@
 using System.Windows;
-using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 using Microsoft.EntityFrameworkCore;
 using OPDClinic.Data;
@@ -46,16 +45,40 @@ public partial class App : Application
 
         Log.Information("Rx Writer starting up");
 
-        // Explicitly set the window icon on every window via a class handler so it
-        // shows correctly in the title bar and taskbar on Windows 7 SP1+.
-        // Without this, WPF on Win7 sometimes fails to pick up the ApplicationIcon resource.
-        var iconUri = new Uri("pack://application:,,,/OPDClinic;component/image/Caduceus.ico");
-        EventManager.RegisterClassHandler(typeof(Window), Window.LoadedEvent,
-            new RoutedEventHandler((s, _) =>
+        // Extract the app icon from the running exe's Win32 RT_ICON resource.
+        // CreateBitmapSourceFromHIcon is the most reliable path on Windows 7 SP1+;
+        // BitmapFrame.Create(pack://...ico) can silently fail on Win7's WIC stack.
+        System.Windows.Media.ImageSource? appIcon = null;
+        try
+        {
+            var exePath = Environment.ProcessPath
+                ?? System.Diagnostics.Process.GetCurrentProcess().MainModule!.FileName;
+            using var sysIcon = System.Drawing.Icon.ExtractAssociatedIcon(exePath);
+            if (sysIcon is not null)
             {
-                if (s is Window w && w.Icon == null)
-                    w.Icon = BitmapFrame.Create(iconUri);
-            }));
+                var bmp = System.Windows.Interop.Imaging.CreateBitmapSourceFromHIcon(
+                    sysIcon.Handle,
+                    System.Windows.Int32Rect.Empty,
+                    System.Windows.Media.Imaging.BitmapSizeOptions.FromEmptyOptions());
+                bmp.Freeze();
+                appIcon = bmp;
+            }
+        }
+        catch (Exception ex)
+        {
+            Log.Warning(ex, "App icon load failed — windows will use OS default");
+        }
+
+        if (appIcon is not null)
+        {
+            var iconSnapshot = appIcon;
+            EventManager.RegisterClassHandler(typeof(Window), Window.LoadedEvent,
+                new RoutedEventHandler((s, _) =>
+                {
+                    if (s is Window w && w.Icon == null)
+                        w.Icon = iconSnapshot;
+                }));
+        }
 
         // ── PDF licence ────────────────────────────────────────────────────────
         QuestPDF.Settings.License = LicenseType.Community;
