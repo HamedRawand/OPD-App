@@ -11,13 +11,15 @@ public static class ReleaseNotes
 
     public static readonly Entry[] Recent =
     [
+        new("2.1.8", "2026-06-19",
+        [
+            "Dashboard: Create Backup quick action is now restricted to admin roles",
+            "Options > Dosage: Type column now supports multiple selections (checklist popup)",
+            "Prescription: Dosage dropdown now filters by the selected medicine form type",
+        ]),
         new("2.1.7", "2026-06-19",
         [
             "Print button icons now display correctly on Windows 7",
-        ]),
-        new("2.1.6", "2026-06-19",
-        [
-            "App icons now display correctly on Windows 7 (sidebar, title bar, taskbar)",
         ]),
     ];
 

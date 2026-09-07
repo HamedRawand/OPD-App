@@ -266,9 +266,11 @@
                                 HorizontalAlignment="Stretch"
                                 Margin="0,0,0,8"
                                 Click="NewVisit_Click"/>
-                        <Button Content="{DynamicResource Dashboard.Btn.Backup}"
+                        <Button x:Name="CreateBackupBtn"
+                                Content="{DynamicResource Dashboard.Btn.Backup}"
                                 Style="{StaticResource SecondaryButton}"
                                 HorizontalAlignment="Stretch"
+                                Visibility="Collapsed"
                                 Click="CreateBackup_Click"/>
                     </StackPanel>
                 </Border>

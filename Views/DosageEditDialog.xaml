@@ -37,11 +37,55 @@
                         <TextBlock Text="{DynamicResource Options.Dosage.Category}" Style="{StaticResource FormLabel}"/>
                         <ComboBox x:Name="CategoryBox"
                                   Style="{StaticResource FormComboBox}"
-                                  IsEditable="True"/>
+                                  IsEditable="True"
+                                  SelectionChanged="CategoryBox_SelectionChanged"/>
                     </StackPanel>
                     <StackPanel Grid.Column="2">
                         <TextBlock Text="{DynamicResource Options.Dosage.Type}" Style="{StaticResource FormLabel}"/>
-                        <TextBox x:Name="TypeBox" Style="{StaticResource FormTextBox}"/>
+                        <!-- Multiselect checklist popup -->
+                        <Grid>
+                            <ToggleButton x:Name="TypeToggle"
+                                          Height="36"
+                                          HorizontalAlignment="Stretch"
+                                          HorizontalContentAlignment="Stretch"
+                                          Background="White"
+                                          BorderBrush="{StaticResource BorderBrush}"
+                                          BorderThickness="1"
+                                          Padding="0">
+                                <DockPanel Margin="10,0,8,0">
+                                    <TextBlock DockPanel.Dock="Right" Text="▾"
+                                               VerticalAlignment="Center" Foreground="#666" FontSize="11"/>
+                                    <TextBlock x:Name="TypeToggleText"
+                                               VerticalAlignment="Center" FontSize="13"
+                                               Foreground="#333" TextTrimming="CharacterEllipsis"/>
+                                </DockPanel>
+                            </ToggleButton>
+                            <Popup x:Name="TypePopup"
+                                   PlacementTarget="{Binding ElementName=TypeToggle}"
+                                   Placement="Bottom"
+                                   StaysOpen="False"
+                                   IsOpen="{Binding IsChecked, ElementName=TypeToggle, Mode=TwoWay}">
+                                <Border Background="White"
+                                        BorderBrush="{StaticResource BorderBrush}"
+                                        BorderThickness="1"
+                                        MinWidth="{Binding ActualWidth, ElementName=TypeToggle}"
+                                        MaxHeight="200">
+                                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                                        <ItemsControl x:Name="TypeItemsControl" Focusable="False">
+                                            <ItemsControl.ItemTemplate>
+                                                <DataTemplate>
+                                                    <CheckBox Content="{Binding Name}"
+                                                              IsChecked="{Binding IsChecked, Mode=TwoWay}"
+                                                              Padding="4,3" Margin="6,2" FontSize="13"
+                                                              Checked="TypeCheckBox_Changed"
+                                                              Unchecked="TypeCheckBox_Changed"/>
+                                                </DataTemplate>
+                                            </ItemsControl.ItemTemplate>
+                                        </ItemsControl>
+                                    </ScrollViewer>
+                                </Border>
+                            </Popup>
+                        </Grid>
                     </StackPanel>
                 </Grid>
 

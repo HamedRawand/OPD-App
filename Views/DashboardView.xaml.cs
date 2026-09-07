@@ -49,6 +49,10 @@ public partial class DashboardView : UserControl
         RecentGrid.Visibility    = ViewModel.RecentVisits.Count > 0
             ? Visibility.Visible : Visibility.Collapsed;
 
+        // Backup is an admin-only operation
+        CreateBackupBtn.Visibility = App.Auth.IsFullAdmin
+            ? Visibility.Visible : Visibility.Collapsed;
+
         ShowStatus();
     }
 
@@ -89,11 +93,7 @@ public partial class DashboardView : UserControl
 
     private void CreateBackup_Click(object sender, RoutedEventArgs e)
     {
-        // Navigate to the full Backup & Restore page so the user can set an
-        // encryption password.  The old path (DashboardViewModel.CreateBackup)
-        // called BackupService.CreateBackup with no password, always producing
-        // an unencrypted .zip — so encrypted backups were never being created
-        // from the Dashboard quick-action button.
+        if (!App.Auth.IsFullAdmin) return;
         (Window.GetWindow(this) as MainWindow)?.NavigateToBackup();
     }
 

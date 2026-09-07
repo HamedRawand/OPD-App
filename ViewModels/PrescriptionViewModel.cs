@@ -178,8 +178,8 @@ public partial class PrescriptionViewModel : ObservableObject
         FilteredDosages = form is null
             ? new ObservableCollection<Dosage>(AllDosages)
             : new ObservableCollection<Dosage>(
-                AllDosages.Where(d => d.Category == form.Category
-                               || string.IsNullOrEmpty(d.Category)));
+                AllDosages.Where(d => string.IsNullOrEmpty(d.Type)
+                               || d.Type.Split(',').Any(t => t.Trim().Equals(form.FormName, StringComparison.OrdinalIgnoreCase))));
     }
 
     private void UpdateFilteredMedicineNotes(MedicineForm? form)
