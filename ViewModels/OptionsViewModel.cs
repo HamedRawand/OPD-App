@@ -19,6 +19,7 @@ public partial class OptionsViewModel : ObservableObject
     [ObservableProperty] private ObservableCollection<MedicineNote>          _medicineNotes      = [];
     [ObservableProperty] private ObservableCollection<PrescriptionNote>      _prescriptionNotes  = [];
     [ObservableProperty] private ObservableCollection<LabTest>               _labTests           = [];
+    [ObservableProperty] private ObservableCollection<PrescriptionTemplate>  _prescriptionTemplates = [];
 
     /// <summary>Distinct category strings from Routes — drives the Category dropdowns
     /// in Dosage and Medicine Categories edit dialogs.</summary>
@@ -38,6 +39,7 @@ public partial class OptionsViewModel : ObservableObject
         LoadMedicineNotes();
         LoadPrescriptionNotes();
         LoadLabTests();
+        LoadPrescriptionTemplates();
     }
 
     private void RefreshRouteCategories()
@@ -248,5 +250,42 @@ public partial class OptionsViewModel : ObservableObject
             return;
         }
         LabTests.Remove(item);
+    }
+
+    // ── Prescription Templates ────────────────────────────────────────────────
+
+    [RelayCommand]
+    public void LoadPrescriptionTemplates()
+    {
+        using var db = _factory.CreateDbContext();
+        PrescriptionTemplates = new ObservableCollection<PrescriptionTemplate>(
+            db.PrescriptionTemplates
+                .Include(t => t.Lines)
+                .Include(t => t.LabTests)
+                .OrderBy(t => t.Name)
+                .ToList());
+    }
+
+    [RelayCommand]
+    private void DeletePrescriptionTemplate(PrescriptionTemplate item)
+    {
+        if (!App.Auth.Can(Services.Permission.DeletePrescriptionTemplates)) { MessageBox.Show("You do not have permission to delete prescription templates.", "Access Denied", MessageBoxButton.OK, MessageBoxImage.Warning); return; }
+        if (MessageBox.Show($"Delete template '{item.Name}'?",
+                "Confirm Delete", MessageBoxButton.YesNo, MessageBoxImage.Warning)
+            != MessageBoxResult.Yes) return;
+
+        try
+        {
+            using var db = _factory.CreateDbContext();
+            db.Remove(new PrescriptionTemplate { Id = item.Id });
+            db.SaveChanges();
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show($"Could not delete template:\n{ex.Message}",
+                "Delete Failed", MessageBoxButton.OK, MessageBoxImage.Error);
+            return;
+        }
+        PrescriptionTemplates.Remove(item);
     }
 }

@@ -92,6 +92,27 @@
     <sys:String x:Key="PatEdit.Btn.Save">Save Visit</sys:String>
     <sys:String x:Key="PatEdit.Btn.SavePrint">Save &amp; Print</sys:String>
     <sys:String x:Key="PatEdit.Btn.Cancel">Cancel</sys:String>
+    <sys:String x:Key="PatEdit.Btn.ApplyTemplate">📋 Apply Template</sys:String>
+    <sys:String x:Key="PatEdit.Btn.ApplyTemplate.Tooltip">Pre-fill this visit's Rx, lab tests and footer note from a saved template</sys:String>
+
+    <!-- Prescription Templates -->
+    <sys:String x:Key="RxTemplate.Name">Template Name</sys:String>
+    <sys:String x:Key="RxTemplate.Description">Description</sys:String>
+    <sys:String x:Key="RxTemplate.DefaultDiagnosis">Default Diagnosis</sys:String>
+    <sys:String x:Key="RxTemplate.DefaultFindings">Default Clinical Findings</sys:String>
+    <sys:String x:Key="RxTemplate.PrefillHint">Diagnosis and Clinical Findings above are only filled in on the visit if those fields are still blank — they never overwrite text already entered.</sys:String>
+    <sys:String x:Key="RxTemplate.RxSection">Prescription</sys:String>
+    <sys:String x:Key="RxTemplate.Header.Add">Add Prescription Template</sys:String>
+    <sys:String x:Key="RxTemplate.Header.Edit">Edit Prescription Template</sys:String>
+    <sys:String x:Key="RxTemplate.BtnAdd">+ Add Template</sys:String>
+    <sys:String x:Key="RxTemplate.Col.Name">Name</sys:String>
+    <sys:String x:Key="RxTemplate.Col.Description">Description</sys:String>
+    <sys:String x:Key="RxTemplate.Col.Lines">Rx Lines</sys:String>
+    <sys:String x:Key="RxTemplate.Col.LabTests">Lab Tests</sys:String>
+    <sys:String x:Key="RxTemplate.Picker.Title">Select a Prescription Template</sys:String>
+    <sys:String x:Key="RxTemplate.Picker.SearchHint">Type to search by name or description</sys:String>
+    <sys:String x:Key="RxTemplate.Picker.NoResults">No templates found.</sys:String>
+    <sys:String x:Key="RxTemplate.Picker.Select">Apply</sys:String>
 
     <!-- Prescription -->
     <sys:String x:Key="Rx.Section.Add">Add Medicine</sys:String>
@@ -245,6 +266,7 @@
     <sys:String x:Key="Options.Tab.Categories">Medicine Categories</sys:String>
     <sys:String x:Key="Options.Tab.Notes">Medicine Notes</sys:String>
     <sys:String x:Key="Options.Tab.PrescriptionNotes">Prescription Notes</sys:String>
+    <sys:String x:Key="Options.Tab.RxTemplates">Prescription Templates</sys:String>
     <sys:String x:Key="Options.Dosage.Text">Dosage</sys:String>
     <sys:String x:Key="Options.Dosage.Type">Type</sys:String>
     <sys:String x:Key="Options.Dosage.Category">Category</sys:String>

@@ -69,6 +69,10 @@ public static class DbSeeder
                 Permission.EditMedicine,
                 Permission.DeleteMedicineCatalog,
                 Permission.ExportMedicineCatalog,
+                Permission.ViewPrescriptionTemplates,
+                Permission.AddPrescriptionTemplates,
+                Permission.EditPrescriptionTemplates,
+                Permission.DeletePrescriptionTemplates,
             ]);
 
         SeedSystemRole(db, "Receptionist",
@@ -189,11 +193,10 @@ public static class DbSeeder
             };
             role.SetPermissions(permissions);
             db.CustomRoles.Add(role);
+            db.SaveChanges();
         }
-        else
-        {
-            existing.SetPermissions(permissions);
-        }
-        db.SaveChanges();
+        // If the row already exists, leave its permissions untouched — an admin may have
+        // customized them via CustomRoleEditDialog, and re-seeding here would silently
+        // discard that customization on every app restart.
     }
 }

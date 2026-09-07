@@ -152,4 +152,35 @@ public partial class OptionsView : UserControl
                 ViewModel.LoadLabTestsCommand.Execute(null);
         }
     }
+
+    // ── Prescription Templates ────────────────────────────────────────────────
+
+    private void AddPrescriptionTemplate_Click(object sender, RoutedEventArgs e)
+    {
+        if (!App.Auth.Can(Permission.AddPrescriptionTemplates))
+        {
+            MessageBox.Show("You do not have permission to add prescription templates.",
+                "Access Denied", MessageBoxButton.OK, MessageBoxImage.Warning);
+            return;
+        }
+        var dlg = new PrescriptionTemplateEditDialog(App.DbFactory, null) { Owner = Owner };
+        if (dlg.ShowDialog() == true)
+            ViewModel.LoadPrescriptionTemplatesCommand.Execute(null);
+    }
+
+    private void EditPrescriptionTemplate_Click(object sender, RoutedEventArgs e)
+    {
+        if (!App.Auth.Can(Permission.EditPrescriptionTemplates))
+        {
+            MessageBox.Show("You do not have permission to edit prescription templates.",
+                "Access Denied", MessageBoxButton.OK, MessageBoxImage.Warning);
+            return;
+        }
+        if ((sender as FrameworkElement)?.Tag is PrescriptionTemplate item)
+        {
+            var dlg = new PrescriptionTemplateEditDialog(App.DbFactory, item) { Owner = Owner };
+            if (dlg.ShowDialog() == true)
+                ViewModel.LoadPrescriptionTemplatesCommand.Execute(null);
+        }
+    }
 }

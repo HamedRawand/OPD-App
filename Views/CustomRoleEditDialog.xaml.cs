@@ -74,6 +74,11 @@ public partial class CustomRoleEditDialog : Window
         [Permission.EditUser]                = ("Edit User",                "Update accounts, reset passwords and assign roles"),
         [Permission.DeleteUsers]             = ("Delete User",              "Permanently delete a user account"),
         [Permission.ExportUsers]             = ("Export Users",             "Download the user list as CSV / Excel"),
+        // Prescription Templates
+        [Permission.ViewPrescriptionTemplates]   = ("View Templates",   "Browse and apply saved prescription templates"),
+        [Permission.AddPrescriptionTemplates]    = ("Add Templates",    "Create new prescription templates"),
+        [Permission.EditPrescriptionTemplates]   = ("Edit Templates",   "Update existing prescription templates"),
+        [Permission.DeletePrescriptionTemplates] = ("Delete Templates", "Permanently delete a prescription template"),
     };
 
     public CustomRoleEditDialog(CustomRole? existing)
@@ -183,6 +188,17 @@ public partial class CustomRoleEditDialog : Window
                 Perm(Permission.EditUser,    "Edit",   existing),
                 Perm(Permission.DeleteUsers, "Delete", existing),
                 Perm(Permission.ExportUsers, "Export", existing),
+            ]
+        },
+        new PermissionSection
+        {
+            Name = "Prescription Templates",
+            Items =
+            [
+                Perm(Permission.ViewPrescriptionTemplates,   "View",   existing),
+                Perm(Permission.AddPrescriptionTemplates,    "Add",    existing),
+                Perm(Permission.EditPrescriptionTemplates,   "Edit",   existing),
+                Perm(Permission.DeletePrescriptionTemplates, "Delete", existing),
             ]
         },
         new PermissionSection

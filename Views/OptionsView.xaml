@@ -375,6 +375,63 @@
                 </Grid>
             </TabItem>
 
+            <!-- ══════════════════════════════════
+                 TAB 7 — PRESCRIPTION TEMPLATES
+                 ══════════════════════════════════ -->
+            <TabItem Header="{DynamicResource Options.Tab.RxTemplates}">
+                <Grid Margin="0,12,0,0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- Toolbar -->
+                    <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,8">
+                        <Button Content="{DynamicResource RxTemplate.BtnAdd}"
+                                Style="{StaticResource SecondaryButton}"
+                                Click="AddPrescriptionTemplate_Click"
+                                Padding="12,6"/>
+                    </StackPanel>
+
+                    <DataGrid Grid.Row="1"
+                              ItemsSource="{Binding PrescriptionTemplates}"
+                              Style="{StaticResource AppDataGrid}"
+                              AutoGenerateColumns="False"
+                              CanUserAddRows="False" CanUserDeleteRows="False">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="{DynamicResource RxTemplate.Col.Name}"
+                                               Binding="{Binding Name}" Width="180"/>
+                            <DataGridTextColumn Header="{DynamicResource RxTemplate.Col.Description}"
+                                               Binding="{Binding Description}" Width="*"/>
+                            <DataGridTextColumn Header="{DynamicResource RxTemplate.Col.Lines}"
+                                               Binding="{Binding Lines.Count}" Width="70"/>
+                            <DataGridTextColumn Header="{DynamicResource RxTemplate.Col.LabTests}"
+                                               Binding="{Binding LabTests.Count}" Width="90"/>
+                            <!-- Edit + Delete -->
+                            <DataGridTemplateColumn Width="180" CanUserResize="False" IsReadOnly="True">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <StackPanel Orientation="Horizontal">
+                                            <Button Content="{DynamicResource Common.Edit}"
+                                                    Style="{StaticResource ActionButton}"
+                                                    Tag="{Binding}"
+                                                    Click="EditPrescriptionTemplate_Click"
+                                                    Margin="0,0,6,0"/>
+                                            <Button Content="{DynamicResource Common.Delete}"
+                                                    Style="{StaticResource ActionButton}"
+                                                    Foreground="{StaticResource DangerBrush}"
+                                                    Command="{Binding DataContext.DeletePrescriptionTemplateCommand,
+                                                              RelativeSource={RelativeSource AncestorType=DataGrid}}"
+                                                    CommandParameter="{Binding}"/>
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </Grid>
+            </TabItem>
+
         </TabControl>
     </Grid>
 </UserControl>

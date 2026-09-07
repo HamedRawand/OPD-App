@@ -59,12 +59,14 @@ public partial class MainWindow : Window
                 Permission.ExportMedicineCatalog, Permission.ManageMedicineCatalog))
             NavMedicinesBtn.Visibility = Visibility.Visible;
 
-        // Options nav: catalog or user permissions
+        // Options nav: catalog, user, or prescription template permissions
         if (App.Auth.CanAny(Permission.ViewMedicineCatalog, Permission.AddMedicine,
                 Permission.EditMedicine, Permission.DeleteMedicineCatalog,
                 Permission.ExportMedicineCatalog, Permission.ManageMedicineCatalog,
                 Permission.ViewUsers, Permission.AddUser, Permission.EditUser,
-                Permission.DeleteUsers, Permission.ExportUsers, Permission.ManageUsers))
+                Permission.DeleteUsers, Permission.ExportUsers, Permission.ManageUsers,
+                Permission.ViewPrescriptionTemplates, Permission.AddPrescriptionTemplates,
+                Permission.EditPrescriptionTemplates, Permission.DeletePrescriptionTemplates))
             NavOptionsBtn.Visibility = Visibility.Visible;
 
         // ADMINISTRATION section: Users, Custom Roles, Import, Backup, Print Settings

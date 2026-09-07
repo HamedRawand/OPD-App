@@ -58,6 +58,24 @@ public partial class PatientEditWindow : Window
         Close();
     }
 
+    private void ApplyTemplate_Click(object sender, RoutedEventArgs e)
+    {
+        var rx = _vm.Prescription;
+        if (rx.Lines.Count > 0 || rx.SelectedLabTests.Count > 0 || rx.SelectedPrescriptionNote is not null)
+        {
+            MessageBox.Show(
+                "Applying a template is only available when the prescription is empty. " +
+                "Clear the existing lines, lab tests and footer note first, or start a new visit.",
+                "Prescription Not Empty", MessageBoxButton.OK, MessageBoxImage.Information);
+            return;
+        }
+
+        var picker = new PrescriptionTemplatePickerDialog(App.DbFactory) { Owner = this };
+        if (picker.ShowDialog() != true || picker.SelectedTemplate is null) return;
+
+        _vm.ApplyTemplate(picker.SelectedTemplate);
+    }
+
     private void SaveAndPrint_Click(object sender, RoutedEventArgs e)
     {
         _printAfterSave = true;

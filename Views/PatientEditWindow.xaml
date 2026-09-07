@@ -262,6 +262,13 @@
                         Style="{StaticResource PrimaryButton}"
                         ToolTip="Save visit  (Ctrl+S)"
                         Command="{Binding SaveCommand}" MinWidth="140"/>
+                <Button DockPanel.Dock="Left"
+                        Content="{DynamicResource PatEdit.Btn.ApplyTemplate}"
+                        Style="{StaticResource SecondaryButton}"
+                        ToolTip="{DynamicResource PatEdit.Btn.ApplyTemplate.Tooltip}"
+                        Click="ApplyTemplate_Click"
+                        Visibility="{Binding CanWritePrescription, Converter={StaticResource BoolToVisible}}"
+                        Padding="14,8"/>
                 <Button DockPanel.Dock="Right"
                         Style="{StaticResource SecondaryButton}"
                         ToolTip="Save and open prescription PDF  (Ctrl+P)"

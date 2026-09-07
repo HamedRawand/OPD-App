@@ -11,15 +11,16 @@ public static class ReleaseNotes
 
     public static readonly Entry[] Recent =
     [
+        new("2.1.9", "2026-09-08",
+        [
+            "New: Prescription Templates — save a common case's medicines, lab tests, and notes as a reusable preset, then apply it to a new visit in one click",
+            "Forgot Password email now works out of the box on a fresh install — no manual Email Settings step required",
+        ]),
         new("2.1.8", "2026-06-19",
         [
             "Dashboard: Create Backup quick action is now restricted to admin roles",
             "Options > Dosage: Type column now supports multiple selections (checklist popup)",
             "Prescription: Dosage dropdown now filters by the selected medicine form type",
-        ]),
-        new("2.1.7", "2026-06-19",
-        [
-            "Print button icons now display correctly on Windows 7",
         ]),
     ];
 

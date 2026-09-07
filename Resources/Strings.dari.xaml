@@ -92,6 +92,27 @@
     <sys:String x:Key="PatEdit.Btn.Save">ذخیره</sys:String>
     <sys:String x:Key="PatEdit.Btn.SavePrint">ذخیره و چاپ</sys:String>
     <sys:String x:Key="PatEdit.Btn.Cancel">لغو</sys:String>
+    <sys:String x:Key="PatEdit.Btn.ApplyTemplate">📋 اعمال طرح آماده</sys:String>
+    <sys:String x:Key="PatEdit.Btn.ApplyTemplate.Tooltip">نسخه، آزمایشات و یادداشت این مراجعه را از یک طرح آماده پُر کنید</sys:String>
+
+    <!-- Prescription Templates -->
+    <sys:String x:Key="RxTemplate.Name">نام طرح</sys:String>
+    <sys:String x:Key="RxTemplate.Description">توضیحات</sys:String>
+    <sys:String x:Key="RxTemplate.DefaultDiagnosis">تشخیص پیش‌فرض</sys:String>
+    <sys:String x:Key="RxTemplate.DefaultFindings">یافته‌های بالینی پیش‌فرض</sys:String>
+    <sys:String x:Key="RxTemplate.PrefillHint">تشخیص و یافته‌های بالینی بالا فقط در صورتی در مراجعه پُر می‌شوند که آن قسمت‌ها هنوز خالی باشند — متن قبلاً نوشته شده هرگز بازنویسی نمی‌شود.</sys:String>
+    <sys:String x:Key="RxTemplate.RxSection">نسخه</sys:String>
+    <sys:String x:Key="RxTemplate.Header.Add">اضافه کردن طرح آماده نسخه</sys:String>
+    <sys:String x:Key="RxTemplate.Header.Edit">ویرایش طرح آماده نسخه</sys:String>
+    <sys:String x:Key="RxTemplate.BtnAdd">+ اضافه کردن طرح</sys:String>
+    <sys:String x:Key="RxTemplate.Col.Name">نام</sys:String>
+    <sys:String x:Key="RxTemplate.Col.Description">توضیحات</sys:String>
+    <sys:String x:Key="RxTemplate.Col.Lines">تعداد دوا</sys:String>
+    <sys:String x:Key="RxTemplate.Col.LabTests">آزمایشات</sys:String>
+    <sys:String x:Key="RxTemplate.Picker.Title">انتخاب طرح آماده نسخه</sys:String>
+    <sys:String x:Key="RxTemplate.Picker.SearchHint">برای جستجو نام یا توضیحات را تایپ کنید</sys:String>
+    <sys:String x:Key="RxTemplate.Picker.NoResults">هیچ طرحی یافت نشد.</sys:String>
+    <sys:String x:Key="RxTemplate.Picker.Select">اعمال کردن</sys:String>
 
     <!-- Prescription -->
     <sys:String x:Key="Rx.Section.Add">اضافه کردن دوا</sys:String>
@@ -229,6 +250,7 @@
     <sys:String x:Key="Options.Tab.Categories">شکل ادویه</sys:String>
     <sys:String x:Key="Options.Tab.Notes">یادداشت ادویه</sys:String>
     <sys:String x:Key="Options.Tab.PrescriptionNotes">یادداشت نسخه</sys:String>
+    <sys:String x:Key="Options.Tab.RxTemplates">طرح‌های آماده نسخه</sys:String>
     <sys:String x:Key="Options.Dosage.Text">دوز</sys:String>
     <sys:String x:Key="Options.Dosage.Type">نوع</sys:String>
     <sys:String x:Key="Options.Dosage.Category">دسته‌بندی</sys:String>

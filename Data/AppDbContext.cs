@@ -21,6 +21,9 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     public DbSet<PrescriptionNote>       PrescriptionNotes => Set<PrescriptionNote>();
     public DbSet<PatientLabTest>         PatientLabTests   => Set<PatientLabTest>();
     public DbSet<AuditLog>               AuditLogs         => Set<AuditLog>();
+    public DbSet<PrescriptionTemplate>        PrescriptionTemplates        => Set<PrescriptionTemplate>();
+    public DbSet<PrescriptionTemplateLine>    PrescriptionTemplateLines    => Set<PrescriptionTemplateLine>();
+    public DbSet<PrescriptionTemplateLabTest> PrescriptionTemplateLabTests => Set<PrescriptionTemplateLabTest>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -81,6 +84,25 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             .OnDelete(DeleteBehavior.Cascade);
 
         modelBuilder.Entity<PatientLabTest>()
+            .HasOne(pl => pl.LabTest)
+            .WithMany()
+            .HasForeignKey(pl => pl.LabTestId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        // ── PrescriptionTemplate ──────────────────────────────────────────────
+        modelBuilder.Entity<PrescriptionTemplateLine>()
+            .HasOne(l => l.Template)
+            .WithMany(t => t.Lines)
+            .HasForeignKey(l => l.PrescriptionTemplateId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<PrescriptionTemplateLabTest>()
+            .HasOne(pl => pl.Template)
+            .WithMany(t => t.LabTests)
+            .HasForeignKey(pl => pl.PrescriptionTemplateId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<PrescriptionTemplateLabTest>()
             .HasOne(pl => pl.LabTest)
             .WithMany()
             .HasForeignKey(pl => pl.LabTestId)

@@ -226,6 +226,12 @@ public enum Permission
     DeleteUsers,
     ExportUsers,
 
+    // ── PRESCRIPTION TEMPLATES ────────────────────────────────────────────────
+    ViewPrescriptionTemplates,
+    AddPrescriptionTemplates,
+    EditPrescriptionTemplates,
+    DeletePrescriptionTemplates,
+
     // ── LEGACY (backward-compat only — hidden in the dialog) ─────────────────
     WritePrescription,          // replaced by AddPrescription + EditPrescription
     ManagePhysicians,
@@ -274,6 +280,11 @@ public static class RolePermissions
             Permission.EditUser,
             Permission.DeleteUsers,
             Permission.ExportUsers,
+            // Prescription Templates
+            Permission.ViewPrescriptionTemplates,
+            Permission.AddPrescriptionTemplates,
+            Permission.EditPrescriptionTemplates,
+            Permission.DeletePrescriptionTemplates,
         ],
         // Co-Admin: identical permissions to Admin; the 4 UI-level restrictions are enforced
         // via App.Auth.IsFullAdmin checks in ViewModels / code-behind, not via permissions.
@@ -289,6 +300,8 @@ public static class RolePermissions
             Permission.DeleteMedicineCatalog, Permission.ExportMedicineCatalog,
             Permission.ViewUsers, Permission.AddUser, Permission.EditUser,
             Permission.DeleteUsers, Permission.ExportUsers,
+            Permission.ViewPrescriptionTemplates, Permission.AddPrescriptionTemplates,
+            Permission.EditPrescriptionTemplates, Permission.DeletePrescriptionTemplates,
         ],
         // Doctor & Receptionist are now served by seeded system custom roles in DB.
         // These static fallback maps are used only if the system role row is not found.
@@ -312,6 +325,10 @@ public static class RolePermissions
             Permission.EditMedicine,
             Permission.DeleteMedicineCatalog,
             Permission.ExportMedicineCatalog,
+            Permission.ViewPrescriptionTemplates,
+            Permission.AddPrescriptionTemplates,
+            Permission.EditPrescriptionTemplates,
+            Permission.DeletePrescriptionTemplates,
         ],
         [UserRole.Receptionist] = [
             Permission.ViewPatients,

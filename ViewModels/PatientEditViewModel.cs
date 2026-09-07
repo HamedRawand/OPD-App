@@ -149,6 +149,46 @@ public partial class PatientEditViewModel : ObservableObject
                     .FirstOrDefault(n => n.Notes == sourceVisit.FooterNote);
     }
 
+    /// <summary>
+    /// Applies a saved <see cref="PrescriptionTemplate"/> to this (new, empty) visit.
+    /// Diagnosis/Clinical Findings are only filled in when currently blank — never
+    /// overwrites text the doctor already typed. Caller is responsible for confirming
+    /// the prescription is empty before calling this (see PatientEditWindow).
+    /// </summary>
+    public void ApplyTemplate(PrescriptionTemplate template)
+    {
+        if (string.IsNullOrWhiteSpace(Diagnosis) && !string.IsNullOrEmpty(template.DefaultDiagnosis))
+            Diagnosis = template.DefaultDiagnosis;
+
+        if (string.IsNullOrWhiteSpace(ClinicalFindings) && !string.IsNullOrEmpty(template.DefaultClinicalFindings))
+            ClinicalFindings = template.DefaultClinicalFindings;
+
+        Prescription.Lines.Clear();
+        foreach (var line in template.Lines.OrderBy(l => l.SortOrder))
+        {
+            Prescription.Lines.Add(new MedicineUsage
+            {
+                LineNumber   = Prescription.Lines.Count + 1,
+                Prescription = line.Prescription,
+                Type         = line.Type,
+                Strength     = line.Strength,
+                Qty          = line.Qty,
+                Usage        = line.Usage,
+                Note         = line.Note,
+            });
+        }
+
+        var templateLabTestIds = template.LabTests.Select(lt => lt.LabTestId).ToHashSet();
+        foreach (var group in Prescription.LabTestGroups)
+            foreach (var test in group.Tests)
+                if (templateLabTestIds.Contains(test.Test.Id))
+                    test.IsSelected = true;
+
+        if (!string.IsNullOrEmpty(template.FooterNote))
+            Prescription.SelectedPrescriptionNote =
+                Prescription.PrescriptionNotes.FirstOrDefault(n => n.Notes == template.FooterNote);
+    }
+
     private void LoadFromPatient(Patient p)
     {
         PatientCode = p.PatientCode ?? "";
